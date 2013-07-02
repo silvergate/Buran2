@@ -47,4 +47,11 @@ public class ONid implements INid, IIncNid {
     public int hashCode() {
         return recordId.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "ONid{" +
+                "recordId=" + recordId +
+                '}';
+    }
 }

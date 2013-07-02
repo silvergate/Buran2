@@ -15,9 +15,20 @@ public class GetLabel implements ILabelGet<GetLabelResult> {
     private final LabelIndex toIndex;
 
     public GetLabel(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
+        if (fromIndex.getIndex() > toIndex.getIndex()) {
+            throw new IllegalArgumentException("fromIndex.getIndex()>toIndex.getIndex()");
+        }
         this.labelName = labelName;
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
+    }
+
+    public static GetLabel c(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
+        return new GetLabel(labelName, fromIndex, toIndex);
+    }
+
+    public static GetLabel c(ILabelName labelName, LabelIndex index) {
+        return new GetLabel(labelName, index, index);
     }
 
     public ILabelName getLabelName() {

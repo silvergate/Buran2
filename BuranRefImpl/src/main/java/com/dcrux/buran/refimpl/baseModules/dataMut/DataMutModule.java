@@ -3,7 +3,7 @@ package com.dcrux.buran.refimpl.baseModules.dataMut;
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.IncNodeNotFound;
 import com.dcrux.buran.common.UserId;
-import com.dcrux.buran.common.fields.IDataSetter;
+import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.labels.ILabelSet;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -21,7 +21,7 @@ public class DataMutModule extends Module<BaseModule> {
     }
 
     public void setData(final UserId sender, final IIncNid incNid,
-            final Optional<IDataSetter> dataSetter, final Optional<ILabelSet> labelSetter)
+            final Optional<IFieldSetter> dataSetter, final Optional<ILabelSet> labelSetter)
             throws IncNodeNotFound {
         final Optional<IncubationNode> iNode =
                 getBase().getIncubationModule().getIncNode(sender, incNid);
@@ -34,7 +34,7 @@ public class DataMutModule extends Module<BaseModule> {
                 /* Set data */
         if (dataSetter.isPresent()) {
             //for (final FieldIndex fieldIndex : batchSet.getSetterMap().keySet()) {
-            //final IDataSetter value = batchSet.getSetterMap().get(fieldIndex);
+            //final IFieldSetter value = batchSet.getSetterMap().get(fieldIndex);
             getBase().getFieldsModule().performSetter(sender, node, dataSetter.get());
             //}
             node.getDocument().save();

@@ -5,7 +5,7 @@ import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.NodeNotFoundException;
 import com.dcrux.buran.common.Version;
-import com.dcrux.buran.common.fields.IDataGetter;
+import com.dcrux.buran.common.fields.IFieldGetter;
 import com.dcrux.buran.common.labels.ILabelGet;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
@@ -70,7 +70,7 @@ public class DataFetchModule extends Module<BaseModule> {
         return getBase().getLabelModule().performLabelGet(node, labelGet);
     }
 
-    public FetchResult getData(final NidVer nidVer, final Optional<IDataGetter> fieldGetter,
+    public FetchResult getData(final NidVer nidVer, final Optional<IFieldGetter> fieldGetter,
             final Optional<ILabelGet> labelGetter) throws NodeNotFoundException {
         final Optional<LiveNode> nodeOpt = getNode(nidVer);
         if (!nodeOpt.isPresent()) {

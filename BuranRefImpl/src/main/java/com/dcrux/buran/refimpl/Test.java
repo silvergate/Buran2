@@ -19,8 +19,14 @@ import com.dcrux.buran.common.classes.ClassHashId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.getter.GetStr;
 import com.dcrux.buran.common.fields.getter.SingleGet;
-import com.dcrux.buran.common.fields.setter.DataSetter;
+import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.setter.SetStr;
+import com.dcrux.buran.common.labels.ClassLabelName;
+import com.dcrux.buran.common.labels.LabelIndex;
+import com.dcrux.buran.common.labels.getter.GetLabel;
+import com.dcrux.buran.common.labels.getter.GetLabelResult;
+import com.dcrux.buran.common.labels.setter.SetLabel;
+import com.dcrux.buran.common.labels.targets.LabelTargetInc;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandRunner.BuranCommandRunner;
 import com.google.common.base.Optional;
@@ -48,48 +54,6 @@ public class Test {
         final UserId thisAccount = new UserId(0);
         final UserId sender = new UserId(332);
 
-        /*BaseModule ri = new BaseModule(thisAccount, sender);
-
-        final ITransRet<IIncNid> t1 = ri.getIncubationModule().createInc(sender, new ClassId(212));
-        IIncNid inid = ri.getDbUtils().run(t1);
-
-        final ITransRet<IIncNid> createNode2 =
-                ri.getIncubationModule().createInc(sender, new ClassId(212));
-        IIncNid node2 = ri.getDbUtils().run(createNode2);
-
-        SetLabel sl = new SetLabel(ClassLabelName.c(3));
-        sl.add(LabelIndex.c(0), LabelTargetInc.unversioned(node2));
-        sl.add(LabelIndex.c(32323), LabelTargetInc.unversioned(node2));
-
-        final ITransaction t2 = ri.getDataMutModule()
-                .setData(sender, inid, DataSetter.c(FieldIndex.c(0), SetStr.c("Hallo Welt")),
-                        Collections.<ILabelSet>singleton(sl));
-        ri.getDbUtils().run(t2);
-
-        final ITransRet<Map<IIncNid, NidVer>> t3 =
-                ri.getCommitModule().commitOld(sender, Arrays.asList(inid, node2));
-        final Map<IIncNid, NidVer> nidVerR = ri.getDbUtils().run(t3);
-        System.out.println(nidVerR);
-        final NidVer nidVer = nidVerR.get(inid);
-
-
-        final ITransRet<BatchGetResult> t4 =
-                ri.getDataFetchModule().getData(nidVer, BatchGet.c(FieldIndex.c(0),
-                GetStr.SINGLETON));
-        final BatchGetResult data = ri.getDbUtils().run(t4);
-
-        System.out.println("Data = " + data.getValues());
-
-        GetLabel gl = new GetLabel(ClassLabelName.c(3), LabelIndex.c(Long.MIN_VALUE),
-                LabelIndex.c(Long.MAX_VALUE));
-        GetLabelResult labels = ri.getDbUtils().run(ri.getDataFetchModule().performLabelGet
-        (nidVer, gl));
-        System.out.println("Labels at node 1: " + labels);
-
-
-        ri.close();*/
-
-
         BuranCommandRunner bcr = new BuranCommandRunner(false);
         try {
             ClassDefinition classDef = new ClassDefinition("Hallo Welt",
@@ -97,12 +61,19 @@ public class Test {
             ClassId classId = bcr.synchronous(thisAccount, sender, new ComDeclareClass(classDef));
 
             final IIncNid incNid1 = bcr.synchronous(thisAccount, sender, ComCreateNew.c(classId));
+            final IIncNid incNid2 = bcr.synchronous(thisAccount, sender, ComCreateNew.c(classId));
+            final IIncNid incNid3 = bcr.synchronous(thisAccount, sender, ComCreateNew.c(classId));
+
+            final SetLabel setLabel1 = SetLabel.c(ClassLabelName.c(0))
+                    .add(LabelIndex.c(0l), LabelTargetInc.unversioned(incNid3))
+                    .add(LabelIndex.c(1), LabelTargetInc.versioned(incNid2));
 
             bcr.synchronous(thisAccount, sender,
-                    ComMutate.field(incNid1, DataSetter.c(0, SetStr.c("Hallo Welt"))));
+                    ComMutate.field(incNid1, FieldSetter.c(0, SetStr.c("Hallo Welt")))
+                            .label(setLabel1));
 
             final ICommitResult comResult =
-                    bcr.synchronous(thisAccount, sender, ComCommit.c(incNid1));
+                    bcr.synchronous(thisAccount, sender, ComCommit.c(incNid1, incNid2, incNid3));
 
             final NidVer comNode = comResult.getNid(incNid1);
 
@@ -120,6 +91,12 @@ public class Test {
                     bcr.synchronous(thisAccount, sender, ComClassIdByHash.c(classHashId));
 
             System.out.println("ClassID from Hash = " + classIdRead);
+
+            /* Read label targets from node 1*/
+            GetLabel labelGet = GetLabel.c(ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX);
+            final FetchResult<VoidType, GetLabelResult> result =
+                    bcr.synchronous(thisAccount, sender, ComFetch.label(comNode, labelGet));
+            System.out.println("Labels Node1 out (name 0): " + result.getLabelResult().get());
 
 
         } catch (UncheckedException uce) {

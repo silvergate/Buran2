@@ -3,7 +3,7 @@ package com.dcrux.buran.commands.dataFetch;
 import com.dcrux.buran.commandBase.VoidType;
 import com.dcrux.buran.commands.Command;
 import com.dcrux.buran.common.NidVer;
-import com.dcrux.buran.common.fields.IDataGetter;
+import com.dcrux.buran.common.fields.IFieldGetter;
 import com.dcrux.buran.common.labels.ILabelGet;
 import com.google.common.base.Optional;
 
@@ -21,10 +21,10 @@ public class ComFetch<TFieldResult extends Serializable, TLabelResult extends Se
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
     private final NidVer nidVer;
-    private Optional<IDataGetter<TFieldResult>> fieldGetter;
+    private Optional<IFieldGetter<TFieldResult>> fieldGetter;
     private Optional<ILabelGet<TLabelResult>> labelGetter;
 
-    public ComFetch(NidVer nidVer, Optional<IDataGetter<TFieldResult>> fieldGetter,
+    public ComFetch(NidVer nidVer, Optional<IFieldGetter<TFieldResult>> fieldGetter,
             Optional<ILabelGet<TLabelResult>> labelGetter) {
         super(EXCEPTIONS);
         this.nidVer = nidVer;
@@ -34,8 +34,8 @@ public class ComFetch<TFieldResult extends Serializable, TLabelResult extends Se
 
     public static <TFieldResultLocal extends Serializable> ComFetch<TFieldResultLocal,
             VoidType> field(
-            NidVer nidVer, IDataGetter<TFieldResultLocal> fieldGetter) {
-        return new ComFetch(nidVer, Optional.<IDataGetter<TFieldResultLocal>>of(fieldGetter),
+            NidVer nidVer, IFieldGetter<TFieldResultLocal> fieldGetter) {
+        return new ComFetch(nidVer, Optional.<IFieldGetter<TFieldResultLocal>>of(fieldGetter),
                 Optional.<ILabelGet<VoidType>>absent());
     }
 
@@ -47,9 +47,9 @@ public class ComFetch<TFieldResult extends Serializable, TLabelResult extends Se
     }
 
     public <TFieldResultLocal extends Serializable> ComFetch<TFieldResultLocal, TLabelResult> field(
-            IDataGetter<TFieldResultLocal> fieldGetter) {
+            IFieldGetter<TFieldResultLocal> fieldGetter) {
         return new ComFetch<TFieldResultLocal, TLabelResult>(getNidVer(),
-                (Optional<IDataGetter<TFieldResultLocal>>) fieldGetter, this.labelGetter);
+                (Optional<IFieldGetter<TFieldResultLocal>>) fieldGetter, this.labelGetter);
     }
 
     public <TLabelResultLocal extends Serializable> ComFetch<TFieldResult, TLabelResultLocal> label(
@@ -62,7 +62,7 @@ public class ComFetch<TFieldResult extends Serializable, TLabelResult extends Se
         return nidVer;
     }
 
-    public Optional<IDataGetter<TFieldResult>> getFieldGetter() {
+    public Optional<IFieldGetter<TFieldResult>> getFieldGetter() {
         return fieldGetter;
     }
 

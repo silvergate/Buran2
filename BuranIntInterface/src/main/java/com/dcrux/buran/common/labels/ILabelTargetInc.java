@@ -8,4 +8,5 @@ import java.io.Serializable;
  * @author: ${USER} Date: 01.07.13 Time: 01:52
  */
 public interface ILabelTargetInc extends Serializable {
+    boolean isTargetIncubation();
 }

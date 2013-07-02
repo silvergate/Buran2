@@ -3,7 +3,7 @@ package com.dcrux.buran.commands.dataMut;
 import com.dcrux.buran.commandBase.VoidType;
 import com.dcrux.buran.commands.Command;
 import com.dcrux.buran.common.IIncNid;
-import com.dcrux.buran.common.fields.IDataSetter;
+import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.labels.ILabelSet;
 import com.google.common.base.Optional;
 
@@ -19,10 +19,10 @@ public class ComMutate extends Command<VoidType> {
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
     private final IIncNid incNid;
-    private Optional<IDataSetter> dataSetter;
+    private Optional<IFieldSetter> dataSetter;
     private Optional<ILabelSet> labelSetter;
 
-    private ComMutate(IIncNid incNid, Optional<IDataSetter> dataSetter,
+    private ComMutate(IIncNid incNid, Optional<IFieldSetter> dataSetter,
             Optional<ILabelSet> labelSetter) {
         super(EXCEPTIONS);
         this.incNid = incNid;
@@ -30,15 +30,15 @@ public class ComMutate extends Command<VoidType> {
         this.labelSetter = labelSetter;
     }
 
-    public static ComMutate field(IIncNid incNid, IDataSetter dataSetter) {
+    public static ComMutate field(IIncNid incNid, IFieldSetter dataSetter) {
         return new ComMutate(incNid, Optional.of(dataSetter), Optional.<ILabelSet>absent());
     }
 
     public static ComMutate label(IIncNid incNid, ILabelSet labelSetter) {
-        return new ComMutate(incNid, Optional.<IDataSetter>absent(), Optional.of(labelSetter));
+        return new ComMutate(incNid, Optional.<IFieldSetter>absent(), Optional.of(labelSetter));
     }
 
-    public ComMutate field(IDataSetter dataSetter) {
+    public ComMutate field(IFieldSetter dataSetter) {
         this.dataSetter = Optional.of(dataSetter);
         return this;
     }
@@ -52,7 +52,7 @@ public class ComMutate extends Command<VoidType> {
         return incNid;
     }
 
-    public Optional<IDataSetter> getDataSetter() {
+    public Optional<IFieldSetter> getDataSetter() {
         return dataSetter;
     }
 

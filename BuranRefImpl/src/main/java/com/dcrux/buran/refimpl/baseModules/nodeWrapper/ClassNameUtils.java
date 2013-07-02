@@ -2,7 +2,6 @@ package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.refimpl.baseModules.fields.DocFields;
-import com.dcrux.buran.refimpl.dao.Mode;
 
 /**
  * Buran.
@@ -11,30 +10,12 @@ import com.dcrux.buran.refimpl.dao.Mode;
  */
 public class ClassNameUtils {
     public static String generateNodeClasName(ClassId classId) {
-        Mode mode = Mode.live;
-        switch (mode) {
-            case incubation:
-                return DocFields.INC_NODE_CLASS_PREFIX + classId.getId();
-            case live:
-                return DocFields.NODE_CLASS_PREFIX + classId.getId();
-            default:
-                throw new IllegalArgumentException();
-        }
+        return DocFields.NODE_CLASS_PREFIX + classId.getId();
     }
 
     public static ClassId getNodeClassId(String oClassName) {
-        Mode mode = Mode.live;
         final String numberStr;
-        switch (mode) {
-            case incubation:
-                numberStr = oClassName.substring(DocFields.INC_NODE_CLASS_PREFIX.length());
-                break;
-            case live:
-                numberStr = oClassName.substring(DocFields.NODE_CLASS_PREFIX.length());
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
+        numberStr = oClassName.substring(DocFields.NODE_CLASS_PREFIX.length());
         return new ClassId(Long.parseLong(numberStr, 10));
     }
 }

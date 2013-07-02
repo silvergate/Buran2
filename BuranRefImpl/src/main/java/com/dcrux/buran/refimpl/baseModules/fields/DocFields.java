@@ -12,7 +12,6 @@ import com.dcrux.buran.common.fields.FieldIndex;
 public class DocFields {
     /* Class prefixes */
     public static final String NODE_CLASS_PREFIX = "node";
-    public static final String INC_NODE_CLASS_PREFIX = "in";
 
     /* Incubation Node */
     public static final String INC_FIELD_ADD_TIME = "added";

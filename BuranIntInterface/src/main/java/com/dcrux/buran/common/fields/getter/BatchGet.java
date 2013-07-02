@@ -1,7 +1,7 @@
 package com.dcrux.buran.common.fields.getter;
 
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.IDataGetter;
+import com.dcrux.buran.common.fields.IFieldGetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author: ${USER} Date: 01.07.13 Time: 00:47
  */
-public class BatchGet implements IDataGetter<BatchGetResult> {
+public class BatchGet implements IFieldGetter<BatchGetResult> {
 
     public static BatchGet c(int index, IUnfieldedDataGetter<?> getter) {
         return c(FieldIndex.c(index), getter);

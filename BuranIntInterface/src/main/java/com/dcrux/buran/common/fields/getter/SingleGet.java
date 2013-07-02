@@ -1,7 +1,7 @@
 package com.dcrux.buran.common.fields.getter;
 
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.IDataGetter;
+import com.dcrux.buran.common.fields.IFieldGetter;
 
 import java.io.Serializable;
 
@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 02.07.13 Time: 18:12
  */
-public class SingleGet<TRetval extends Serializable> implements IDataGetter<TRetval> {
+public class SingleGet<TRetval extends Serializable> implements IFieldGetter<TRetval> {
     private final FieldIndex fieldIndex;
     private final IUnfieldedDataGetter<TRetval> fieldGetter;
 

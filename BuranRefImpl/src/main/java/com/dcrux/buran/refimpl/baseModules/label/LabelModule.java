@@ -1,18 +1,15 @@
 package com.dcrux.buran.refimpl.baseModules.label;
 
-import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.labels.*;
 import com.dcrux.buran.common.labels.getter.GetLabel;
 import com.dcrux.buran.common.labels.getter.GetLabelResult;
 import com.dcrux.buran.common.labels.setter.SetLabel;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitInfo;
-import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
@@ -57,20 +54,8 @@ public class LabelModule extends Module<BaseModule> {
                     clazz.createIndex(INDEX_NODES_BY_LABEL, OClass.INDEX_TYPE.NOTUNIQUE,
                             RelationWrapper.FIELD_SRC, RelationWrapper.FIELD_LABEL_NAME,
                             RelationWrapper.FIELD_LABEL_INDEX);
-            //final OCompositeIndexDefinition def = (OCompositeIndexDefinition)index.getDefinition
-            //  ();
-
             schema.save();
         }
-    }
-
-    private LabelTargetInt getTargetInc(ILabelTargetInc targetInc) {
-        if (targetInc instanceof LabelTargetInc) {
-            final LabelTargetInc labelTargetInc = (LabelTargetInc) targetInc;
-            return new LabelTargetInt(true,
-                    IfaceUtils.getOincNid(labelTargetInc.getTargetNid()).getRecordId());
-        }
-        throw new IllegalArgumentException("Unkown targetType");
     }
 
     public <T extends Object> T performLabelGet(final LiveNode node, ILabelGet<T> labelGet) {
@@ -102,9 +87,8 @@ public class LabelModule extends Module<BaseModule> {
         for (OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
             final RelationWrapper relationWrapper = new RelationWrapper(doc);
-            results.put(relationWrapper.getLabelIndex(),
-                    new com.dcrux.buran.common.labels.LabelTarget(null,
-                            Optional.<Version>absent()));
+            final ILabelTarget labelTarget = RelWrapToLabelTarget.convert(relationWrapper);
+            results.put(relationWrapper.getLabelIndex(), labelTarget);
         }
         return new GetLabelResult(results);
     }
@@ -117,21 +101,22 @@ public class LabelModule extends Module<BaseModule> {
                 final ClassLabelName classLabelName = (ClassLabelName) labelName;
                 for (final Map.Entry<LabelIndex, ILabelTargetInc> target : setLabel.getTargets()
                         .entrySet()) {
-                    final LabelTargetInt labelTargetInt = getTargetInc(target.getValue());
+                    final ILabelTargetInc labelTargetInc = target.getValue();
                     final LabelIndex index = target.getKey();
-                    RelationWrapper relationWrapper = RelationWrapper
-                            .createInc(incubationNode.getNid(), true,
-                                    new ONid(labelTargetInt.getTarget()),
-                                    labelTargetInt.isIncubation(), classLabelName, index);
-                    //TODO: Überprüfen, ob target verfügbar ist (zwar: Eher erst beim
+                    final RelationWrapper relationWrapper = RelationWrapper
+                            .from(incubationNode.getNid(), classLabelName, index, labelTargetInc);
+
+                    //TODO: Überprüfen, ob targets verfügbar ist (zwar: Eher erst beim
                     // commitOld).
+                    //TODO: Ausserdem schauen, dass nicht auf eigner account verweist wird (bei
+                    // Externem target).
                     relationWrapper.getDocument().save();
 
                     System.out.println("Successfully added a new Relation");
                 }
-            } else {
-                throw new IllegalArgumentException("Only Class Label names are " + "implemented");
+                return;
             }
+            throw new IllegalArgumentException("Only Class Label names are " + "implemented");
         }
         throw new IllegalArgumentException("Unknown set label");
     }
@@ -181,24 +166,19 @@ public class LabelModule extends Module<BaseModule> {
         for (final OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
             final RelationWrapper relationWrapper = new RelationWrapper(doc);
-            final ONid newTarget;
+
+            /* Adjust target */
+            final LiveNode newTarget;
             if (relationWrapper.isTargetIsInc()) {
-                /* Target points to a node in incubation */
-                final ONid oldTarget = relationWrapper.getTarget();
-                final CommitInfo.CommitEntry possibleNewEntry =
-                        commitInfo.getByIncNid(oldTarget.getRecordId());
-                if (possibleNewEntry == null) {
-                    throw new IllegalStateException("Label target node (to incubation) is not in" +
-                            " " +
-                            "commitOld");
-                }
-                newTarget = possibleNewEntry.getLiveNode().getNid();
+                CommitInfo.CommitEntry possibleNewEntry =
+                        commitInfo.getByIncNid(relationWrapper.getTarget().getRecordId());
+                newTarget = possibleNewEntry.getLiveNode();
             } else {
-                newTarget = relationWrapper.getTarget();
+                newTarget = null;
             }
+
             relationWrapper.goLive(liveNid, newTarget);
             relationWrapper.getDocument().save();
-
         }
     }
 }

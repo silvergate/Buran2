@@ -6,6 +6,10 @@ package com.dcrux.buran.common.labels;
  * @author: ${USER} Date: 01.07.13 Time: 01:41
  */
 public class LabelIndex {
+
+    public static final LabelIndex MIN = new LabelIndex(Long.MIN_VALUE);
+    public static final LabelIndex MAX = new LabelIndex(Long.MAX_VALUE);
+
     private final long index;
 
     public LabelIndex(long index) {

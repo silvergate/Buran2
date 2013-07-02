@@ -7,5 +7,5 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 30.06.13 Time: 13:06
  */
-public interface IDataGetter<TRetval extends Serializable> extends Serializable {
+public interface IFieldGetter<TRetval extends Serializable> extends Serializable {
 }

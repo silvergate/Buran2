@@ -21,6 +21,10 @@ public class SetLabel implements ILabelSet {
         this.name = name;
     }
 
+    public static SetLabel c(ILabelName name) {
+        return new SetLabel(name);
+    }
+
     public SetLabel add(LabelIndex index, ILabelTargetInc target) {
         this.targets.put(index, target);
         return this;

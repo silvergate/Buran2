@@ -1,7 +1,7 @@
 package com.dcrux.buran.common.fields.setter;
 
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.IDataSetter;
+import com.dcrux.buran.common.fields.IFieldSetter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,25 +11,25 @@ import java.util.Map;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:56
  */
-//TODO: Rename to DataSetter
-public class DataSetter implements IDataSetter {
+//TODO: Rename to FieldSetter
+public class FieldSetter implements IFieldSetter {
 
-    public static DataSetter c(int index, IUnfieldedDataSetter setter) {
+    public static FieldSetter c(int index, IUnfieldedDataSetter setter) {
         return c(FieldIndex.c(index), setter);
     }
 
-    public static DataSetter c(FieldIndex index, IUnfieldedDataSetter setter) {
-        final DataSetter bs = new DataSetter();
+    public static FieldSetter c(FieldIndex index, IUnfieldedDataSetter setter) {
+        final FieldSetter bs = new FieldSetter();
         bs.add(index, setter);
         return bs;
     }
 
-    public DataSetter add(int index, IUnfieldedDataSetter setter) {
+    public FieldSetter add(int index, IUnfieldedDataSetter setter) {
         this.setterMap.put(FieldIndex.c(index), setter);
         return this;
     }
 
-    public DataSetter add(FieldIndex index, IUnfieldedDataSetter setter) {
+    public FieldSetter add(FieldIndex index, IUnfieldedDataSetter setter) {
         this.setterMap.put(index, setter);
         return this;
     }

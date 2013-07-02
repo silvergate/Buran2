@@ -2,10 +2,10 @@ package com.dcrux.buran.refimpl.baseModules.fields;
 
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.IDataGetter;
-import com.dcrux.buran.common.fields.IDataSetter;
+import com.dcrux.buran.common.fields.IFieldGetter;
+import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.fields.getter.*;
-import com.dcrux.buran.common.fields.setter.DataSetter;
+import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.setter.SetStr;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
@@ -35,9 +35,9 @@ public class FieldsModule extends Module<BaseModule> {
         }
     }
 
-    public void performSetter(UserId sender, IncubationNode node, IDataSetter dataSetter) {
-        if (dataSetter instanceof DataSetter) {
-            final DataSetter batchSet = (DataSetter) dataSetter;
+    public void performSetter(UserId sender, IncubationNode node, IFieldSetter dataSetter) {
+        if (dataSetter instanceof FieldSetter) {
+            final FieldSetter batchSet = (FieldSetter) dataSetter;
             for (final Map.Entry<FieldIndex, IUnfieldedDataSetter> entry : batchSet.getSetterMap()
                     .entrySet()) {
                 performUnfieldedSetter(sender, node, entry.getKey(), entry.getValue());
@@ -56,7 +56,7 @@ public class FieldsModule extends Module<BaseModule> {
         throw new IllegalArgumentException("Unknown getter");
     }
 
-    public Object performGetter(LiveNode node, IDataGetter dataGetter) {
+    public Object performGetter(LiveNode node, IFieldGetter dataGetter) {
         if (dataGetter instanceof BatchGet) {
             final BatchGet batchGet = (BatchGet) dataGetter;
             final BatchGetResult result = new BatchGetResult();
