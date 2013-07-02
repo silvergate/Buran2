@@ -21,6 +21,7 @@
     <orderEntry type="library" name="Maven: com.orientechnologies:orientdb-client:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.orientechnologies:orientdb-enterprise:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:14.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.1" level="project" />
   </component>
 </module>
 

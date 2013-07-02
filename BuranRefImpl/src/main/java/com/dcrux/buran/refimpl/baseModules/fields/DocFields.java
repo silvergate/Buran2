@@ -1,12 +1,13 @@
 package com.dcrux.buran.refimpl.baseModules.fields;
 
-import com.dcrux.buran.fields.FieldIndex;
+import com.dcrux.buran.common.fields.FieldIndex;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 29.06.13 Time: 15:01
  */
+//TODO: Raus in die wrapper-klassen
 @Deprecated
 public class DocFields {
     /* Class prefixes */

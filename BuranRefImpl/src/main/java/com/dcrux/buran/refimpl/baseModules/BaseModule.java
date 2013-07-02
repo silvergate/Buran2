@@ -1,19 +1,23 @@
 package com.dcrux.buran.refimpl.baseModules;
 
-import com.dcrux.buran.UserId;
-import com.dcrux.buran.refimpl.baseModules.fields.GetterSetterSrv;
-import com.dcrux.buran.refimpl.baseModules.label.LabelSrv;
-import com.dcrux.buran.refimpl.dao.Classes;
-import com.dcrux.buran.refimpl.dao.DataSrv;
-import com.dcrux.buran.refimpl.dao.DbUtils;
-import com.dcrux.buran.refimpl.dao.IncubationSrv;
-import com.dcrux.buran.refimpl.service.CurrentTimestampProvider;
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.refimpl.baseModules.auth.AuthModule;
+import com.dcrux.buran.refimpl.baseModules.classes.ClassesModule;
+import com.dcrux.buran.refimpl.baseModules.commit.CommitModule;
+import com.dcrux.buran.refimpl.baseModules.dataFetch.DataFetchModule;
+import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
+import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
+import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
+import com.dcrux.buran.refimpl.baseModules.label.LabelModule;
+import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
+import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 /**
  * Buran.
@@ -24,12 +28,16 @@ public class BaseModule {
 
     private final CurrentTimestampProvider currentTimestampProvider =
             new CurrentTimestampProvider();
-    private final IncubationSrv incubationSrv = new IncubationSrv(this);
+    private final IncubationModule incubationModule = new IncubationModule(this);
     private final DbUtils dbUtils = new DbUtils(this);
-    private final Classes classes = new Classes(this);
-    private final GetterSetterSrv getterSetterSrv = new GetterSetterSrv(this);
-    private final DataSrv dataSrv = new DataSrv(this);
-    private final LabelSrv labelSrv = new LabelSrv(this);
+    private final ClassesModule classesModule = new ClassesModule(this);
+    private final FieldsModule fieldsModule = new FieldsModule(this);
+    private final DataFetchModule dataFetchModule = new DataFetchModule(this);
+    private final LabelModule labelModule = new LabelModule(this);
+    private final DataMutModule dataMutModule = new DataMutModule(this);
+    private final CommitModule commitModule = new CommitModule(this);
+    private final AuthModule authModule = new AuthModule(this);
+    private final Random random = new Random();
 
     ODatabaseDocumentTx db;
 
@@ -42,7 +50,8 @@ public class BaseModule {
     }
 
     private void setup() {
-        this.labelSrv.setupDb();
+        this.labelModule.setupDb();
+        this.classesModule.setupDb();
     }
 
     public ODatabaseDocument getDb() {
@@ -61,41 +70,73 @@ public class BaseModule {
         db.close();
     }
 
-    public BaseModule(UserId userId) throws IOException {
+    public BaseModule(UserId userId, UserId sender) throws IOException {
         final File path = getDbPath(userId);
         this.db = ODatabaseDocumentPool.global().acquire(getDbString(path), "admin", "admin");
+        setSender(sender);
+        getAuthModule().setReceiver(userId);
         setup();
+    }
+
+    public UserId getReceiver() {
+        return getAuthModule().getReceiver();
+    }
+
+    public void setSender(UserId sender) {
+        getAuthModule().setSender(sender);
     }
 
     public void close() {
         this.db.close();
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
+    }
+
     public CurrentTimestampProvider getCurrentTimestampProvider() {
         return currentTimestampProvider;
     }
 
-    public IncubationSrv getIncubationSrv() {
-        return incubationSrv;
+    public IncubationModule getIncubationModule() {
+        return incubationModule;
     }
 
     public DbUtils getDbUtils() {
         return dbUtils;
     }
 
-    public Classes getClasses() {
-        return classes;
+    public ClassesModule getClassesModule() {
+        return classesModule;
     }
 
-    public GetterSetterSrv getGetterSetterSrv() {
-        return getterSetterSrv;
+    public FieldsModule getFieldsModule() {
+        return fieldsModule;
     }
 
-    public DataSrv getDataSrv() {
-        return dataSrv;
+    public DataFetchModule getDataFetchModule() {
+        return dataFetchModule;
     }
 
-    public LabelSrv getLabelSrv() {
-        return labelSrv;
+    public LabelModule getLabelModule() {
+        return labelModule;
+    }
+
+    public DataMutModule getDataMutModule() {
+        return dataMutModule;
+    }
+
+    public CommitModule getCommitModule() {
+        return commitModule;
+    }
+
+    public AuthModule getAuthModule() {
+        return authModule;
+    }
+
+    public Random getRandom() {
+        return random;
     }
 }
