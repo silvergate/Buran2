@@ -11,15 +11,15 @@ import java.util.Map;
  *
  * @author: ${USER} Date: 01.07.13 Time: 00:47
  */
-public class BatchGet implements IFieldGetter<BatchGetResult> {
+public class FieldGet implements IFieldGetter<FieldGetResult> {
 
-    public static BatchGet c(int index, IUnfieldedDataGetter<?> getter) {
+    public static FieldGet c(int index, IUnfieldedDataGetter<?> getter) {
         return c(FieldIndex.c(index), getter);
     }
 
-    public static BatchGet c(FieldIndex index, IUnfieldedDataGetter<?> getter) {
-        final BatchGet batchGet = new BatchGet();
-        return batchGet.add(index, getter);
+    public static FieldGet c(FieldIndex index, IUnfieldedDataGetter<?> getter) {
+        final FieldGet fieldGet = new FieldGet();
+        return fieldGet.add(index, getter);
     }
 
     private final Map<FieldIndex, IUnfieldedDataGetter<?>> entries = new HashMap<>();
@@ -28,11 +28,11 @@ public class BatchGet implements IFieldGetter<BatchGetResult> {
         return entries;
     }
 
-    public BatchGet add(int index, IUnfieldedDataGetter<?> getter) {
+    public FieldGet add(int index, IUnfieldedDataGetter<?> getter) {
         return add(FieldIndex.c(index), getter);
     }
 
-    public BatchGet add(FieldIndex index, IUnfieldedDataGetter<?> getter) {
+    public FieldGet add(FieldIndex index, IUnfieldedDataGetter<?> getter) {
         this.entries.put(index, getter);
         return this;
     }

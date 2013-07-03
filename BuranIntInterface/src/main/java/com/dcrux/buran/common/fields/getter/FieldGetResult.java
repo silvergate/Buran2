@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author: ${USER} Date: 30.06.13 Time: 23:28
  */
-public class BatchGetResult implements Serializable {
+public class FieldGetResult implements Serializable {
     private Map<FieldIndex, Object> values = new HashMap<>();
 
     public Map<FieldIndex, Object> getValues() {

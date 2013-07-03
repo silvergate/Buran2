@@ -99,7 +99,7 @@ public class BuranCommandRunner implements ICommandRunner {
     }
 
     @Override
-    public <TRetval extends Serializable> TRetval synchronous(UserId receiver, UserId sender,
+    public <TRetval extends Serializable> TRetval sync(UserId receiver, UserId sender,
             ICommand<TRetval> command)
             throws UncheckedException, UnknownCommandException, WrappedExpectableException {
         try {

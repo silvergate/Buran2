@@ -22,7 +22,7 @@ public class ComMutateImpl extends TransactionalCommand<VoidType, ComMutate> {
     protected VoidType transactional(ComMutate command, BaseModule baseModule) throws Exception {
         baseModule.getDataMutModule()
                 .setData(baseModule.getAuthModule().getSender(), command.getIncNid(),
-                        command.getDataSetter(), command.getLabelSetter());
+                        command.getSetter());
         return VoidType.SINGLETON;
     }
 }

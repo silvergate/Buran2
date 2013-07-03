@@ -21,6 +21,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class LabelModule extends Module<BaseModule> {
         }
     }
 
-    public <T extends Object> T performLabelGet(final LiveNode node, ILabelGet<T> labelGet) {
+    public <T extends Serializable> T performLabelGet(final LiveNode node, ILabelGet<T> labelGet) {
         if (labelGet instanceof GetLabel) {
             final GetLabel getLabel = (GetLabel) labelGet;
             return (T) performLabelGet_getLabel(node, getLabel);

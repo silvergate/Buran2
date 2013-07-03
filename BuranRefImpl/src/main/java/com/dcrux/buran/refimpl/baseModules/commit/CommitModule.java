@@ -1,6 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
 import com.dcrux.buran.common.*;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;

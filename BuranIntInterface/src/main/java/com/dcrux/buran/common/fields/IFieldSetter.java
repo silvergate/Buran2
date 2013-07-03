@@ -1,11 +1,11 @@
 package com.dcrux.buran.common.fields;
 
-import java.io.Serializable;
+import com.dcrux.buran.common.getterSetter.IDataSetter;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:24
  */
-public interface IFieldSetter extends Serializable {
+public interface IFieldSetter extends IDataSetter {
 }

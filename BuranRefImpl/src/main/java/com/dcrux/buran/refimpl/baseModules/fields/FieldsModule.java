@@ -57,10 +57,10 @@ public class FieldsModule extends Module<BaseModule> {
     }
 
     public Object performGetter(LiveNode node, IFieldGetter dataGetter) {
-        if (dataGetter instanceof BatchGet) {
-            final BatchGet batchGet = (BatchGet) dataGetter;
-            final BatchGetResult result = new BatchGetResult();
-            for (final Map.Entry<FieldIndex, IUnfieldedDataGetter<?>> entry : batchGet.getEntries()
+        if (dataGetter instanceof FieldGet) {
+            final FieldGet fieldGet = (FieldGet) dataGetter;
+            final FieldGetResult result = new FieldGetResult();
+            for (final Map.Entry<FieldIndex, IUnfieldedDataGetter<?>> entry : fieldGet.getEntries()
                     .entrySet()) {
                 final Object value = performUnfieldedGetter(node, entry.getKey(), entry.getValue());
                 result.getValues().put(entry.getKey(), value);

@@ -1,11 +1,14 @@
 package com.dcrux.buran.refimpl.baseModules.dataFetch;
 
-import com.dcrux.buran.commands.dataFetch.FetchResult;
 import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.NidVer;
-import com.dcrux.buran.common.NodeNotFoundException;
 import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.IFieldGetter;
+import com.dcrux.buran.common.getterSetter.BulkGet;
+import com.dcrux.buran.common.getterSetter.BulkGetIndex;
+import com.dcrux.buran.common.getterSetter.IBulkGetResult;
+import com.dcrux.buran.common.getterSetter.IDataGetter;
 import com.dcrux.buran.common.labels.ILabelGet;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
@@ -14,6 +17,10 @@ import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Buran.
@@ -36,7 +43,7 @@ public class DataFetchModule extends Module<BaseModule> {
     public void assertVersion(LiveNode node, Version version) throws NodeNotFoundException {
         Version ver = node.getVersion();
         if (ver.getVersion() != version.getVersion()) {
-            throw new NodeNotFoundException("Wrong node version", true);
+            throw NodeNotFoundException.wrongVersion(ver);
         }
     }
 
@@ -56,47 +63,42 @@ public class DataFetchModule extends Module<BaseModule> {
         if (nodeOpt.isPresent()) {
             return nodeOpt.get();
         }
-        throw new NodeNotFoundException("Node not found", false);
+        throw NodeNotFoundException.doesNotExist();
     }
 
-    public <T extends Object> T performLabelGet(final NidVer nidVer, final ILabelGet<T> labelGet)
-            throws NodeNotFoundException {
-        //TODO: Mergen mit 'getData()'
-        final Optional<LiveNode> nodeOpt = getNode(nidVer);
-        if (!nodeOpt.isPresent()) {
-            throw new NodeNotFoundException("Node not found", false);
-        }
-        final LiveNode node = nodeOpt.get();
-        return getBase().getLabelModule().performLabelGet(node, labelGet);
+    public <TRetVal extends Serializable> TRetVal getData(NidVer nidVer,
+            IDataGetter<TRetVal> getter) throws NodeNotFoundException {
+        final LiveNode node = getNodeReq(nidVer);
+        return (TRetVal) getData(node, getter);
     }
 
-    public FetchResult getData(final NidVer nidVer, final Optional<IFieldGetter> fieldGetter,
-            final Optional<ILabelGet> labelGetter) throws NodeNotFoundException {
-        final Optional<LiveNode> nodeOpt = getNode(nidVer);
-        if (!nodeOpt.isPresent()) {
-            throw new NodeNotFoundException("Node not found", false);
+    public <TRetVal extends Serializable> Serializable getData(LiveNode node,
+            IDataGetter<TRetVal> getter) {
+        if (getter instanceof BulkGet) {
+            final BulkGet bulkGet = (BulkGet) getter;
+            final List<Serializable> results = new ArrayList<>();
+            for (final IDataGetter<?> entry : bulkGet.getDataGetterList()) {
+                results.add(getData(node, entry));
+            }
+            return (TRetVal) new IBulkGetResult() {
+                @Override
+                public <TRetVal> TRetVal get(BulkGetIndex<TRetVal> index) {
+                    return (TRetVal) results.get(index.getIndex());
+                }
+            };
         }
-
-        final LiveNode node = nodeOpt.get();
 
         /* Field data */
-        Optional<Object> fieldResult;
-        if (fieldGetter.isPresent()) {
-            fieldResult = Optional.fromNullable(
-                    getBase().getFieldsModule().performGetter(node, fieldGetter.get()));
-        } else {
-            fieldResult = Optional.absent();
+        if (getter instanceof IFieldGetter) {
+            final IFieldGetter fieldGetter = (IFieldGetter) getter;
+            return (TRetVal) getBase().getFieldsModule().performGetter(node, fieldGetter);
         }
 
-        /* Label data */
-        Optional<Object> labelResult;
-        if (labelGetter.isPresent()) {
-            labelResult = Optional.fromNullable(
-                    getBase().getLabelModule().performLabelGet(node, labelGetter.get()));
-        } else {
-            labelResult = Optional.absent();
+        if (getter instanceof ILabelGet) {
+            final ILabelGet labelGetter = (ILabelGet) getter;
+            return getBase().getLabelModule().performLabelGet(node, labelGetter);
         }
 
-        return new FetchResult(fieldResult, labelResult);
+        throw new IllegalArgumentException("Unkown data getter");
     }
 }
