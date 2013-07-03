@@ -10,5 +10,6 @@ import java.io.Serializable;
  * @author: ${USER} Date: 02.07.13 Time: 17:56
  */
 public interface IUnfieldedDataSetter extends Serializable {
+    @Deprecated
     boolean canApplyTo(ITypeDef dataType);
 }

@@ -1,11 +1,13 @@
 package com.dcrux.buran.common.labels;
 
+import java.io.Serializable;
+
 /**
  * Buran.
  *
  * @author: ${USER} Date: 01.07.13 Time: 01:41
  */
-public class LabelIndex {
+public final class LabelIndex implements Serializable {
 
     public static final LabelIndex MIN = new LabelIndex(Long.MIN_VALUE);
     public static final LabelIndex MAX = new LabelIndex(Long.MAX_VALUE);

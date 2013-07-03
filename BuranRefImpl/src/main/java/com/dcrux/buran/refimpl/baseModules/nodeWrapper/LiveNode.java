@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.Version;
-import com.dcrux.buran.refimpl.baseModules.fields.DocFields;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -14,26 +13,30 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  */
 public class LiveNode extends CommonNode {
 
+    /* Live node */
+    public static final String FIELD_COMMIT_TIME = "ct";
+    public static final String FIELD_VERSION = "version";
+
     public LiveNode(ODocument document) {
         super(document);
     }
 
     public void setCommitTime(final long time) {
-        getDocument().field(DocFields.FIELD_COMMIT_TIME, time, OType.LONG);
+        getDocument().field(FIELD_COMMIT_TIME, time, OType.LONG);
     }
 
     public Version getVersion() {
-        final long version = getDocument().field(DocFields.FIELD_VERSION, OType.LONG);
+        final long version = getDocument().field(FIELD_VERSION, OType.LONG);
         return new Version(version);
     }
 
     public void setVersion(Version version) {
-        getDocument().field(DocFields.FIELD_VERSION, version.getVersion(), OType.LONG);
+        getDocument().field(FIELD_VERSION, version.getVersion(), OType.LONG);
     }
 
     public void incVersion() {
-        final long version = getDocument().field(DocFields.FIELD_VERSION, OType.LONG);
-        getDocument().field(DocFields.FIELD_VERSION, version + 1, OType.LONG);
+        final long version = getDocument().field(FIELD_VERSION, OType.LONG);
+        getDocument().field(FIELD_VERSION, version + 1, OType.LONG);
     }
 
     public NidVer getNidVer() {

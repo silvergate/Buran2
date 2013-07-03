@@ -14,6 +14,7 @@ import java.util.*;
  */
 public class CommitInfo {
     public static class CommitEntry {
+
         private final IncubationNode incubationNode;
         private final LiveNode liveNode;
 

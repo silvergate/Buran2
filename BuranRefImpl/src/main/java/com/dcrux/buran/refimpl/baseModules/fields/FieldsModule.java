@@ -1,16 +1,19 @@
 package com.dcrux.buran.refimpl.baseModules.fields;
 
 import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
+import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.IFieldGetter;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.fields.getter.*;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
-import com.dcrux.buran.common.fields.setter.SetStr;
+import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
-import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
@@ -23,28 +26,54 @@ import java.util.Map;
  */
 public class FieldsModule extends Module<BaseModule> {
 
+    private static final FieldPerformerRegistry REGISTRY;
+
+    static {
+        REGISTRY = new FieldPerformerRegistry();
+        FieldPerformerRegistryUtil.register(REGISTRY);
+    }
+
     public FieldsModule(BaseModule baseModule) {
         super(baseModule);
     }
 
-    public void performUnfieldedSetter(UserId sender, IncubationNode incNode, FieldIndex fieldIndex,
-            IUnfieldedDataSetter value) {
-        if (value instanceof SetStr) {
-            incNode.setFieldValue(fieldIndex, ((SetStr) value).getValue(), OType.STRING);
-            return;
-        }
-    }
-
-    public void performSetter(UserId sender, IncubationNode node, IFieldSetter dataSetter) {
+    public boolean performSetter(UserId sender, CommonNode node, IFieldSetter dataSetter)
+            throws NodeClassNotFoundException, FieldConstraintViolationInt {
         if (dataSetter instanceof FieldSetter) {
+            final ClassDefinition classDef =
+                    getBase().getClassesModule().getClassDefById(node.getClassId());
+            final ClassFieldsDefinition classDefFields = classDef.getFields();
             final FieldSetter batchSet = (FieldSetter) dataSetter;
+            boolean nodeChanged = false;
             for (final Map.Entry<FieldIndex, IUnfieldedDataSetter> entry : batchSet.getSetterMap()
                     .entrySet()) {
-                performUnfieldedSetter(sender, node, entry.getKey(), entry.getValue());
+                final ClassFieldsDefinition.FieldEntry fieldEntry =
+                        classDefFields.getFieldEntries().get(entry.getKey());
+                if (fieldEntry == null) {
+                    throw new IllegalArgumentException("No such field is declared in class");
+                }
+                final ITypeDef typeDef = fieldEntry.getTypeDef();
+                final IFieldPerformer performer = REGISTRY.get(typeDef.getClass());
+                if (performer == null) {
+                    throw new IllegalArgumentException("No performer for this field type found");
+                }
+                if (!performer.supportedSetters().contains(entry.getValue().getClass())) {
+                    throw new IllegalArgumentException(
+                            "Performer does not support setter: " + entry.getValue().getClass());
+                }
+
+                final boolean unc = performer
+                        .performSetter(sender, node, classDef, typeDef, entry.getKey(),
+                                entry.getValue());
+
+                if (unc) {
+                    nodeChanged = true;
+                }
             }
-        } else {
-            throw new IllegalArgumentException("Unkown Data Setter");
+            return nodeChanged;
         }
+
+        throw new IllegalArgumentException("Unkown Data Setter");
     }
 
     private <T extends Object> T performUnfieldedGetter(LiveNode node, FieldIndex fieldIndex,

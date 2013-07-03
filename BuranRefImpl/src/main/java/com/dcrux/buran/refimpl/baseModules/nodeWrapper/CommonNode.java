@@ -4,7 +4,6 @@ import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.refimpl.baseModules.common.DocumentWrapper;
-import com.dcrux.buran.refimpl.baseModules.fields.DocFields;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -15,21 +14,28 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
  */
 public class CommonNode extends DocumentWrapper {
 
+    /* Class prefixes */
+    public static final String NODE_CLASS_PREFIX = "node";
+
+    /* Common */
+    public static final String FIELD_COMMON_LIVE = "live";
+    public static final String INC_FIELD_SENDER = "sender";
+
     public CommonNode(ODocument document) {
         super(document);
     }
 
     public boolean isLive() {
-        final Boolean live = getDocument().field(DocFields.FIELD_COMMON_LIVE, OType.BOOLEAN);
+        final Boolean live = getDocument().field(FIELD_COMMON_LIVE, OType.BOOLEAN);
         return (live == null) || (live);
     }
 
     public void setSender(UserId userId) {
-        getDocument().field(DocFields.INC_FIELD_SENDER, userId.getId(), OType.LONG);
+        getDocument().field(INC_FIELD_SENDER, userId.getId(), OType.LONG);
     }
 
     public UserId getSender() {
-        final long senderId = getDocument().field(DocFields.INC_FIELD_SENDER, OType.LONG);
+        final long senderId = getDocument().field(INC_FIELD_SENDER, OType.LONG);
         return new UserId(senderId);
     }
 
@@ -37,13 +43,17 @@ public class CommonNode extends DocumentWrapper {
         return ClassNameUtils.getNodeClassId(getDocument().getClassName());
     }
 
+    public static String fieldName(FieldIndex index) {
+        return "f" + index.getIndex();
+    }
+
     public void setFieldValue(FieldIndex index, Object value, OType type) {
-        System.out.println("Setting value: " + value + ", at index: " + DocFields.fieldName(index));
-        getDocument().field(DocFields.fieldName(index), value, type);
+        System.out.println("Setting value: " + value + ", at index: " + fieldName(index));
+        getDocument().field(fieldName(index), value, type);
     }
 
     public Object getFieldValue(FieldIndex index, OType type) {
-        return getDocument().field(DocFields.fieldName(index), type);
+        return getDocument().field(fieldName(index), type);
     }
 
 

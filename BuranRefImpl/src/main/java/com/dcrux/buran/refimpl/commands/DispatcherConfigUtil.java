@@ -10,6 +10,7 @@ import com.dcrux.buran.refimpl.commands.dataFetch.ComFetchImpl;
 import com.dcrux.buran.refimpl.commands.dataMut.ComMutateImpl;
 import com.dcrux.buran.refimpl.commands.incubation.ComCommitImpl;
 import com.dcrux.buran.refimpl.commands.incubation.ComCreateNewImpl;
+import com.dcrux.buran.refimpl.commands.incubation.ComCreateUpdateImpl;
 
 /**
  * Buran.
@@ -26,5 +27,6 @@ public class DispatcherConfigUtil {
         dispatcher.register(ComFetchImpl.SINGLETON, runParam);
         dispatcher.register(ComClassIdByHashImpl.SINGLETON, runParam);
         dispatcher.register(ComClassHashIdByIdImpl.SINGLETON, runParam);
+        dispatcher.register(ComCreateUpdateImpl.SINGLETON, runParam);
     }
 }

@@ -1,17 +1,20 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
 import com.dcrux.buran.common.*;
-import com.dcrux.buran.common.exceptions.NodeNotFoundException;
+import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.deltaRecorder.IRecordPlayer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.google.common.base.Optional;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.sun.istack.internal.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Buran.
@@ -23,8 +26,23 @@ public class CommitModule extends Module<BaseModule> {
         super(baseModule);
     }
 
-    private LiveNode commitNode(final IncubationNode incubationNode) throws NodeNotFoundException {
-        final boolean update = incubationNode.getUpdateVersion() != null;
+    private void playRecordedDeltas(final UserId sender, final IncubationNode incubationNode,
+            final LiveNode applyTo, @Nullable final Set<OIdentifiable> outCommittableRelations)
+            throws Exception {
+        getBase().getDeltaRecorderModule()
+                .playRecords(incubationNode.getNid(), new IRecordPlayer() {
+
+                    @Override
+                    public void entry(ONid onid, IDataSetter setter) throws Exception {
+                        getBase().getDataMutModule()
+                                .setDataDirect(sender, applyTo, setter, outCommittableRelations);
+                    }
+                });
+    }
+
+    private LiveNode commitNode(final UserId sender, final IncubationNode incubationNode,
+            @Nullable final Set<OIdentifiable> outCommittableRelations) throws Exception {
+        final boolean update = incubationNode.isUpdate();
         if (!update) {
             incubationNode.goLive();
             final LiveNode storeNode = new LiveNode(incubationNode.getDocument());
@@ -36,33 +54,23 @@ public class CommitModule extends Module<BaseModule> {
             final Version upVersion = incubationNode.getUpdateVersion();
             LiveNode up = getBase().getDataFetchModule().getNodeReq(new NidVer(upOnid, upVersion));
 
-                    /* Update node */
-            if (up.getClassId().getId() != incubationNode.getClassId().getId()) {
-                throw new IllegalStateException("Incompatible class");
-            }
-                    /* Remove fields */
-            for (final String upFieldName : up.getDocument().fieldNames()) {
-                up.getDocument().removeField(upFieldName);
-            }
-            for (final String fieldName : incubationNode.getDocument().fieldNames()) {
-                final Object value = incubationNode.getDocument().field(fieldName);
-                System.out.println("Transferring " + fieldName + ", value = " + value);
-                up.getDocument().field(fieldName, value);
-            }
+            playRecordedDeltas(sender, incubationNode, up, outCommittableRelations);
 
             up.incVersion();
             up.getDocument().save();
-
             return up;
         }
     }
 
     public Map<IIncNid, NidVer> commit(final UserId sender, final Collection<IIncNid> incNids)
-            throws IncNodeNotFound, NodeNotFoundException {
+            throws Exception {
         final Map<IIncNid, NidVer> result = new HashMap<>();
         final CommitInfo commitInfo = new CommitInfo();
 
-                /* Commit node */
+        final Multimap<OIdentifiable, OIdentifiable> committableRelationsByNode =
+                HashMultimap.create();
+
+        /* Commit node */
         for (final IIncNid incNid : incNids) {
             final Optional<IncubationNode> iNode =
                     getBase().getIncubationModule().getIncNode(sender, incNid);
@@ -70,18 +78,25 @@ public class CommitModule extends Module<BaseModule> {
                 throw new IncNodeNotFound("Inc node not found");
             }
             final IncubationNode node = iNode.get();
-            final LiveNode liveNode = commitNode(node);
+            final Set<OIdentifiable> commitableRelations = new HashSet<>();
+            final LiveNode liveNode = commitNode(sender, node, commitableRelations);
+
+            for (final OIdentifiable commitable : commitableRelations) {
+                committableRelationsByNode.put(liveNode.getDocument(), commitable);
+            }
+
             result.put(incNid, liveNode.getNidVer());
             commitInfo.add(new CommitInfo.CommitEntry(node, liveNode));
         }
 
-                /* Commit label */
+        /* Commit label */
         for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
-            getBase().getLabelModule()
-                    .commit(entry.getIncubationNode(), entry.getLiveNode(), commitInfo);
+            final Collection<OIdentifiable> additional =
+                    committableRelationsByNode.get(entry.getLiveNode().getDocument());
+            getBase().getLabelModule().commit(entry.getLiveNode(), additional, commitInfo);
         }
 
-                /* Remove incubation */
+        /* Remove incubation */
         for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
             if (entry.isUpdate()) {
                 removeIncNode(new ONid(entry.getIncubationNode().getNid().getRecordId()));

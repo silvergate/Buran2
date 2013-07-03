@@ -1,14 +1,17 @@
 package com.dcrux.buran.refimpl.baseModules.incubation;
 
 import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -28,6 +31,19 @@ public class IncubationModule extends Module<BaseModule> {
         getBase().getClassesModule().assureOrientClass(classId);
         final IncubationNode incubationNode = IncubationNode
                 .createNew(classId, getBase().getCurrentTimestampProvider().get(), sender);
+        incubationNode.getDocument().save();
+        return incubationNode.getNid();
+    }
+
+    ;
+
+    public IIncNid createIncUpdate(final UserId sender, NidVer nidVerToUpdate)
+            throws NodeNotFoundException {
+        final LiveNode nodeToUpdate = getBase().getDataFetchModule().getNodeReq(nidVerToUpdate);
+
+        final IncubationNode incubationNode = IncubationNode.createUpdate(nodeToUpdate.getClassId(),
+                getBase().getCurrentTimestampProvider().get(), sender, nodeToUpdate.getNid(),
+                nodeToUpdate.getVersion());
         incubationNode.getDocument().save();
         return incubationNode.getNid();
     }

@@ -6,6 +6,7 @@ import com.dcrux.buran.refimpl.baseModules.classes.ClassesModule;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitModule;
 import com.dcrux.buran.refimpl.baseModules.dataFetch.DataFetchModule;
 import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
+import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.label.LabelModule;
@@ -37,6 +38,7 @@ public class BaseModule {
     private final DataMutModule dataMutModule = new DataMutModule(this);
     private final CommitModule commitModule = new CommitModule(this);
     private final AuthModule authModule = new AuthModule(this);
+    private final DeltaRecorderModule deltaRecorderModule = new DeltaRecorderModule(this);
     private final Random random = new Random();
 
     ODatabaseDocumentTx db;
@@ -52,6 +54,7 @@ public class BaseModule {
     private void setup() {
         this.labelModule.setupDb();
         this.classesModule.setupDb();
+        this.deltaRecorderModule.setupDb();
     }
 
     public ODatabaseDocument getDb() {
@@ -138,5 +141,9 @@ public class BaseModule {
 
     public Random getRandom() {
         return random;
+    }
+
+    public DeltaRecorderModule getDeltaRecorderModule() {
+        return deltaRecorderModule;
     }
 }

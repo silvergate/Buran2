@@ -57,6 +57,15 @@ public class ClassesModule extends Module<BaseModule> {
         return exists;
     }
 
+    public ClassDefinition getClassDefById(ClassId classId) throws NodeClassNotFoundException {
+        //TODO: Diese methode wird sehr oft aufgerufen, einen cache machen dafür!
+        final ClassDefWrapper wrapper = getClassWrapperById(classId);
+        final byte[] definition = wrapper.getDef();
+        final ClassDefinition classDef =
+                (ClassDefinition) SerializationUtils.deserialize(definition);
+        return classDef;
+    }
+
     public Optional<ClassId> getClassIdByClassHash(final ClassHashId classHashId) {
         final OIndex index = getBase().getDbUtils()
                 .getIndex(ClassDefWrapper.CLASS_NAME, ClassDefWrapper.INDEX_HASH);
@@ -89,12 +98,16 @@ public class ClassesModule extends Module<BaseModule> {
         return classWrapper.getClassHashId();
     }
 
-    private byte[] calcHash(ClassDefinition classDefinition) {
-        byte[] ser = SerializationUtils.serialize(classDefinition);
+    private byte[] toBinary(ClassDefinition classDefinition) {
+        //TODO: Das muss irgendwann mal canonical werden
+        return SerializationUtils.serialize(classDefinition);
+    }
+
+    private byte[] calcHash(byte[] classDefinitionBinary) {
         final MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(ser);
+            byte[] hash = md.digest(classDefinitionBinary);
             return hash;
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
@@ -102,7 +115,8 @@ public class ClassesModule extends Module<BaseModule> {
     }
 
     public ClassId declareClass(ClassDefinition classDefinition) throws Exception {
-        final byte[] hashByte = calcHash(classDefinition);
+        final byte[] classAsBinary = toBinary(classDefinition);
+        final byte[] hashByte = calcHash(classAsBinary);
         final ClassHashId classHashId = new ClassHashId(hashByte);
         final Optional<ClassId> classIdOpt = getClassIdByClassHash(classHashId);
         if (classIdOpt.isPresent()) {
@@ -115,18 +129,9 @@ public class ClassesModule extends Module<BaseModule> {
         ClassId classId = null;
         final long classIdLong = getBase().getRandom().nextLong();
         classId = new ClassId(classIdLong);
-        final ClassDefWrapper classDefWrapper = ClassDefWrapper.c(classId, classHashId);
+        final ClassDefWrapper classDefWrapper =
+                ClassDefWrapper.c(classId, classHashId, classAsBinary);
         classDefWrapper.getDocument().save();
-
-
-
-        /*
-        exception = getBase().getDbUtils().commitAndReBegin();
-            if (exception.isPresent() && (!(exception.get() instanceof
-                    ORecordDuplicatedException))) {
-                throw exception.get();
-            }*/
-
 
         return classId;
     }

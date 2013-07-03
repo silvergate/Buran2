@@ -8,10 +8,13 @@ import com.dcrux.buran.common.labels.LabelIndex;
 import com.dcrux.buran.common.labels.targets.LabelTarget;
 import com.dcrux.buran.common.labels.targets.LabelTargetExt;
 import com.dcrux.buran.common.labels.targets.LabelTargetInc;
+import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.sun.istack.internal.Nullable;
@@ -35,15 +38,22 @@ public class RelationWrapper {
         this.document = document;
     }
 
+    public static final String INDEX_INC_NODES = "incNodexIdx";
+    public static final String INDEX_NODES_BY_LABEL = "nodesByLabel";
+
     public static final String CLASS_NAME = "ClassRelation";
 
     /* Source */
     public static final String FIELD_SRC = "src";
-    public static final String FIELD_SRC_IS_INC = "sinc";
 
     /* Label and index */
     public static final String FIELD_LABEL_NAME = "labelName";
     public static final String FIELD_LABEL_INDEX = "labelIndex";
+
+    /* Target adjustment */
+    public static final String FIELD_UNCOMMITTED = "isuncom";
+    public static final String FIELD_ISCOM = "iscom";
+
 
     /* Target */
     public static final String FIELD_TARGET_IS_INC = "tinc";
@@ -90,12 +100,14 @@ public class RelationWrapper {
             @Nullable Version targetVersion, @Nullable UserId targetUserId, TargetType targetType,
             ClassLabelName labelName, LabelIndex index) {
         ODocument doc = new ODocument(CLASS_NAME);
-        doc.field(FIELD_SRC_IS_INC, true, OType.BOOLEAN);
 
         doc.field(FIELD_LABEL_NAME, labelName.getIndex(), OType.SHORT);
         doc.field(FIELD_LABEL_INDEX, index.getIndex(), OType.LONG);
         RelationWrapper relationWrapper = new RelationWrapper(doc);
         relationWrapper.setSource(source);
+
+        /* Commit state */
+        doc.field(FIELD_UNCOMMITTED, true, OType.BOOLEAN);
 
         /* Target */
         doc.field(FIELD_TARGET, target.getAsString(), OType.STRING);
@@ -190,7 +202,7 @@ public class RelationWrapper {
         return (updateOnCommit != null) && (updateOnCommit);
     }
 
-    public void goLive(ONid source, @Nullable LiveNode committedTarget) {
+    public void goLive(@Nullable LiveNode committedTarget) {
         /* Adjust target */
         if (isTargetIsInc()) {
             if (committedTarget == null) {
@@ -205,12 +217,32 @@ public class RelationWrapper {
             }
         }
 
-        /* Adjust source */
-        setSource(source);
+        /* Commit state */
+        getDocument().field(FIELD_ISCOM, true, OType.BOOLEAN);
 
         /* Remove unused fields */
-        getDocument().removeField(FIELD_SRC_IS_INC);
+        getDocument().removeField(FIELD_UNCOMMITTED);
         getDocument().removeField(FIELD_TARGET_IS_INC);
         getDocument().removeField(FIELD_UPDATE_VESION_ON_COMMIT);
+    }
+
+    public static void setupDb(BaseModule baseModule) {
+        final OSchema schema = baseModule.getDb().getMetadata().getSchema();
+        if (!schema.existsClass(RelationWrapper.CLASS_NAME)) {
+            final OClass clazz = schema.createClass(RelationWrapper.CLASS_NAME);
+            clazz.createProperty(RelationWrapper.FIELD_UNCOMMITTED, OType.BOOLEAN);
+            clazz.createProperty(RelationWrapper.FIELD_ISCOM, OType.BOOLEAN);
+            clazz.createProperty(RelationWrapper.FIELD_LABEL_NAME, OType.SHORT);
+            clazz.createProperty(RelationWrapper.FIELD_LABEL_INDEX, OType.LONG);
+            clazz.createProperty(RelationWrapper.FIELD_SRC, OType.STRING);
+
+            clazz.createIndex(INDEX_INC_NODES, OClass.INDEX_TYPE.NOTUNIQUE,
+                    RelationWrapper.FIELD_UNCOMMITTED, RelationWrapper.FIELD_SRC);
+
+            clazz.createIndex(INDEX_NODES_BY_LABEL, OClass.INDEX_TYPE.NOTUNIQUE,
+                    RelationWrapper.FIELD_ISCOM, RelationWrapper.FIELD_SRC,
+                    RelationWrapper.FIELD_LABEL_NAME, RelationWrapper.FIELD_LABEL_INDEX);
+            schema.save();
+        }
     }
 }
