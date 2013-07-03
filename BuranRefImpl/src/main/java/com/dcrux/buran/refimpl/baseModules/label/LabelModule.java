@@ -1,9 +1,11 @@
 package com.dcrux.buran.refimpl.baseModules.label;
 
-import com.dcrux.buran.common.labels.*;
-import com.dcrux.buran.common.labels.getter.GetLabel;
-import com.dcrux.buran.common.labels.getter.GetLabelResult;
-import com.dcrux.buran.common.labels.setter.SetLabel;
+import com.dcrux.buran.common.edges.*;
+import com.dcrux.buran.common.edges.getter.GetEdge;
+import com.dcrux.buran.common.edges.getter.GetEdgeResult;
+import com.dcrux.buran.common.edges.getter.GetInClassEdge;
+import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
+import com.dcrux.buran.common.edges.setter.SetEdge;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitInfo;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -21,9 +23,7 @@ import com.sun.istack.internal.Nullable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Buran.
@@ -31,9 +31,6 @@ import java.util.Set;
  * @author: ${USER} Date: 29.06.13 Time: 13:59
  */
 public class LabelModule extends Module<BaseModule> {
-
-    //public static final String INDEX_INC_NODES = "incNodexIdx";
-    //public static final String INDEX_NODES_BY_LABEL = "nodesByLabel";
 
     public LabelModule(BaseModule baseModule) {
         super(baseModule);
@@ -43,54 +40,85 @@ public class LabelModule extends Module<BaseModule> {
         RelationWrapper.setupDb(getBase());
     }
 
-    public <T extends Serializable> T performLabelGet(final LiveNode node, ILabelGet<T> labelGet) {
-        if (labelGet instanceof GetLabel) {
-            final GetLabel getLabel = (GetLabel) labelGet;
-            return (T) performLabelGet_getLabel(node, getLabel);
-        } else {
-            throw new NotImplementedException();
+    public <T extends Serializable> T performLabelGet(final LiveNode node,
+            IEdgeGetter<T> labelGet) {
+        if (labelGet instanceof GetEdge) {
+            final GetEdge getEdge = (GetEdge) labelGet;
+            return (T) performLabelGet_getLabel(node, getEdge);
         }
+
+        if (labelGet instanceof GetInClassEdge) {
+            final GetInClassEdge getInClassEdge = (GetInClassEdge) labelGet;
+            return (T) performLabelGet_getInClassEdge(node, getInClassEdge);
+        }
+
+        throw new NotImplementedException();
     }
 
-    private GetLabelResult performLabelGet_getLabel(final LiveNode node, final GetLabel getLabel) {
-        if (!(getLabel.getLabelName() instanceof ClassLabelName)) {
+    private GetEdgeResult performLabelGet_getLabel(final LiveNode node, final GetEdge getEdge) {
+        if (!(getEdge.getLabelName() instanceof ClassLabelName)) {
             throw new NotImplementedException();
         }
-        final ClassLabelName classLabelName = (ClassLabelName) getLabel.getLabelName();
+        final ClassLabelName classLabelName = (ClassLabelName) getEdge.getLabelName();
 
         final OIndex<?> index = getBase().getDbUtils()
                 .getIndex(RelationWrapper.CLASS_NAME, RelationWrapper.INDEX_NODES_BY_LABEL);
         final Object valueStart = index.getDefinition()
                 .createValue(true, node.getNid().getRecordId().toString(),
-                        classLabelName.getIndex(), getLabel.getFromIndex().getIndex());
+                        classLabelName.getIndex(), getEdge.getFromIndex().getIndex());
         final Object valueEnd = index.getDefinition()
                 .createValue(true, node.getNid().getRecordId().toString(),
-                        classLabelName.getIndex(), getLabel.getToIndex().getIndex());
+                        classLabelName.getIndex(), getEdge.getToIndex().getIndex());
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(valueStart, valueEnd);
-        System.out.println("Found labels: " + foundSet);
-        Multimap<LabelIndex, ILabelTarget> results = HashMultimap.create();
+
+        System.out.println("Found edges: " + foundSet);
+        Multimap<LabelIndex, IEdgeTarget> results = HashMultimap.create();
         for (OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
             final RelationWrapper relationWrapper = new RelationWrapper(doc);
-            final ILabelTarget labelTarget = RelWrapToLabelTarget.convert(relationWrapper);
+            final IEdgeTarget labelTarget = RelWrapToLabelTarget.convert(relationWrapper);
             results.put(relationWrapper.getLabelIndex(), labelTarget);
         }
-        return new GetLabelResult(results);
+        return new GetEdgeResult(results);
     }
 
-    public void performLabelSet(final CommonNode incubationNode, ILabelSet labelSet,
+    private GetInClassEdgeResult performLabelGet_getInClassEdge(LiveNode node,
+            GetInClassEdge getInClassEdge) {
+        final OIndex<?> index = getBase().getDbUtils()
+                .getIndex(RelationWrapper.CLASS_NAME, RelationWrapper.INDEX_IN_EDGES);
+        final Object valueStart = index.getDefinition()
+                .createValue(true, node.getNid().getAsString(),
+                        getInClassEdge.getLabelName().getIndex(),
+                        getInClassEdge.getFromIndex().getIndex());
+        final Object valueEnd = index.getDefinition().createValue(true, node.getNid().getAsString(),
+                getInClassEdge.getLabelName().getIndex(), getInClassEdge.getToIndex().getIndex());
+        final Collection<OIdentifiable> foundSet = index.getValuesBetween(valueStart, valueEnd);
+
+        System.out.println("Found in edges: " + foundSet);
+        final List<GetInClassEdgeResult.Entry> entries = new ArrayList<>();
+        for (OIdentifiable found : foundSet) {
+            final ODocument doc = getBase().getDb().load(found.getIdentity());
+            final RelationWrapper relationWrapper = new RelationWrapper(doc);
+            entries.add(new GetInClassEdgeResult.Entry(relationWrapper.getSource(),
+                    relationWrapper.getLabelIndex()));
+        }
+        return new GetInClassEdgeResult(entries);
+    }
+
+    public void performLabelSet(final CommonNode incubationNode, IEdgeSetter labelSet,
             @Nullable Set<OIdentifiable> outCommitableRelations) {
-        if (labelSet instanceof SetLabel) {
-            final SetLabel setLabel = (SetLabel) labelSet;
-            final ILabelName labelName = setLabel.getName();
+        if (labelSet instanceof SetEdge) {
+            final SetEdge setEdge = (SetEdge) labelSet;
+            final ILabelName labelName = setEdge.getName();
             if (labelName instanceof ClassLabelName) {
                 final ClassLabelName classLabelName = (ClassLabelName) labelName;
-                for (final Map.Entry<LabelIndex, ILabelTargetInc> target : setLabel.getTargets()
+                for (final Map.Entry<LabelIndex, IEdgeTargetInc> target : setEdge.getTargets()
                         .entrySet()) {
-                    final ILabelTargetInc labelTargetInc = target.getValue();
+                    final IEdgeTargetInc labelTargetInc = target.getValue();
                     final LabelIndex index = target.getKey();
                     final RelationWrapper relationWrapper = RelationWrapper
-                            .from(incubationNode.getNid(), classLabelName, index, labelTargetInc);
+                            .from(incubationNode.getNid(), incubationNode.getClassId(),
+                                    classLabelName, index, labelTargetInc);
 
                     //TODO: Überprüfen, ob targets verfügbar ist (zwar: Eher erst beim
                     // commitOld).
@@ -113,7 +141,7 @@ public class LabelModule extends Module<BaseModule> {
 
     public void commit(CommonNode node, Collection<OIdentifiable> additionalRelations,
             CommitInfo commitInfo) {
-        /* Make labels live */
+        /* Make edges live */
         //ONid incNid = incNode.getNid();
         //ONid liveNid = liveNode.getNid();
         makeLabelsLive(node.getNid(), commitInfo, additionalRelations);
@@ -124,7 +152,7 @@ public class LabelModule extends Module<BaseModule> {
                 getBase().getDbUtils().getIndex(RelationWrapper.CLASS_NAME, INDEX_NODES_BY_LABEL);
         final Object value = index.getDefinition().createValue(nid.getRecordId().toString());
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(value, value);
-        System.out.println("Found (remove old labels): " + foundSet);
+        System.out.println("Found (remove old edges): " + foundSet);
         for (final OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
             doc.delete();

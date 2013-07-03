@@ -1,28 +1,28 @@
-package com.dcrux.buran.common.labels.targets;
+package com.dcrux.buran.common.edges.targets;
 
 import com.dcrux.buran.common.IIncNid;
-import com.dcrux.buran.common.labels.ILabelTargetInc;
+import com.dcrux.buran.common.edges.IEdgeTargetInc;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
-public class LabelTargetInc implements ILabelTargetInc {
+public class EdgeTargetInc implements IEdgeTargetInc {
     private final IIncNid targetNid;
     private final boolean versioned;
 
-    public LabelTargetInc(IIncNid targetNid, boolean versioned) {
+    public EdgeTargetInc(IIncNid targetNid, boolean versioned) {
         this.targetNid = targetNid;
         this.versioned = versioned;
     }
 
-    public static LabelTargetInc unversioned(IIncNid target) {
-        return new LabelTargetInc(target, false);
+    public static EdgeTargetInc unversioned(IIncNid target) {
+        return new EdgeTargetInc(target, false);
     }
 
-    public static LabelTargetInc versioned(IIncNid target) {
-        return new LabelTargetInc(target, true);
+    public static EdgeTargetInc versioned(IIncNid target) {
+        return new EdgeTargetInc(target, true);
     }
 
     public IIncNid getTargetNid() {
@@ -43,7 +43,7 @@ public class LabelTargetInc implements ILabelTargetInc {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        LabelTargetInc that = (LabelTargetInc) o;
+        EdgeTargetInc that = (EdgeTargetInc) o;
 
         if (versioned != that.versioned) return false;
         if (!targetNid.equals(that.targetNid)) return false;
@@ -60,7 +60,7 @@ public class LabelTargetInc implements ILabelTargetInc {
 
     @Override
     public String toString() {
-        return "LabelTargetInc{" +
+        return "EdgeTargetInc{" +
                 "targetNid=" + targetNid +
                 ", versioned=" + versioned +
                 '}';

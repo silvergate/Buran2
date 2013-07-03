@@ -8,6 +8,8 @@ import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.IFieldGetter;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.fields.getter.*;
+import com.dcrux.buran.common.fields.setter.FieldRemove;
+import com.dcrux.buran.common.fields.setter.FieldRemoveAll;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.typeDef.ITypeDef;
@@ -15,8 +17,8 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
-import com.orientechnologies.orient.core.metadata.schema.OType;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -39,6 +41,16 @@ public class FieldsModule extends Module<BaseModule> {
 
     public boolean performSetter(UserId sender, CommonNode node, IFieldSetter dataSetter)
             throws NodeClassNotFoundException, FieldConstraintViolationInt {
+        if (dataSetter instanceof FieldRemoveAll) {
+            final ClassDefinition classDef =
+                    getBase().getClassesModule().getClassDefById(node.getClassId());
+            final FieldSetter fs = new FieldSetter();
+            for (final FieldIndex index : classDef.getFields().getFieldIndexes()) {
+                fs.add(index, FieldRemove.c());
+            }
+            return performSetter(sender, node, fs);
+        }
+
         if (dataSetter instanceof FieldSetter) {
             final ClassDefinition classDef =
                     getBase().getClassesModule().getClassDefById(node.getClassId());
@@ -76,22 +88,48 @@ public class FieldsModule extends Module<BaseModule> {
         throw new IllegalArgumentException("Unkown Data Setter");
     }
 
-    private <T extends Object> T performUnfieldedGetter(LiveNode node, FieldIndex fieldIndex,
+    private <T extends Serializable> T performUnfieldedGetter(LiveNode node,
+            ClassDefinition classDefinition, FieldIndex fieldIndex,
             IUnfieldedDataGetter<T> getter) {
-        if (getter instanceof GetStr) {
-            return (T) node.getFieldValue(fieldIndex, OType.STRING);
+        final ClassFieldsDefinition.FieldEntry fieldEntry =
+                classDefinition.getFields().getFieldEntries().get(fieldIndex);
+        final ITypeDef typeDef = fieldEntry.getTypeDef();
+        final IFieldPerformer performer = REGISTRY.get(typeDef.getClass());
+        if (performer == null) {
+            throw new IllegalArgumentException("No performer for this field type found");
+        }
+        if (!performer.supportedGetters().contains(getter.getClass())) {
+            throw new IllegalArgumentException(
+                    "Performer does not support getter: " + getter.getClass());
         }
 
-        throw new IllegalArgumentException("Unknown getter");
+        return (T) performer.performGetter(node, classDefinition, typeDef, fieldIndex, getter);
     }
 
-    public Object performGetter(LiveNode node, IFieldGetter dataGetter) {
+    public Serializable performGetter(LiveNode node, IFieldGetter dataGetter)
+            throws NodeClassNotFoundException {
+        final ClassDefinition classDef =
+                getBase().getClassesModule().getClassDefById(node.getClassId());
+
         if (dataGetter instanceof FieldGet) {
             final FieldGet fieldGet = (FieldGet) dataGetter;
             final FieldGetResult result = new FieldGetResult();
             for (final Map.Entry<FieldIndex, IUnfieldedDataGetter<?>> entry : fieldGet.getEntries()
                     .entrySet()) {
-                final Object value = performUnfieldedGetter(node, entry.getKey(), entry.getValue());
+                final Serializable value =
+                        performUnfieldedGetter(node, classDef, entry.getKey(), entry.getValue());
+                result.getValues().put(entry.getKey(), value);
+            }
+            return result;
+        }
+
+        if (dataGetter instanceof FieldGetAll) {
+            final FieldGetPrim fieldGet = FieldGetPrim.SINGLETON;
+            final FieldGetResult result = new FieldGetResult();
+            for (final Map.Entry<FieldIndex, ClassFieldsDefinition.FieldEntry> entry : classDef
+                    .getFields().getFieldEntries().entrySet()) {
+                final Serializable value =
+                        performUnfieldedGetter(node, classDef, entry.getKey(), fieldGet);
                 result.getValues().put(entry.getKey(), value);
             }
             return result;
@@ -99,8 +137,9 @@ public class FieldsModule extends Module<BaseModule> {
 
         if (dataGetter instanceof SingleGet) {
             final SingleGet singleGet = (SingleGet) dataGetter;
-            final Object value = performUnfieldedGetter(node, singleGet.getFieldIndex(),
-                    singleGet.getFieldGetter());
+            final Serializable value =
+                    performUnfieldedGetter(node, classDef, singleGet.getFieldIndex(),
+                            singleGet.getFieldGetter());
             return value;
         }
 

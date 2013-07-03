@@ -8,11 +8,11 @@ import com.dcrux.buran.common.fields.types.IntegerType;
  *
  * @author: ${USER} Date: 29.06.13 Time: 14:52
  */
-public class SetInt implements IUnfieldedDataSetter {
+public class FieldSetInt implements IUnfieldedDataSetter {
 
     private final Number value;
 
-    public SetInt(Number value) {
+    public FieldSetInt(Number value) {
         this.value = value;
     }
 
@@ -20,8 +20,8 @@ public class SetInt implements IUnfieldedDataSetter {
         return value;
     }
 
-    public static SetInt c(final Number value) {
-        return new SetInt(value);
+    public static FieldSetInt c(final Number value) {
+        return new FieldSetInt(value);
     }
 
     @Override

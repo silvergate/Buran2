@@ -1,13 +1,15 @@
 package com.dcrux.buran.refimpl.baseModules.label;
 
+import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.Version;
-import com.dcrux.buran.common.labels.ClassLabelName;
-import com.dcrux.buran.common.labels.ILabelTargetInc;
-import com.dcrux.buran.common.labels.LabelIndex;
-import com.dcrux.buran.common.labels.targets.LabelTarget;
-import com.dcrux.buran.common.labels.targets.LabelTargetExt;
-import com.dcrux.buran.common.labels.targets.LabelTargetInc;
+import com.dcrux.buran.common.classes.ClassId;
+import com.dcrux.buran.common.edges.ClassLabelName;
+import com.dcrux.buran.common.edges.IEdgeTargetInc;
+import com.dcrux.buran.common.edges.LabelIndex;
+import com.dcrux.buran.common.edges.targets.EdgeTarget;
+import com.dcrux.buran.common.edges.targets.EdgeTargetExt;
+import com.dcrux.buran.common.edges.targets.EdgeTargetInc;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
@@ -40,11 +42,13 @@ public class RelationWrapper {
 
     public static final String INDEX_INC_NODES = "incNodexIdx";
     public static final String INDEX_NODES_BY_LABEL = "nodesByLabel";
+    public static final String INDEX_IN_EDGES = "inEdgesIndex";
 
     public static final String CLASS_NAME = "ClassRelation";
 
     /* Source */
     public static final String FIELD_SRC = "src";
+    public static final String FIELD_SRC_CLASS = "srcCls";
 
     /* Label and index */
     public static final String FIELD_LABEL_NAME = "labelName";
@@ -62,27 +66,27 @@ public class RelationWrapper {
     public static final String FIELD_UPDATE_VESION_ON_COMMIT = "uvoc";
     public static final String FIELD_TARGET_USERID = "tuid";
 
-    public static RelationWrapper from(ONid source, ClassLabelName labelName, LabelIndex index,
-            ILabelTargetInc targetInc) {
+    public static RelationWrapper from(ONid source, ClassId sourceClass, ClassLabelName labelName,
+            LabelIndex index, IEdgeTargetInc targetInc) {
         final ONid target;
         final @Nullable Version targetVersion;
         final @Nullable UserId targetUserId;
         final TargetType targetType;
 
-        if (targetInc instanceof LabelTarget) {
-            final LabelTarget labelTarget = (LabelTarget) targetInc;
+        if (targetInc instanceof EdgeTarget) {
+            final EdgeTarget labelTarget = (EdgeTarget) targetInc;
             target = IfaceUtils.getONid(labelTarget.getTargetNid());
             targetVersion = labelTarget.getVersion().orNull();
             targetUserId = null;
             targetType = TargetType.liveTarget;
-        } else if (targetInc instanceof LabelTargetExt) {
-            LabelTargetExt labelTargetExt = (LabelTargetExt) targetInc;
+        } else if (targetInc instanceof EdgeTargetExt) {
+            EdgeTargetExt labelTargetExt = (EdgeTargetExt) targetInc;
             target = IfaceUtils.getONid(labelTargetExt.getTargetNid());
             targetVersion = labelTargetExt.getVersion().orNull();
             targetUserId = labelTargetExt.getUserId();
             targetType = TargetType.liveTarget;
-        } else if (targetInc instanceof LabelTargetInc) {
-            LabelTargetInc labelTargeInc = (LabelTargetInc) targetInc;
+        } else if (targetInc instanceof EdgeTargetInc) {
+            EdgeTargetInc labelTargeInc = (EdgeTargetInc) targetInc;
 
             target = IfaceUtils.getOincNid(labelTargeInc.getTargetNid());
             targetVersion = null;
@@ -93,14 +97,16 @@ public class RelationWrapper {
             throw new IllegalArgumentException("Unknown target type");
         }
 
-        return createInc(source, target, targetVersion, targetUserId, targetType, labelName, index);
+        return createInc(source, sourceClass, target, targetVersion, targetUserId, targetType,
+                labelName, index);
     }
 
-    private static RelationWrapper createInc(ONid source, ONid target,
+    private static RelationWrapper createInc(ONid source, ClassId srcClass, ONid target,
             @Nullable Version targetVersion, @Nullable UserId targetUserId, TargetType targetType,
             ClassLabelName labelName, LabelIndex index) {
         ODocument doc = new ODocument(CLASS_NAME);
 
+        doc.field(FIELD_SRC_CLASS, srcClass.getId(), OType.LONG);
         doc.field(FIELD_LABEL_NAME, labelName.getIndex(), OType.SHORT);
         doc.field(FIELD_LABEL_INDEX, index.getIndex(), OType.LONG);
         RelationWrapper relationWrapper = new RelationWrapper(doc);
@@ -139,6 +145,15 @@ public class RelationWrapper {
 
     protected void setSource(ONid src) {
         getDocument().field(FIELD_SRC, src.getRecordId().toString(), OType.STRING);
+    }
+
+    @Nullable
+    public INid getSource() {
+        final String oIdentifiable = getDocument().field(FIELD_SRC, OType.STRING);
+        if (oIdentifiable == null) {
+            return null;
+        }
+        return ONid.fromString(oIdentifiable);
     }
 
     public boolean isTargetIsInc() {
@@ -235,6 +250,7 @@ public class RelationWrapper {
             clazz.createProperty(RelationWrapper.FIELD_LABEL_NAME, OType.SHORT);
             clazz.createProperty(RelationWrapper.FIELD_LABEL_INDEX, OType.LONG);
             clazz.createProperty(RelationWrapper.FIELD_SRC, OType.STRING);
+            clazz.createProperty(RelationWrapper.FIELD_TARGET, OType.STRING);
 
             clazz.createIndex(INDEX_INC_NODES, OClass.INDEX_TYPE.NOTUNIQUE,
                     RelationWrapper.FIELD_UNCOMMITTED, RelationWrapper.FIELD_SRC);
@@ -242,6 +258,11 @@ public class RelationWrapper {
             clazz.createIndex(INDEX_NODES_BY_LABEL, OClass.INDEX_TYPE.NOTUNIQUE,
                     RelationWrapper.FIELD_ISCOM, RelationWrapper.FIELD_SRC,
                     RelationWrapper.FIELD_LABEL_NAME, RelationWrapper.FIELD_LABEL_INDEX);
+
+            clazz.createIndex(INDEX_IN_EDGES, OClass.INDEX_TYPE.NOTUNIQUE,
+                    RelationWrapper.FIELD_ISCOM, RelationWrapper.FIELD_TARGET,
+                    RelationWrapper.FIELD_LABEL_NAME, RelationWrapper.FIELD_LABEL_INDEX);
+
             schema.save();
         }
     }

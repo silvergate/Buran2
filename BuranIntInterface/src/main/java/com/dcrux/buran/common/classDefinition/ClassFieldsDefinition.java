@@ -6,6 +6,7 @@ import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Buran.
@@ -41,5 +42,9 @@ public class ClassFieldsDefinition implements Serializable {
 
     public Map<FieldIndex, FieldEntry> getFieldEntries() {
         return fieldEntries;
+    }
+
+    public Set<FieldIndex> getFieldIndexes() {
+        return this.fieldEntries.keySet();
     }
 }

@@ -1,20 +1,20 @@
-package com.dcrux.buran.common.labels.getter;
+package com.dcrux.buran.common.edges.getter;
 
-import com.dcrux.buran.common.labels.ILabelGet;
-import com.dcrux.buran.common.labels.ILabelName;
-import com.dcrux.buran.common.labels.LabelIndex;
+import com.dcrux.buran.common.edges.IEdgeGetter;
+import com.dcrux.buran.common.edges.ILabelName;
+import com.dcrux.buran.common.edges.LabelIndex;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 02.07.13 Time: 02:32
  */
-public class GetLabel implements ILabelGet<GetLabelResult> {
+public class GetEdge implements IEdgeGetter<GetEdgeResult> {
     private final ILabelName labelName;
     private final LabelIndex fromIndex;
     private final LabelIndex toIndex;
 
-    public GetLabel(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
+    public GetEdge(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
         if (fromIndex.getIndex() > toIndex.getIndex()) {
             throw new IllegalArgumentException("fromIndex.getIndex()>toIndex.getIndex()");
         }
@@ -23,12 +23,12 @@ public class GetLabel implements ILabelGet<GetLabelResult> {
         this.toIndex = toIndex;
     }
 
-    public static GetLabel c(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
-        return new GetLabel(labelName, fromIndex, toIndex);
+    public static GetEdge c(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
+        return new GetEdge(labelName, fromIndex, toIndex);
     }
 
-    public static GetLabel c(ILabelName labelName, LabelIndex index) {
-        return new GetLabel(labelName, index, index);
+    public static GetEdge c(ILabelName labelName, LabelIndex index) {
+        return new GetEdge(labelName, index, index);
     }
 
     public ILabelName getLabelName() {

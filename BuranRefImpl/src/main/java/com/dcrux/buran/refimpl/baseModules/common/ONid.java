@@ -3,6 +3,7 @@ package com.dcrux.buran.refimpl.baseModules.common;
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.INid;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 /**
@@ -16,6 +17,10 @@ public class ONid implements INid, IIncNid {
 
     public ONid(ORID recordId) {
         this.recordId = recordId;
+    }
+
+    public static ONid fromString(String oridStr) {
+        return new ONid(new ORecordId(oridStr));
     }
 
     public static ONid fromDoc(ODocument document) {

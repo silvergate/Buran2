@@ -1,4 +1,4 @@
-package com.dcrux.buran.common.labels;
+package com.dcrux.buran.common.edges;
 
 import java.io.Serializable;
 

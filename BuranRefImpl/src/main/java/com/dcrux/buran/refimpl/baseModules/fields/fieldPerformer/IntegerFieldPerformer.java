@@ -4,11 +4,12 @@ import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.getter.GetInt;
-import com.dcrux.buran.common.fields.getter.GetPrim;
+import com.dcrux.buran.common.fields.getter.FieldGetInt;
+import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
+import com.dcrux.buran.common.fields.setter.FieldRemove;
+import com.dcrux.buran.common.fields.setter.FieldSetInt;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
-import com.dcrux.buran.common.fields.setter.SetInt;
 import com.dcrux.buran.common.fields.types.IntegerType;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
@@ -27,9 +28,10 @@ import java.util.Set;
 public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
 
     private final static Set<Class<? extends IUnfieldedDataGetter<?>>> GETTERS =
-            getters(GetInt.class, GetPrim.class);
+            getters(FieldGetInt.class, FieldGetPrim.class);
 
-    private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(SetInt.class);
+    private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetInt
+            .class, FieldRemove.class);
 
     public static final IntegerFieldPerformer SINGLETON = new IntegerFieldPerformer();
 
@@ -52,13 +54,21 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
     public boolean performSetter(UserId sender, CommonNode node, ClassDefinition classDefinition,
             IntegerType integerType, FieldIndex fieldIndex, IUnfieldedDataSetter setter)
             throws FieldConstraintViolationInt {
-        final Number value = ((SetInt) setter).getValue();
-        if (!integerType.isValid(value)) {
-            throw new FieldConstraintViolationInt("Invalid number. Check min-value / max-value.");
+        if (setter instanceof FieldSetInt) {
+            final Number value = ((FieldSetInt) setter).getValue();
+            if (!integerType.isValid(value)) {
+                throw new FieldConstraintViolationInt(
+                        "Invalid number. Check min-value / max-value.");
+            }
+            node.setFieldValue(fieldIndex, value, oTypeFrom(integerType));
+            return true;
         }
 
-        node.setFieldValue(fieldIndex, value, oTypeFrom(integerType));
-        return true;
+        if (setter instanceof FieldRemove) {
+            node.removeFieldValue(fieldIndex);
+            return true;
+        }
+        throw new IllegalStateException("Unknown setter");
     }
 
     @Override

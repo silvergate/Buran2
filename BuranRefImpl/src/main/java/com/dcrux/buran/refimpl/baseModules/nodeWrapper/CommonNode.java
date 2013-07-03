@@ -52,6 +52,10 @@ public class CommonNode extends DocumentWrapper {
         getDocument().field(fieldName(index), value, type);
     }
 
+    public void removeFieldValue(FieldIndex index) {
+        getDocument().removeField(fieldName(index));
+    }
+
     public Object getFieldValue(FieldIndex index, OType type) {
         return getDocument().field(fieldName(index), type);
     }

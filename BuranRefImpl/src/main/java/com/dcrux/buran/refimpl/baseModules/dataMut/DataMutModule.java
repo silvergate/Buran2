@@ -3,11 +3,11 @@ package com.dcrux.buran.refimpl.baseModules.dataMut;
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.IncNodeNotFound;
 import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.edges.IEdgeSetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
-import com.dcrux.buran.common.labels.ILabelSet;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
@@ -52,8 +52,8 @@ public class DataMutModule extends Module<BaseModule> {
             return true;
         }
 
-        if (setter instanceof ILabelSet) {
-            final ILabelSet labelSetter = (ILabelSet) setter;
+        if (setter instanceof IEdgeSetter) {
+            final IEdgeSetter labelSetter = (IEdgeSetter) setter;
             getBase().getLabelModule().performLabelSet(node, labelSetter, outCommittableRelations);
             return false;
         }

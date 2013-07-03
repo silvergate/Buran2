@@ -1,9 +1,9 @@
-package com.dcrux.buran.common.labels.targets;
+package com.dcrux.buran.common.edges.targets;
 
 import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.Version;
-import com.dcrux.buran.common.labels.ILabelTarget;
-import com.dcrux.buran.common.labels.ILabelTargetInc;
+import com.dcrux.buran.common.edges.IEdgeTarget;
+import com.dcrux.buran.common.edges.IEdgeTargetInc;
 import com.google.common.base.Optional;
 
 /**
@@ -11,11 +11,11 @@ import com.google.common.base.Optional;
  *
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
-public class LabelTarget implements ILabelTargetInc, ILabelTarget {
+public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
     private final INid targetNid;
     private final Optional<Version> version;
 
-    public LabelTarget(INid targetNid, Optional<Version> version) {
+    public EdgeTarget(INid targetNid, Optional<Version> version) {
         this.targetNid = targetNid;
         this.version = version;
     }
@@ -38,7 +38,7 @@ public class LabelTarget implements ILabelTargetInc, ILabelTarget {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        LabelTarget that = (LabelTarget) o;
+        EdgeTarget that = (EdgeTarget) o;
 
         if (!targetNid.equals(that.targetNid)) return false;
         if (!version.equals(that.version)) return false;
@@ -55,7 +55,7 @@ public class LabelTarget implements ILabelTargetInc, ILabelTarget {
 
     @Override
     public String toString() {
-        return "LabelTarget{" +
+        return "EdgeTarget{" +
                 "targetNid=" + targetNid +
                 ", version=" + version +
                 '}';

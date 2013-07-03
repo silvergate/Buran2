@@ -3,13 +3,14 @@ package com.dcrux.buran.refimpl.baseModules.dataFetch;
 import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.edges.IEdgeGetter;
+import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.IFieldGetter;
 import com.dcrux.buran.common.getterSetter.BulkGet;
 import com.dcrux.buran.common.getterSetter.BulkGetIndex;
 import com.dcrux.buran.common.getterSetter.IBulkGetResult;
 import com.dcrux.buran.common.getterSetter.IDataGetter;
-import com.dcrux.buran.common.labels.ILabelGet;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -67,13 +68,13 @@ public class DataFetchModule extends Module<BaseModule> {
     }
 
     public <TRetVal extends Serializable> TRetVal getData(NidVer nidVer,
-            IDataGetter<TRetVal> getter) throws NodeNotFoundException {
+            IDataGetter<TRetVal> getter) throws NodeNotFoundException, NodeClassNotFoundException {
         final LiveNode node = getNodeReq(nidVer);
         return (TRetVal) getData(node, getter);
     }
 
     public <TRetVal extends Serializable> Serializable getData(LiveNode node,
-            IDataGetter<TRetVal> getter) {
+            IDataGetter<TRetVal> getter) throws NodeClassNotFoundException {
         if (getter instanceof BulkGet) {
             final BulkGet bulkGet = (BulkGet) getter;
             final List<Serializable> results = new ArrayList<>();
@@ -94,8 +95,8 @@ public class DataFetchModule extends Module<BaseModule> {
             return (TRetVal) getBase().getFieldsModule().performGetter(node, fieldGetter);
         }
 
-        if (getter instanceof ILabelGet) {
-            final ILabelGet labelGetter = (ILabelGet) getter;
+        if (getter instanceof IEdgeGetter) {
+            final IEdgeGetter labelGetter = (IEdgeGetter) getter;
             return getBase().getLabelModule().performLabelGet(node, labelGetter);
         }
 

@@ -7,5 +7,5 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 02.07.13 Time: 18:09
  */
-public interface IUnfieldedDataGetter<T extends Object> extends Serializable {
+public interface IUnfieldedDataGetter<T extends Serializable> extends Serializable {
 }

@@ -8,11 +8,11 @@ import com.dcrux.buran.common.fields.types.StringType;
  *
  * @author: ${USER} Date: 29.06.13 Time: 14:52
  */
-public class SetStr implements IUnfieldedDataSetter {
+public class FieldSetStr implements IUnfieldedDataSetter {
 
     private final String value;
 
-    public SetStr(String value) {
+    public FieldSetStr(String value) {
         this.value = value;
     }
 
@@ -20,8 +20,8 @@ public class SetStr implements IUnfieldedDataSetter {
         return value;
     }
 
-    public static SetStr c(final String value) {
-        return new SetStr(value);
+    public static FieldSetStr c(final String value) {
+        return new FieldSetStr(value);
     }
 
     @Override
