@@ -3,6 +3,7 @@ package com.dcrux.buran.refimpl.baseModules.commit;
 import com.dcrux.buran.common.*;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.IRecordPlayer;
@@ -41,13 +42,15 @@ public class CommitModule extends Module<BaseModule> {
     }
 
     private LiveNode commitNode(final UserId sender, final IncubationNode incubationNode,
-            @Nullable final Set<OIdentifiable> outCommittableRelations) throws Exception {
+            @Nullable final Set<OIdentifiable> outCommittableRelations,
+            IChangeTracker changeTracker) throws Exception {
         final boolean update = incubationNode.isUpdate();
         if (!update) {
             incubationNode.goLive();
             final LiveNode storeNode = new LiveNode(incubationNode.getDocument());
             storeNode.setVersion(Version.INITIAL);
             incubationNode.getDocument().save();
+            changeTracker.newNode(storeNode);
             return storeNode;
         } else {
             final ONid upOnid = incubationNode.getUpdateNid();
@@ -58,6 +61,7 @@ public class CommitModule extends Module<BaseModule> {
 
             up.incVersion();
             up.getDocument().save();
+            changeTracker.updatedNode(up);
             return up;
         }
     }
@@ -70,6 +74,8 @@ public class CommitModule extends Module<BaseModule> {
         final Multimap<OIdentifiable, OIdentifiable> committableRelationsByNode =
                 HashMultimap.create();
 
+        final IChangeTracker changeTracker = getBase().getIndexModule().createChangeTracker();
+
         /* Commit node */
         for (final IIncNid incNid : incNids) {
             final Optional<IncubationNode> iNode =
@@ -79,7 +85,7 @@ public class CommitModule extends Module<BaseModule> {
             }
             final IncubationNode node = iNode.get();
             final Set<OIdentifiable> commitableRelations = new HashSet<>();
-            final LiveNode liveNode = commitNode(sender, node, commitableRelations);
+            final LiveNode liveNode = commitNode(sender, node, commitableRelations, changeTracker);
 
             for (final OIdentifiable commitable : commitableRelations) {
                 committableRelationsByNode.put(liveNode.getDocument(), commitable);
@@ -93,7 +99,8 @@ public class CommitModule extends Module<BaseModule> {
         for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
             final Collection<OIdentifiable> additional =
                     committableRelationsByNode.get(entry.getLiveNode().getDocument());
-            getBase().getLabelModule().commit(entry.getLiveNode(), additional, commitInfo);
+            getBase().getLabelModule()
+                    .commit(entry.getLiveNode(), additional, commitInfo, changeTracker);
         }
 
         /* Remove incubation */

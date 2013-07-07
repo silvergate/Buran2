@@ -7,6 +7,7 @@ import com.dcrux.buran.common.edges.getter.GetInClassEdge;
 import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
 import com.dcrux.buran.common.edges.setter.SetEdge;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitInfo;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
@@ -17,7 +18,6 @@ import com.google.common.collect.Multimap;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexManagerProxy;
-import com.orientechnologies.orient.core.iterator.ORecordIteratorClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.sun.istack.internal.Nullable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -140,11 +140,9 @@ public class LabelModule extends Module<BaseModule> {
     }
 
     public void commit(CommonNode node, Collection<OIdentifiable> additionalRelations,
-            CommitInfo commitInfo) {
+            CommitInfo commitInfo, IChangeTracker changeTracker) {
         /* Make edges live */
-        //ONid incNid = incNode.getNid();
-        //ONid liveNid = liveNode.getNid();
-        makeLabelsLive(node.getNid(), commitInfo, additionalRelations);
+        makeLabelsLive(node, commitInfo, additionalRelations, changeTracker);
     }
 
     /*private void removeAllLabels(ONid nid) {
@@ -159,8 +157,9 @@ public class LabelModule extends Module<BaseModule> {
         }
     } */
 
-    private void makeLabelsLive(ONid nid, CommitInfo commitInfo,
-            @Nullable Collection<OIdentifiable> additionalRelations) {
+    private void makeLabelsLive(CommonNode node, CommitInfo commitInfo,
+            @Nullable Collection<OIdentifiable> additionalRelations, IChangeTracker changeTracker) {
+        final ONid nid = node.getNid();
         final OIndexManagerProxy indexManager = getBase().getDb().getMetadata().getIndexManager();
         final OIndex<?> index = indexManager
                 .getClassIndex(RelationWrapper.CLASS_NAME, RelationWrapper.INDEX_INC_NODES);
@@ -172,27 +171,31 @@ public class LabelModule extends Module<BaseModule> {
         while (titer.hasNext()) {
             System.out.println("Entry : " + titer.next());
         } */
+
         /* Test */
-        final ORecordIteratorClass<ODocument> iter =
+        /*final ORecordIteratorClass<ODocument> iter =
                 getBase().getDb().browseClass(RelationWrapper.CLASS_NAME);
         while (iter.hasNext()) {
             System.out.println("   * Relation in DB: " + iter.next());
-        }
+        }*/
+
+        final LiveNode liveNode = new LiveNode(node.getDocument());
 
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(value, value);
-        System.out.println("Found (make live): For Node " + nid.getAsString() + ", " +
-                "" + foundSet + ", index-size: " + index.getSize());
+        /*System.out.println("Found (make live): For Node " + nid.getAsString() + ", " +
+                "" + foundSet + ", index-size: " + index.getSize());*/
         for (final OIdentifiable found : foundSet) {
-            makeSingleLabelLive(found, commitInfo);
+            makeSingleLabelLive(liveNode, found, commitInfo, changeTracker);
         }
         if (additionalRelations != null) {
             for (final OIdentifiable found : additionalRelations) {
-                makeSingleLabelLive(found, commitInfo);
+                makeSingleLabelLive(liveNode, found, commitInfo, changeTracker);
             }
         }
     }
 
-    private void makeSingleLabelLive(OIdentifiable found, CommitInfo commitInfo) {
+    private void makeSingleLabelLive(LiveNode source, OIdentifiable found, CommitInfo commitInfo,
+            IChangeTracker changeTracker) {
         final ODocument doc = getBase().getDb().load(found.getIdentity());
         final RelationWrapper relationWrapper = new RelationWrapper(doc);
 
@@ -208,5 +211,7 @@ public class LabelModule extends Module<BaseModule> {
 
         relationWrapper.goLive(newTarget);
         relationWrapper.getDocument().save();
+
+        changeTracker.newRelation(source, relationWrapper);
     }
 }

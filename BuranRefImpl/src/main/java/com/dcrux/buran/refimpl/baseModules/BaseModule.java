@@ -9,6 +9,7 @@ import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
+import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
 import com.dcrux.buran.refimpl.baseModules.label.LabelModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
@@ -40,6 +41,7 @@ public class BaseModule {
     private final AuthModule authModule = new AuthModule(this);
     private final DeltaRecorderModule deltaRecorderModule = new DeltaRecorderModule(this);
     private final Random random = new Random();
+    private final IndexModule indexModule = new IndexModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -145,5 +147,9 @@ public class BaseModule {
 
     public DeltaRecorderModule getDeltaRecorderModule() {
         return deltaRecorderModule;
+    }
+
+    public IndexModule getIndexModule() {
+        return indexModule;
     }
 }

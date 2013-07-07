@@ -12,6 +12,7 @@
         <module>BuranRefImpl</module>
         <module>BuranRefImpl</module>
         <module>BuranIntInterface</module>
+        <module>BuranScripting</module>
     </modules>
 
     <repositories>
