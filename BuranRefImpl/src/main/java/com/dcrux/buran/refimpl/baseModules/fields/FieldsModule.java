@@ -14,6 +14,8 @@ import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
+import com.dcrux.buran.refimpl.baseModules.changeTracker.Time;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
@@ -39,7 +41,8 @@ public class FieldsModule extends Module<BaseModule> {
         super(baseModule);
     }
 
-    public boolean performSetter(UserId sender, CommonNode node, IFieldSetter dataSetter)
+    public boolean performSetter(UserId sender, CommonNode node, IFieldSetter dataSetter,
+            IChangeTracker changeTracker)
             throws NodeClassNotFoundException, FieldConstraintViolationInt {
         if (dataSetter instanceof FieldRemoveAll) {
             final ClassDefinition classDef =
@@ -48,7 +51,7 @@ public class FieldsModule extends Module<BaseModule> {
             for (final FieldIndex index : classDef.getFields().getFieldIndexes()) {
                 fs.add(index, FieldRemove.c());
             }
-            return performSetter(sender, node, fs);
+            return performSetter(sender, node, fs, changeTracker);
         }
 
         if (dataSetter instanceof FieldSetter) {
@@ -74,9 +77,11 @@ public class FieldsModule extends Module<BaseModule> {
                             "Performer does not support setter: " + entry.getValue().getClass());
                 }
 
+                changeTracker.fieldUpdate(Time.pre, entry.getKey(), node);
                 final boolean unc = performer
                         .performSetter(sender, node, classDef, typeDef, entry.getKey(),
                                 entry.getValue());
+                changeTracker.fieldUpdate(Time.post, entry.getKey(), node);
 
                 if (unc) {
                     nodeChanged = true;

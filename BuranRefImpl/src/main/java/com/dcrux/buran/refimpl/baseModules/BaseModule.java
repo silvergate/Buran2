@@ -7,12 +7,13 @@ import com.dcrux.buran.refimpl.baseModules.commit.CommitModule;
 import com.dcrux.buran.refimpl.baseModules.dataFetch.DataFetchModule;
 import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
+import com.dcrux.buran.refimpl.baseModules.edge.EdgeModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
-import com.dcrux.buran.refimpl.baseModules.label.LabelModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
+import com.dcrux.buran.refimpl.baseModules.versions.VersionsModule;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -35,13 +36,14 @@ public class BaseModule {
     private final ClassesModule classesModule = new ClassesModule(this);
     private final FieldsModule fieldsModule = new FieldsModule(this);
     private final DataFetchModule dataFetchModule = new DataFetchModule(this);
-    private final LabelModule labelModule = new LabelModule(this);
+    private final EdgeModule edgeModule = new EdgeModule(this);
     private final DataMutModule dataMutModule = new DataMutModule(this);
     private final CommitModule commitModule = new CommitModule(this);
     private final AuthModule authModule = new AuthModule(this);
     private final DeltaRecorderModule deltaRecorderModule = new DeltaRecorderModule(this);
     private final Random random = new Random();
     private final IndexModule indexModule = new IndexModule(this);
+    private final VersionsModule versionsModule = new VersionsModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -54,9 +56,10 @@ public class BaseModule {
     }
 
     private void setup() {
-        this.labelModule.setupDb();
+        this.edgeModule.setupDb();
         this.classesModule.setupDb();
         this.deltaRecorderModule.setupDb();
+        this.versionsModule.setupDb();
     }
 
     public ODatabaseDocument getDb() {
@@ -125,8 +128,8 @@ public class BaseModule {
         return dataFetchModule;
     }
 
-    public LabelModule getLabelModule() {
-        return labelModule;
+    public EdgeModule getEdgeModule() {
+        return edgeModule;
     }
 
     public DataMutModule getDataMutModule() {
@@ -151,5 +154,9 @@ public class BaseModule {
 
     public IndexModule getIndexModule() {
         return indexModule;
+    }
+
+    public VersionsModule getVersionsModule() {
+        return versionsModule;
     }
 }

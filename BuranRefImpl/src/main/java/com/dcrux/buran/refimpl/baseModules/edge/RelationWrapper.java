@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.baseModules.label;
+package com.dcrux.buran.refimpl.baseModules.edge;
 
 import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.UserId;

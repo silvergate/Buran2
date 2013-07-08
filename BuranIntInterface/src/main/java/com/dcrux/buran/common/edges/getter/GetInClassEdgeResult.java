@@ -45,7 +45,7 @@ public class GetInClassEdgeResult implements Serializable {
     public List<Entry> entries;
 
     /**
-     * Sorted by label index.
+     * Sorted by edge index.
      *
      * @return
      */

@@ -31,6 +31,7 @@ public class ClassDefinition implements Serializable {
     }
 
     private final ClassFieldsDefinition fields = new ClassFieldsDefinition();
+    private final ClassIndexDefinition indexes = new ClassIndexDefinition();
 
     public ClassFieldsDefinition getFields() {
         return fields;
@@ -42,5 +43,9 @@ public class ClassDefinition implements Serializable {
 
     public String getLongDesc() {
         return longDesc;
+    }
+
+    public ClassIndexDefinition getIndexes() {
+        return indexes;
     }
 }

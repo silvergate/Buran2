@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.baseModules.label;
+package com.dcrux.buran.refimpl.baseModules.edge;
 
 import com.dcrux.buran.common.edges.*;
 import com.dcrux.buran.common.edges.getter.GetEdge;
@@ -30,9 +30,9 @@ import java.util.*;
  *
  * @author: ${USER} Date: 29.06.13 Time: 13:59
  */
-public class LabelModule extends Module<BaseModule> {
+public class EdgeModule extends Module<BaseModule> {
 
-    public LabelModule(BaseModule baseModule) {
+    public EdgeModule(BaseModule baseModule) {
         super(baseModule);
     }
 
@@ -136,7 +136,7 @@ public class LabelModule extends Module<BaseModule> {
             }
             throw new IllegalArgumentException("Only Class Label names are " + "implemented");
         }
-        throw new IllegalArgumentException("Unknown set label");
+        throw new IllegalArgumentException("Unknown set edge");
     }
 
     public void commit(CommonNode node, Collection<OIdentifiable> additionalRelations,

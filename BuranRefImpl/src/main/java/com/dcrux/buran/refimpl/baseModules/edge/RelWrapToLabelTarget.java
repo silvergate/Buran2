@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.baseModules.label;
+package com.dcrux.buran.refimpl.baseModules.edge;
 
 import com.dcrux.buran.common.edges.IEdgeTarget;
 import com.dcrux.buran.common.edges.targets.EdgeTarget;

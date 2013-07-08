@@ -14,6 +14,7 @@ import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassHashId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.edges.ClassLabelName;
@@ -37,8 +38,19 @@ import com.dcrux.buran.common.fields.types.IntegerType;
 import com.dcrux.buran.common.fields.types.StringType;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
+import com.dcrux.buran.indexing.IndexDefinition;
+import com.dcrux.buran.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.indexing.mapInput.FieldTarget;
+import com.dcrux.buran.indexing.mapInput.NodeMapInput;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandRunner.BuranCommandRunner;
+import com.dcrux.buran.scripting.functions.FunGet;
+import com.dcrux.buran.scripting.functions.FunRet;
+import com.dcrux.buran.scripting.functions.integer.FunIntLit;
+import com.dcrux.buran.scripting.functions.integer.FunIntToBin;
+import com.dcrux.buran.scripting.functions.list.FunListNew;
+import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.VarName;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -54,13 +66,25 @@ public class Test {
 
     public static final FieldIndex C1_I0 = FieldIndex.c(0);
     public static final FieldIndex C1_I1 = FieldIndex.c(1);
+    public static final ClassIndexName C1_I1_INDEX = new ClassIndexName("byI1");
 
 
     public static ClassDefinition cdef1() {
+        NodeMapInput nodeMapInput = new NodeMapInput();
+        nodeMapInput.getFields().put(VarName.c("input"), new FieldTarget(C1_I1, true));
+        Block block = new Block();
+        block.add(FunRet.c(FunListNew.c().add(FunIntToBin.c(FunGet
+                .c(VarName.c("input"), com.dcrux.buran.scripting.iface.types.IntegerType.class),
+                com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
+                .add(FunIntLit.c(212)).get()));
+        MapFunction mapFunction = MapFunction.single(block);
+        IndexDefinition byField1 = new IndexDefinition(nodeMapInput, mapFunction);
+
         ClassDefinition classDef = new ClassDefinition("Hallo Welt",
                 "kfk lkamdlkmalksml kmalksmld kmalsm sdf asdf sd fsdf sdf sdf a.");
         classDef.getFields().add(C1_I0, new StringType(0, 200), false)
                 .add(C1_I1, IntegerType.cInt16Range(), false);
+        classDef.getIndexes().add(C1_I1_INDEX, byField1);
         return classDef;
     }
 
@@ -118,7 +142,7 @@ public class Test {
 
             System.out.println("ClassID from Hash = " + classIdRead);
 
-            /* Read label targets from node 1*/
+            /* Read edge targets from node 1*/
             GetEdge labelGet = GetEdge.c(ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX);
             final GetEdgeResult result =
                     bcr.sync(thisAccount, sender, ComFetch.c(comNode, labelGet));

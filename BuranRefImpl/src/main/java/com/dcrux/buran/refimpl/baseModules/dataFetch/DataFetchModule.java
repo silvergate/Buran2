@@ -17,6 +17,7 @@ import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.google.common.base.Optional;
+import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import java.io.Serializable;
@@ -39,6 +40,14 @@ public class DataFetchModule extends Module<BaseModule> {
         final ODocument doc = getBase().getDb().load(oNid.getRecordId());
         final LiveNode incubationNode = new LiveNode(doc);
         return Optional.of(incubationNode);
+    }
+
+    public LiveNode getNode(ORID versionsRecord) throws NodeNotFoundException {
+        final NidVer nidVer = getBase().getVersionsModule().getNidVer(versionsRecord);
+        if (nidVer == null) {
+            throw NodeNotFoundException.deleted();
+        }
+        return getNodeReq(nidVer);
     }
 
     public void assertVersion(LiveNode node, Version version) throws NodeNotFoundException {
@@ -97,7 +106,7 @@ public class DataFetchModule extends Module<BaseModule> {
 
         if (getter instanceof IEdgeGetter) {
             final IEdgeGetter labelGetter = (IEdgeGetter) getter;
-            return getBase().getLabelModule().performLabelGet(node, labelGetter);
+            return getBase().getEdgeModule().performLabelGet(node, labelGetter);
         }
 
         throw new IllegalArgumentException("Unkown data getter");

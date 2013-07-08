@@ -2,12 +2,43 @@ package com.dcrux.buran.scripting.iface.types;
 
 import com.dcrux.buran.scripting.iface.IType;
 
+import java.io.Serializable;
+
 /**
  * Buran.
  *
  * @author: ${USER} Date: 04.07.13 Time: 17:36
  */
 public final class IntegerType implements IType<Number> {
+
+    public static enum NumOfBits implements Serializable {
+        int8((short) 1),
+        int16((short) 2),
+        int32((short) 4),
+        int64((short) 8);
+        short bytes;
+
+        private NumOfBits(short bytes) {
+            this.bytes = bytes;
+        }
+
+        public short getBytes() {
+            return bytes;
+        }
+    }
+
+    public NumOfBits getRequiredBits() {
+        if ((this.minValue >= Byte.MIN_VALUE) && (this.maxValue <= Byte.MAX_VALUE)) {
+            return NumOfBits.int8;
+        }
+        if ((this.minValue >= Short.MIN_VALUE) && (this.maxValue <= Short.MAX_VALUE)) {
+            return NumOfBits.int16;
+        }
+        if ((this.minValue >= Integer.MIN_VALUE) && (this.maxValue <= Integer.MAX_VALUE)) {
+            return NumOfBits.int32;
+        }
+        return NumOfBits.int64;
+    }
 
     private final long minValue;
     private final long maxValue;

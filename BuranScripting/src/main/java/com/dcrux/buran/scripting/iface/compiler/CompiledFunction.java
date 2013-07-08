@@ -2,6 +2,8 @@ package com.dcrux.buran.scripting.iface.compiler;
 
 import com.dcrux.buran.scripting.iface.*;
 
+import java.io.Serializable;
+
 /**
  * Buran.
  *
@@ -9,7 +11,7 @@ import com.dcrux.buran.scripting.iface.*;
  */
 public class CompiledFunction<TRetJavaType, TRetType extends IType<TRetJavaType>,
         TFun extends IFunctionDeclaration<TRetType>>
-        implements IEvaluable {
+        implements IEvaluable, Serializable {
 
     private final IFunctionImplementation<TRetJavaType, TRetType, TFun> implementation;
     private final IEvaluable[] args;

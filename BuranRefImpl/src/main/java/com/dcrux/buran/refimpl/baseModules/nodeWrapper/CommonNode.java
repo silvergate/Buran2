@@ -60,5 +60,13 @@ public class CommonNode extends DocumentWrapper {
         return getDocument().field(fieldName(index), type);
     }
 
+    public Object getFieldValue(FieldIndex index) {
+        return getDocument().field(fieldName(index));
+    }
+
+    public boolean hasField(FieldIndex index) {
+        return getDocument().containsField(fieldName(index));
+    }
+
 
 }

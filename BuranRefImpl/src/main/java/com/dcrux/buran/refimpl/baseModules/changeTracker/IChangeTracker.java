@@ -1,6 +1,8 @@
 package com.dcrux.buran.refimpl.baseModules.changeTracker;
 
-import com.dcrux.buran.refimpl.baseModules.label.RelationWrapper;
+import com.dcrux.buran.common.fields.FieldIndex;
+import com.dcrux.buran.refimpl.baseModules.edge.RelationWrapper;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 
 /**
@@ -8,6 +10,7 @@ import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
  *
  * @author: ${USER} Date: 04.07.13 Time: 14:22
  */
+@Deprecated
 public interface IChangeTracker {
     void newNode(LiveNode newNode);
 
@@ -18,4 +21,6 @@ public interface IChangeTracker {
     void newRelation(LiveNode sourceNode, RelationWrapper relation);
 
     void removedRelation(LiveNode sourceNode, RelationWrapper relation);
+
+    void fieldUpdate(Time time, FieldIndex fieldIndex, CommonNode sourceNode);
 }

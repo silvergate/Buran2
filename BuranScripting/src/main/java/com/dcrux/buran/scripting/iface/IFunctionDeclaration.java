@@ -1,5 +1,6 @@
 package com.dcrux.buran.scripting.iface;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @author: ${USER} Date: 04.07.13 Time: 17:28
  */
-public interface IFunctionDeclaration<TRetType extends IType> {
+public interface IFunctionDeclaration<TRetType extends IType> extends Serializable {
     List<IFunctionDeclaration<?>> getInput();
 
     IFunctionDeclaration<?> getInput(int index);

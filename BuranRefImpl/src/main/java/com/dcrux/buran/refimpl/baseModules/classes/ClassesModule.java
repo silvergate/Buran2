@@ -1,12 +1,14 @@
 package com.dcrux.buran.refimpl.baseModules.classes;
 
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassHashId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.ClassNameUtils;
+import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
@@ -15,9 +17,11 @@ import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Buran.
@@ -57,13 +61,16 @@ public class ClassesModule extends Module<BaseModule> {
         return exists;
     }
 
-    public ClassDefinition getClassDefById(ClassId classId) throws NodeClassNotFoundException {
+    public ClassDefExt getClassDefExtById(ClassId classId) throws NodeClassNotFoundException {
         //TODO: Diese methode wird sehr oft aufgerufen, einen cache machen dafür!
         final ClassDefWrapper wrapper = getClassWrapperById(classId);
         final byte[] definition = wrapper.getDef();
-        final ClassDefinition classDef =
-                (ClassDefinition) SerializationUtils.deserialize(definition);
+        final ClassDefExt classDef = (ClassDefExt) SerializationUtils.deserialize(definition);
         return classDef;
+    }
+
+    public ClassDefinition getClassDefById(ClassId classId) throws NodeClassNotFoundException {
+        return getClassDefExtById(classId).getClassDefinition();
     }
 
     public Optional<ClassId> getClassIdByClassHash(final ClassHashId classHashId) {
@@ -98,7 +105,7 @@ public class ClassesModule extends Module<BaseModule> {
         return classWrapper.getClassHashId();
     }
 
-    private byte[] toBinary(ClassDefinition classDefinition) {
+    private byte[] toBinary(Serializable classDefinition) {
         //TODO: Das muss irgendwann mal canonical werden
         return SerializationUtils.serialize(classDefinition);
     }
@@ -125,12 +132,17 @@ public class ClassesModule extends Module<BaseModule> {
 
         /* Class is not yet declared. Declare now. */
 
-        Optional<Exception> exception = null;
+        final Map<ClassIndexName, CompiledBlock> combiledMapFunctions =
+                getBase().getIndexModule().getFunctionCompiler()
+                        .compileAndValidateMapFunctions(classDefinition.getIndexes());
+        ClassDefExt classDefExt = new ClassDefExt(classDefinition, combiledMapFunctions);
+        final byte[] completedBinary = toBinary(classDefExt);
+
         ClassId classId = null;
         final long classIdLong = getBase().getRandom().nextLong();
         classId = new ClassId(classIdLong);
         final ClassDefWrapper classDefWrapper =
-                ClassDefWrapper.c(classId, classHashId, classAsBinary);
+                ClassDefWrapper.c(classId, classHashId, completedBinary);
         classDefWrapper.getDocument().save();
 
         return classId;

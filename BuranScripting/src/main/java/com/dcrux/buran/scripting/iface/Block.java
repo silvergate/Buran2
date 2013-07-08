@@ -1,5 +1,6 @@
 package com.dcrux.buran.scripting.iface;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  *
  * @author: ${USER} Date: 05.07.13 Time: 07:34
  */
-public class Block {
+public class Block implements Serializable {
 
     public static Block c() {
         return new Block();
