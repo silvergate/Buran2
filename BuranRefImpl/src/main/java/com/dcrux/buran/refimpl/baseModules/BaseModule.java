@@ -60,6 +60,7 @@ public class BaseModule {
         this.classesModule.setupDb();
         this.deltaRecorderModule.setupDb();
         this.versionsModule.setupDb();
+        this.indexModule.setupDb();
     }
 
     public ODatabaseDocument getDb() {

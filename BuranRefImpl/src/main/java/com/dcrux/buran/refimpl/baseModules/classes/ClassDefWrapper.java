@@ -28,12 +28,15 @@ public class ClassDefWrapper extends DocumentWrapper {
         super(document);
     }
 
-    public static ClassDefWrapper c(ClassId classId, ClassHashId classHashId, byte[] serDef) {
+    public static ClassDefWrapper c(ClassId classId) {
         final ODocument doc = new ODocument(CLASS_NAME);
         doc.field(FIELD_CID, classId.getId(), OType.LONG);
-        doc.field(FIELD_HASH, classHashId.getHash(), OType.BINARY);
-        doc.field(FIELD_DEF, serDef, OType.BINARY);
         return new ClassDefWrapper(doc);
+    }
+
+    public void complete(ClassHashId classHashId, byte[] serDef) {
+        getDocument().field(FIELD_HASH, classHashId.getHash(), OType.BINARY);
+        getDocument().field(FIELD_DEF, serDef, OType.BINARY);
     }
 
     @Nullable

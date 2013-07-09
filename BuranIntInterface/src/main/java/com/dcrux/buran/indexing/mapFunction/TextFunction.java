@@ -14,7 +14,7 @@ public class TextFunction implements Serializable {
 
     public static final int MAX_TOKEN_LENGTH_LIMIT = 48;
 
-    public static enum MatchType {
+    public static enum FuzzinessType {
         exact,
         lowFuzziness,
         mediumFuzziness,
@@ -24,7 +24,7 @@ public class TextFunction implements Serializable {
     public static enum ProximityType {
         following,
         near,
-        indocument
+        indocument // This operation is optional
     }
 
     private IFieldTarget target;
@@ -32,6 +32,6 @@ public class TextFunction implements Serializable {
     private int numOfTokenLimit = Integer.MAX_VALUE;
     private int tokenLengthLimit = MAX_TOKEN_LENGTH_LIMIT;
     private boolean removeStopwords;
-    private EnumSet<MatchType> supportedMatchTypes;
+    private EnumSet<FuzzinessType> supportedFuzzinessTypes;
     private EnumSet<ProximityType> supportedProximityTypes;
 }

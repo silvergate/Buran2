@@ -32,8 +32,11 @@ public class IndexImpl extends Module<BaseModule> {
         return classDef.getIndexes();
     }
 
-    public void removeFromIndex(ORID versionsRecord, ClassId classId) {
-
+    public void removeFromIndex(ORID versionsRecord, ClassId classId)
+            throws NodeClassNotFoundException {
+        final ClassDefExt classDefExt = getBase().getClassesModule().getClassDefExtById(classId);
+        getBase().getIndexModule().getMapIndexModule()
+                .removeFromMapStorage(classId, classDefExt, versionsRecord);
     }
 
     public void index(ORID versionsRecord, ClassId classId)
@@ -41,8 +44,15 @@ public class IndexImpl extends Module<BaseModule> {
         final LiveNode node = getBase().getDataFetchModule().getNode(versionsRecord);
         final ClassDefExt classDefExt =
                 getBase().getClassesModule().getClassDefExtById(node.getClassId());
+
+        /* Eval values for map index */
         final Map<ClassIndexName, Collection<EvaluatedMap>> evalResult =
                 getBase().getIndexModule().getMapFunEvaluator().eval(classDefExt, node);
+
+        /* Store in map index */
+        getBase().getIndexModule().getMapIndexModule()
+                .addToMapStorage(classId, classDefExt, versionsRecord, evalResult);
+
         System.out.println("INDEX Eval Result: " + evalResult);
     }
 

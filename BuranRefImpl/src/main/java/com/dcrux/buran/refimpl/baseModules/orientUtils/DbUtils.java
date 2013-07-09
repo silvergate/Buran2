@@ -20,7 +20,7 @@ public class DbUtils extends Module<BaseModule> implements IRunner {
     }
 
     public void run(ITransaction transaction, boolean reuse, ODatabaseDocument database)
-            throws Throwable {
+            throws Exception {
         if (!reuse) {
             database.begin(OTransaction.TXTYPE.OPTIMISTIC);
         }
@@ -33,12 +33,16 @@ public class DbUtils extends Module<BaseModule> implements IRunner {
             if (!reuse) {
                 database.rollback();
             }
-            throw t;
+            if (t instanceof Exception) {
+                throw (Exception) t;
+            } else {
+                throw new Exception(t);
+            }
         }
     }
 
     public <T extends Object> T run(ITransRet<T> transaction, boolean reuse,
-            ODatabaseDocument database) throws Throwable {
+            ODatabaseDocument database) throws Exception {
         if (!reuse) {
             database.begin(OTransaction.TXTYPE.OPTIMISTIC);
         }
@@ -52,18 +56,22 @@ public class DbUtils extends Module<BaseModule> implements IRunner {
             if (!reuse) {
                 database.rollback();
             }
-            throw t;
+            if (t instanceof Exception) {
+                throw (Exception) t;
+            } else {
+                throw new Exception(t);
+            }
         }
     }
 
     @Override
-    public void run(ITransaction transaction) throws Throwable {
+    public void run(ITransaction transaction) throws Exception {
         ODatabaseDocument database = getBase().getDb();
         run(transaction, false, database);
     }
 
     @Override
-    public <T extends Object> T run(ITransRet<T> transaction) throws Throwable {
+    public <T extends Object> T run(ITransRet<T> transaction) throws Exception {
         ODatabaseDocument database = getBase().getDb();
         return run(transaction, false, database);
     }

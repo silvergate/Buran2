@@ -7,9 +7,14 @@ import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.IndexingAdditionalInfo;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.ClassNameUtils;
+import com.dcrux.buran.refimpl.baseModules.orientUtils.IRunner;
+import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransRet;
+import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransaction;
 import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
 import com.google.common.base.Optional;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -125,25 +130,69 @@ public class ClassesModule extends Module<BaseModule> {
         final byte[] classAsBinary = toBinary(classDefinition);
         final byte[] hashByte = calcHash(classAsBinary);
         final ClassHashId classHashId = new ClassHashId(hashByte);
-        final Optional<ClassId> classIdOpt = getClassIdByClassHash(classHashId);
+        final Optional<ClassId> classIdOpt =
+                getBase().getDbUtils().run(new ITransRet<Optional<ClassId>>() {
+                    @Override
+                    public Optional<ClassId> run(ODatabaseDocument db, IRunner runner)
+                            throws Throwable {
+                        return getClassIdByClassHash(classHashId);
+                    }
+                });
         if (classIdOpt.isPresent()) {
             return classIdOpt.get();
         }
 
         /* Class is not yet declared. Declare now. */
 
-        final Map<ClassIndexName, CompiledBlock> combiledMapFunctions =
-                getBase().getIndexModule().getFunctionCompiler()
-                        .compileAndValidateMapFunctions(classDefinition.getIndexes());
-        ClassDefExt classDefExt = new ClassDefExt(classDefinition, combiledMapFunctions);
+        final int maxNumOfRetries = 100;
+        ClassDefWrapper classDefWrapper = null;
+        /* Find a free classID */
+        for (int i = 0; i < 100; i++) {
+            try {
+                classDefWrapper = getBase().getDbUtils().run(new ITransRet<ClassDefWrapper>() {
+                    @Override
+                    public ClassDefWrapper run(ODatabaseDocument db, IRunner runner)
+                            throws Throwable {
+                        final long classIdLong = getBase().getRandom().nextLong();
+                        final ClassDefWrapper classDefWrapper =
+                                ClassDefWrapper.c(new ClassId(classIdLong));
+                        classDefWrapper.getDocument().save();
+                        return classDefWrapper;
+                    }
+                });
+            } catch (Exception ex) {
+                /* Next try */
+            }
+            if (classDefWrapper != null) {
+                break;
+            }
+        }
+        if (classDefWrapper == null) {
+            throw new IllegalStateException("No free class ID found");
+        }
+
+        ClassId classId = classDefWrapper.getClassId();
+
+        /* Create information for storage */
+        final IndexingAdditionalInfo indexingAdditionalInfo = getBase().getIndexModule()
+                .prepareClassForIndexing(classId, classDefinition.getIndexes());
+        final Map<ClassIndexName, CompiledBlock> compiledMapFunctions =
+                indexingAdditionalInfo.getCompiledIndexes();
+        ClassDefExt classDefExt = new ClassDefExt(classDefinition, compiledMapFunctions);
         final byte[] completedBinary = toBinary(classDefExt);
 
-        ClassId classId = null;
-        final long classIdLong = getBase().getRandom().nextLong();
-        classId = new ClassId(classIdLong);
-        final ClassDefWrapper classDefWrapper =
-                ClassDefWrapper.c(classId, classHashId, completedBinary);
-        classDefWrapper.getDocument().save();
+        /* Create orientDB-classes */
+        getBase().getClassesModule().createOrientClassIfNonExistent(classId);
+
+        /* Got everything, store now complete class */
+        final ClassDefWrapper classDefWrapperFinal = classDefWrapper;
+        getBase().getDbUtils().run(new ITransaction() {
+            @Override
+            public void run(ODatabaseDocument db, IRunner runner) throws Throwable {
+                classDefWrapperFinal.complete(classHashId, completedBinary);
+                classDefWrapperFinal.getDocument().save();
+            }
+        });
 
         return classId;
     }

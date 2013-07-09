@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.index;
 
+import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
@@ -7,7 +8,12 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.index.eval.MapFunEvaluator;
 import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.FunctionCompiler;
+import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.IndexingAdditionalInfo;
+import com.dcrux.buran.refimpl.baseModules.index.keyGen.KeyGenModule;
+import com.dcrux.buran.refimpl.baseModules.index.mapIndex.MapIndexModule;
+import com.dcrux.buran.refimpl.baseModules.index.orientSerializer.BuranKeySerializer;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.serialization.serializer.binary.OBinarySerializerFactory;
 
 /**
  * Buran.
@@ -19,9 +25,15 @@ public class IndexModule extends Module<BaseModule> {
     private final FunctionCompiler functionCompiler = new FunctionCompiler(getBase());
     private final MapFunEvaluator mapFunEvaluator = new MapFunEvaluator(getBase());
     private final IndexImpl indexImpl = new IndexImpl(getBase());
+    private final MapIndexModule mapIndexModule = new MapIndexModule(getBase());
+    private final KeyGenModule keyGenModule = new KeyGenModule(getBase());
 
     public IndexModule(BaseModule baseModule) {
         super(baseModule);
+    }
+
+    public void setupDb() {
+        OBinarySerializerFactory.INSTANCE.registerSerializer(new BuranKeySerializer(), null);
     }
 
     public FunctionCompiler getFunctionCompiler() {
@@ -36,8 +48,14 @@ public class IndexModule extends Module<BaseModule> {
         return indexImpl;
     }
 
-    public void removeFromIndex(ORID versionsRecord, ClassId classId) {
+    public KeyGenModule getKeyGenModule() {
+        return keyGenModule;
+    }
+
+    public void removeFromIndex(ORID versionsRecord, ClassId classId)
+            throws NodeClassNotFoundException {
         System.out.println("   - REMOVE FROM INDEX: " + versionsRecord);
+        getIndexImpl().removeFromIndex(versionsRecord, classId);
     }
 
     public void index(ORID versionsRecord, ClassId classId)
@@ -46,39 +64,15 @@ public class IndexModule extends Module<BaseModule> {
         System.out.println("   - ADD TO INDEX: " + versionsRecord);
     }
 
-    /*public IChangeTracker createChangeTracker() {
-        return new IChangeTracker() {
-            @Override
-            public void newNode(LiveNode newNode) {
-                System.out.println("  CHANGE TRACKER: New Node");
-            }
+    public IndexingAdditionalInfo prepareClassForIndexing(ClassId classId,
+            ClassIndexDefinition cid) {
+        getMapIndexModule().createIndexes(classId, cid);
+        return new IndexingAdditionalInfo(
+                getFunctionCompiler().compileAndValidateMapFunctions(cid));
+    }
 
-            @Override
-            public void updatedNode(LiveNode updatedNode) {
-                System.out.println("  CHANGE TRACKER: Updated Node");
-            }
+    public MapIndexModule getMapIndexModule() {
+        return mapIndexModule;
+    }
 
-            @Override
-            public void removedNode(LiveNode deletedNode) {
-                System.out.println("  CHANGE TRACKER: Removed Node");
-            }
-
-            @Override
-            public void newRelation(LiveNode sourceNode, RelationWrapper relation) {
-                System.out.println("  CHANGE TRACKER: New Relation: " +
-                        relation.getDocument().getIdentity().toString());
-            }
-
-            @Override
-            public void removedRelation(LiveNode sourceNode, RelationWrapper relation) {
-                System.out.println("  CHANGE TRACKER: Removed relation");
-            }
-
-            @Override
-            public void fieldUpdate(Time time, FieldIndex fieldIndex, CommonNode sourceNode) {
-                System.out.println("  CHANGE TRACKER: Updated FIELD " + fieldIndex + ", " +
-                        "time: " + time);
-            }
-        };
-    }      */
 }

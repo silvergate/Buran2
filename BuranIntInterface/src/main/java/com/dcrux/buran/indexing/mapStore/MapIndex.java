@@ -5,10 +5,10 @@ package com.dcrux.buran.indexing.mapStore;
  *
  * @author: ${USER} Date: 08.07.13 Time: 09:44
  */
-public class MapStore implements IMapStore {
+public class MapIndex implements IMapIndex {
     private final boolean rangeSupport;
 
-    public MapStore(boolean rangeSupport) {
+    public MapIndex(boolean rangeSupport) {
         this.rangeSupport = rangeSupport;
     }
 

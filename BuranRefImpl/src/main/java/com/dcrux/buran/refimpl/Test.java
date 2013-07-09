@@ -10,6 +10,7 @@ import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.ICommitResult;
+import com.dcrux.buran.commands.indexing.ComQuery;
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
@@ -39,9 +40,12 @@ import com.dcrux.buran.common.fields.types.StringType;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.indexing.IndexDefinition;
+import com.dcrux.buran.indexing.keyGen.NumberKeyGen;
+import com.dcrux.buran.indexing.keyGen.RangeIndexKeyGen;
 import com.dcrux.buran.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.indexing.mapInput.FieldTarget;
 import com.dcrux.buran.indexing.mapInput.NodeMapInput;
+import com.dcrux.buran.indexing.mapStore.MapIndex;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandRunner.BuranCommandRunner;
 import com.dcrux.buran.scripting.functions.FunGet;
@@ -78,7 +82,8 @@ public class Test {
                 com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
                 .add(FunIntLit.c(212)).get()));
         MapFunction mapFunction = MapFunction.single(block);
-        IndexDefinition byField1 = new IndexDefinition(nodeMapInput, mapFunction);
+        IndexDefinition byField1 =
+                new IndexDefinition(nodeMapInput, mapFunction, new MapIndex(true));
 
         ClassDefinition classDef = new ClassDefinition("Hallo Welt",
                 "kfk lkamdlkmalksml kmalksmld kmalsm sdf asdf sd fsdf sdf sdf a.");
@@ -119,6 +124,8 @@ public class Test {
             bcr.sync(thisAccount, sender, ComMutate.c(incNid1, BulkSet.c(
                     FieldSetter.c(0, FieldSetStr.c("Hallo Welt")).add(1, FieldSetInt.c(32)))
                     .add(setEdge1)));
+            bcr.sync(thisAccount, sender, ComMutate.c(incNid2, BulkSet.c(
+                    FieldSetter.c(0, FieldSetStr.c("Noch ne welt")).add(1, FieldSetInt.c(32312)))));
 
             final ICommitResult comResult =
                     bcr.sync(thisAccount, sender, ComCommit.c(incNid1, incNid2, incNid3));
@@ -190,6 +197,11 @@ public class Test {
                             .c(classId, ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX)));
             System.out.println("All in nodes to node " + node3.getNid().getAsString() + ": " +
                     allInNodes);
+
+            /* Index-Abfrage */
+            ComQuery cq = new ComQuery(classId, C1_I1_INDEX,
+                    RangeIndexKeyGen.from(NumberKeyGen.int64(666)));
+            bcr.sync(thisAccount, sender, cq);
 
         } catch (UncheckedException uce) {
             uce.getWrapped().printStackTrace();
