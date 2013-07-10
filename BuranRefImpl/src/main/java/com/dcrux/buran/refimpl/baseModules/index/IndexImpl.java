@@ -32,20 +32,23 @@ public class IndexImpl extends Module<BaseModule> {
         return classDef.getIndexes();
     }
 
-    public void removeFromIndex(ORID versionsRecord, ClassId classId)
-            throws NodeClassNotFoundException {
+    public void removeFromIndexAndNotify(ORID versionsRecord, ClassId classId,
+            boolean causeIsRemove) throws NodeClassNotFoundException {
         final ClassDefExt classDefExt = getBase().getClassesModule().getClassDefExtById(classId);
         getBase().getIndexModule().getMapIndexModule()
                 .removeFromMapStorage(classId, classDefExt, versionsRecord);
+
+        /* Notify */
+        getBase().getNotificationsModule().removedOrUpdated(classId, versionsRecord, causeIsRemove);
     }
 
-    public void index(ORID versionsRecord, ClassId classId)
+    public void indexAndNotify(ORID versionsRecord, ClassId classId)
             throws NodeNotFoundException, NodeClassNotFoundException {
         final LiveNode node = getBase().getDataFetchModule().getNode(versionsRecord);
         final ClassDefExt classDefExt =
                 getBase().getClassesModule().getClassDefExtById(node.getClassId());
 
-        /* Eval values for map index */
+        /* Eval values for map indexAndNotify */
         final Map<ClassIndexName, Collection<EvaluatedMap>> evalResult =
                 getBase().getIndexModule().getMapFunEvaluator().eval(classDefExt, node);
 
@@ -53,7 +56,8 @@ public class IndexImpl extends Module<BaseModule> {
         getBase().getIndexModule().getMapIndexModule()
                 .addToMapStorage(classId, classDefExt, versionsRecord, evalResult);
 
-        System.out.println("INDEX Eval Result: " + evalResult);
+        /* Notify notification manager */
+        getBase().getNotificationsModule().notifyAddedToIndex(classId, versionsRecord, evalResult);
     }
 
 

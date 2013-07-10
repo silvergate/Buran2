@@ -3,7 +3,7 @@ package com.dcrux.buran.commands.indexing;
 import com.dcrux.buran.commands.Command;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
-import com.dcrux.buran.indexing.keyGen.IKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.IKeyGen;
 
 /**
  * Buran.

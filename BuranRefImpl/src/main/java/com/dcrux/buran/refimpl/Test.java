@@ -39,13 +39,13 @@ import com.dcrux.buran.common.fields.types.IntegerType;
 import com.dcrux.buran.common.fields.types.StringType;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
-import com.dcrux.buran.indexing.IndexDefinition;
-import com.dcrux.buran.indexing.keyGen.NumberKeyGen;
-import com.dcrux.buran.indexing.keyGen.RangeIndexKeyGen;
-import com.dcrux.buran.indexing.mapFunction.MapFunction;
-import com.dcrux.buran.indexing.mapInput.FieldTarget;
-import com.dcrux.buran.indexing.mapInput.NodeMapInput;
-import com.dcrux.buran.indexing.mapStore.MapIndex;
+import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.keyGen.NumberKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.RangeIndexKeyGen;
+import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
+import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
+import com.dcrux.buran.common.indexing.mapStore.MapIndex;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandRunner.BuranCommandRunner;
 import com.dcrux.buran.scripting.functions.FunGet;
@@ -137,7 +137,7 @@ public class Test {
             final String value = bcr.sync(thisAccount, sender,
                     ComFetch.c(comNode, SingleGet.c(0, FieldGetStr.SINGLETON)));
 
-            System.out.println("Data at index 0: " + value);
+            System.out.println("Data at indexAndNotify 0: " + value);
 
             final ClassHashId classHashId =
                     bcr.sync(thisAccount, sender, ComClassHashIdById.c(classId));
@@ -160,9 +160,9 @@ public class Test {
 
             IIncNid changedNode = bcr.sync(thisAccount, sender, comCreateUpdate);
 
-            final IDataSetter changeLabelSetter =
+            final IDataSetter changeLabelSetter = BulkSet.c(
                     FieldSetter.c(0, FieldSetStr.c("Ich bin eine Änderung!"))
-                            .add(C1_I1, FieldSetInt.c(666));
+                            .add(C1_I1, FieldSetInt.c(666)));
             bcr.sync(thisAccount, sender, ComMutate.c(changedNode, changeLabelSetter));
 
             final IEdgeSetter newLabel = SetEdge.c(ClassLabelName.c(0))
@@ -176,7 +176,7 @@ public class Test {
             final String value2 = bcr.sync(thisAccount, sender,
                     ComFetch.c(changedNodeCommited, SingleGet.c(0, FieldGetStr.SINGLETON)));
 
-            System.out.println("Data at index 0 (After change): " + value2);
+            System.out.println("Data at indexAndNotify 0 (After change): " + value2);
 
             GetEdge labelGet2 = GetEdge.c(ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX);
             final GetEdgeResult result2 =

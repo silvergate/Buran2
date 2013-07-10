@@ -51,9 +51,15 @@ public class ComCommitImpl implements ICommandImpl<BaseModule, ICommitResult, Co
             baseModule.getIndexModule()
                     .index(addToIndex.getVersionsRecord(), addToIndex.getClassId());
         }
-        for (CommitResult.IndexResult removeFromIndex : commitResult.getRemoveFromIndexes()) {
+        for (CommitResult.IndexResult removeFromIndex : commitResult
+                .getRemoveFromIndexesCauseRemoved()) {
             baseModule.getIndexModule().removeFromIndex(removeFromIndex.getVersionsRecord(),
-                    removeFromIndex.getClassId());
+                    removeFromIndex.getClassId(), true);
+        }
+        for (CommitResult.IndexResult removeFromIndex : commitResult
+                .getRemoveFromIndexesCauseUpdated()) {
+            baseModule.getIndexModule().removeFromIndex(removeFromIndex.getVersionsRecord(),
+                    removeFromIndex.getClassId(), false);
         }
 
         return new ICommitResult() {

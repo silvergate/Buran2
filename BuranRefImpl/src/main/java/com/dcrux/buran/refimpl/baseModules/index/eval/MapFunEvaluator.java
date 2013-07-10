@@ -2,9 +2,9 @@ package com.dcrux.buran.refimpl.baseModules.index.eval;
 
 import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
-import com.dcrux.buran.indexing.IndexDefinition;
-import com.dcrux.buran.indexing.mapFunction.MapFunction;
-import com.dcrux.buran.indexing.mapInput.*;
+import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.mapInput.*;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -64,7 +64,7 @@ public class MapFunEvaluator extends Module<BaseModule> {
                         if ((!hasValue) && (fieldTargetCast.isRequired())) {
                            /* Index gen abort */
                             result.remove(entry.getKey());
-                            //TODO: Falsch, da ein index-input auch kein feld haben kann.
+                            //TODO: Falsch, da ein indexAndNotify-input auch kein feld haben kann.
                             break;
                         } else {
                             value = node.getFieldValue(fieldTargetCast.getField());

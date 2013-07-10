@@ -2,8 +2,8 @@ package com.dcrux.buran.refimpl.baseModules.index.functionCompiler;
 
 import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
-import com.dcrux.buran.indexing.IndexDefinition;
-import com.dcrux.buran.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.scripting.functionsImpl.FunAssignImpl;

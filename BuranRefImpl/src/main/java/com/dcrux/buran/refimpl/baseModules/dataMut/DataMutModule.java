@@ -8,6 +8,7 @@ import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
+import com.dcrux.buran.common.nodes.INodeSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -58,6 +59,12 @@ public class DataMutModule extends Module<BaseModule> {
             final IEdgeSetter labelSetter = (IEdgeSetter) setter;
             getBase().getEdgeModule().performLabelSet(node, labelSetter, outCommittableRelations);
             return false;
+        }
+
+        if (setter instanceof INodeSetter) {
+            final INodeSetter nodeSetter = (INodeSetter) setter;
+            getBase().getNodesModule().performNodeSet(node, nodeSetter);
+            return true;
         }
 
         throw new IllegalArgumentException("Unknown setter type");

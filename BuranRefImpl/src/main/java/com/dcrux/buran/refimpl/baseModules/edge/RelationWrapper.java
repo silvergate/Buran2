@@ -50,7 +50,7 @@ public class RelationWrapper {
     public static final String FIELD_SRC = "src";
     public static final String FIELD_SRC_CLASS = "srcCls";
 
-    /* Label and index */
+    /* Label and indexAndNotify */
     public static final String FIELD_LABEL_NAME = "labelName";
     public static final String FIELD_LABEL_INDEX = "labelIndex";
 

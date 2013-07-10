@@ -44,4 +44,6 @@ public class LiveNode extends CommonNode {
         final Version version = getVersion();
         return new NidVer(nid, version);
     }
+
+
 }

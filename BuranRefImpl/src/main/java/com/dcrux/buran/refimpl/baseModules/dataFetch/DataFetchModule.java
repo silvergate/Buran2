@@ -51,6 +51,9 @@ public class DataFetchModule extends Module<BaseModule> {
     }
 
     public void assertVersion(LiveNode node, Version version) throws NodeNotFoundException {
+        if (node.isMarkedForDeletion()) {
+            throw NodeNotFoundException.deleted();
+        }
         Version ver = node.getVersion();
         if (ver.getVersion() != version.getVersion()) {
             throw NodeNotFoundException.wrongVersion(ver);

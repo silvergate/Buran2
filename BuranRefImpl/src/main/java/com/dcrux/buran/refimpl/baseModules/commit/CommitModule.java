@@ -46,7 +46,9 @@ public class CommitModule extends Module<BaseModule> {
 
     private LiveNode commitNode(final UserId sender, final IncubationNode incubationNode,
             @Nullable final Set<OIdentifiable> outCommittableRelations,
-            IChangeTracker changeTracker, Collection<CommitResult.IndexResult> outRemoveFromIndex,
+            IChangeTracker changeTracker,
+            Collection<CommitResult.IndexResult> outRemoveFromIndexCauseRemoved,
+            Collection<CommitResult.IndexResult> outRemoveFromIndexCauseUpdate,
             Collection<CommitResult.IndexResult> outAddToIndex) throws Exception {
         final boolean update = incubationNode.isUpdate();
         if (!update) {
@@ -74,14 +76,23 @@ public class CommitModule extends Module<BaseModule> {
             up.getDocument().save();
             changeTracker.updatedNode(up);
 
-            /* Remove old version , add new */
+            /* Remove old version, add new */
             final VersionWrapper removedVers =
                     getBase().getVersionsModule().removeNodeVersion(upOnid, upVersion);
-            outRemoveFromIndex
-                    .add(new CommitResult.IndexResult(up.getClassId(), removedVers.getOrid()));
-            final VersionWrapper addedVers =
-                    getBase().getVersionsModule().addNodeVersion(upOnid, up.getVersion());
-            outAddToIndex.add(new CommitResult.IndexResult(up.getClassId(), addedVers.getOrid()));
+            if (up.isMarkedForDeletion()) {
+                outRemoveFromIndexCauseRemoved
+                        .add(new CommitResult.IndexResult(up.getClassId(), removedVers.getOrid()));
+            } else {
+                outRemoveFromIndexCauseUpdate
+                        .add(new CommitResult.IndexResult(up.getClassId(), removedVers.getOrid()));
+            }
+            if (!up.isMarkedForDeletion()) {
+                /* No need to index deleted nodes */
+                final VersionWrapper addedVers =
+                        getBase().getVersionsModule().addNodeVersion(upOnid, up.getVersion());
+                outAddToIndex
+                        .add(new CommitResult.IndexResult(up.getClassId(), addedVers.getOrid()));
+            }
 
             return up;
         }
@@ -95,11 +106,14 @@ public class CommitModule extends Module<BaseModule> {
         final Multimap<OIdentifiable, OIdentifiable> committableRelationsByNode =
                 HashMultimap.create();
 
-        Collection<CommitResult.IndexResult> removeFromIndex = new ArrayList<>();
+        Collection<CommitResult.IndexResult> removeFromIndexCauseRemoved = new ArrayList<>();
+        Collection<CommitResult.IndexResult> removeFromIndexCauseUpdated = new ArrayList<>();
         Collection<CommitResult.IndexResult> addToIndex = new ArrayList<>();
 
         @Deprecated
         final IChangeTracker changeTracker = NullChangeTracker.SINGLETON;
+
+        final Collection<LiveNode> nodesMarkedAsDeleted = new ArrayList<>();
 
         /* Commit node */
         for (final IIncNid incNid : incNids) {
@@ -110,9 +124,11 @@ public class CommitModule extends Module<BaseModule> {
             }
             final IncubationNode node = iNode.get();
             final Set<OIdentifiable> commitableRelations = new HashSet<>();
-            final LiveNode liveNode =
-                    commitNode(sender, node, commitableRelations, changeTracker, removeFromIndex,
-                            addToIndex);
+            final LiveNode liveNode = commitNode(sender, node, commitableRelations, changeTracker,
+                    removeFromIndexCauseRemoved, removeFromIndexCauseUpdated, addToIndex);
+            if (liveNode.isMarkedForDeletion()) {
+                nodesMarkedAsDeleted.add(liveNode);
+            }
 
             for (final OIdentifiable commitable : commitableRelations) {
                 committableRelationsByNode.put(liveNode.getDocument(), commitable);
@@ -137,7 +153,15 @@ public class CommitModule extends Module<BaseModule> {
             }
         }
 
-        return new CommitResult(result, removeFromIndex, addToIndex);
+        /* Clear deleted nodes */
+        for (final LiveNode nodeMarkedForDeletion : nodesMarkedAsDeleted) {
+            nodeMarkedForDeletion.deleteNow();
+            nodeMarkedForDeletion.getDocument().save();
+            //TODO: Hier müssen auch noch die edges entfernt werden (nicht nur die node)!
+        }
+
+        return new CommitResult(result, removeFromIndexCauseRemoved, removeFromIndexCauseUpdated,
+                addToIndex);
     }
 
     private void removeIncNode(final ONid incNid) {

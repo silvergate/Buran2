@@ -52,15 +52,15 @@ public class IndexModule extends Module<BaseModule> {
         return keyGenModule;
     }
 
-    public void removeFromIndex(ORID versionsRecord, ClassId classId)
+    public void removeFromIndex(ORID versionsRecord, ClassId classId, boolean causeIsRemove)
             throws NodeClassNotFoundException {
         System.out.println("   - REMOVE FROM INDEX: " + versionsRecord);
-        getIndexImpl().removeFromIndex(versionsRecord, classId);
+        getIndexImpl().removeFromIndexAndNotify(versionsRecord, classId, causeIsRemove);
     }
 
     public void index(ORID versionsRecord, ClassId classId)
             throws NodeNotFoundException, NodeClassNotFoundException {
-        getIndexImpl().index(versionsRecord, classId);
+        getIndexImpl().indexAndNotify(versionsRecord, classId);
         System.out.println("   - ADD TO INDEX: " + versionsRecord);
     }
 

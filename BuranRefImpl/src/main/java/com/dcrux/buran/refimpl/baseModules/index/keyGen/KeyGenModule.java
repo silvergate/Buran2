@@ -1,8 +1,8 @@
 package com.dcrux.buran.refimpl.baseModules.index.keyGen;
 
-import com.dcrux.buran.indexing.keyGen.IKeyGen;
-import com.dcrux.buran.indexing.keyGen.ISingleIndexKeyGen;
-import com.dcrux.buran.indexing.keyGen.RangeIndexKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.IKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.ISingleIndexKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.RangeIndexKeyGen;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 

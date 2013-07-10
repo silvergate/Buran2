@@ -20,6 +20,7 @@ public class CommonNode extends DocumentWrapper {
     /* Common */
     public static final String FIELD_COMMON_LIVE = "live";
     public static final String INC_FIELD_SENDER = "sender";
+    public static final String FIELD_MARKED_FOR_DELETION = "markDel";
 
     public CommonNode(ODocument document) {
         super(document);
@@ -48,7 +49,7 @@ public class CommonNode extends DocumentWrapper {
     }
 
     public void setFieldValue(FieldIndex index, Object value, OType type) {
-        System.out.println("Setting value: " + value + ", at index: " + fieldName(index));
+        System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName(index));
         getDocument().field(fieldName(index), value, type);
     }
 
@@ -68,5 +69,17 @@ public class CommonNode extends DocumentWrapper {
         return getDocument().containsField(fieldName(index));
     }
 
+    public void markForDeletion() {
+        getDocument().field(FIELD_MARKED_FOR_DELETION, true, OType.BOOLEAN);
+    }
 
+    public boolean isMarkedForDeletion() {
+        final Boolean marked = getDocument().field(FIELD_MARKED_FOR_DELETION, OType.BOOLEAN);
+        return (marked != null) && marked;
+    }
+
+    public void deleteNow() {
+        getDocument().clear();
+        markForDeletion();
+    }
 }

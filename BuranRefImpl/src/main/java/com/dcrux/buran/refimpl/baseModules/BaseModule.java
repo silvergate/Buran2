@@ -11,6 +11,8 @@ import com.dcrux.buran.refimpl.baseModules.edge.EdgeModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
+import com.dcrux.buran.refimpl.baseModules.nodes.NodesModule;
+import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionsModule;
@@ -44,6 +46,8 @@ public class BaseModule {
     private final Random random = new Random();
     private final IndexModule indexModule = new IndexModule(this);
     private final VersionsModule versionsModule = new VersionsModule(this);
+    private final NotificationsModule notificationsModule = new NotificationsModule(this);
+    private final NodesModule nodesModule = new NodesModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -159,5 +163,13 @@ public class BaseModule {
 
     public VersionsModule getVersionsModule() {
         return versionsModule;
+    }
+
+    public NotificationsModule getNotificationsModule() {
+        return notificationsModule;
+    }
+
+    public NodesModule getNodesModule() {
+        return nodesModule;
     }
 }

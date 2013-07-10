@@ -1,6 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.index.orientSerializer;
 
-import com.dcrux.buran.indexing.KeyComparator;
+import com.dcrux.buran.common.indexing.KeyComparator;
 
 /**
  * Buran.

@@ -3,10 +3,10 @@ package com.dcrux.buran.refimpl.baseModules.index.mapIndex;
 import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
-import com.dcrux.buran.indexing.IndexDefinition;
-import com.dcrux.buran.indexing.mapStore.IMapIndex;
-import com.dcrux.buran.indexing.mapStore.MapIndex;
-import com.dcrux.buran.indexing.mapStore.NullMapIndex;
+import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.mapStore.IMapIndex;
+import com.dcrux.buran.common.indexing.mapStore.MapIndex;
+import com.dcrux.buran.common.indexing.mapStore.NullMapIndex;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -59,7 +59,7 @@ public class MapIndexModule extends Module<BaseModule> {
 
         } else {
             throw new IllegalArgumentException(
-                    "Unknown map index, given Type: " + mapIndex.getClass());
+                    "Unknown map indexAndNotify, given Type: " + mapIndex.getClass());
         }
     }
 
@@ -82,7 +82,7 @@ public class MapIndexModule extends Module<BaseModule> {
             } else if (mapIndex instanceof NullMapIndex) {
             } else {
                 throw new IllegalArgumentException(
-                        "Unknown map index, given Type: " + mapIndex.getClass());
+                        "Unknown map indexAndNotify, given Type: " + mapIndex.getClass());
             }
         }
     }

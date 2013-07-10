@@ -146,10 +146,11 @@ public class EdgeModule extends Module<BaseModule> {
     }
 
     /*private void removeAllLabels(ONid nid) {
-        final OIndex<?> index =
+        final OIndex<?> indexAndNotify =
                 getBase().getDbUtils().getIndex(RelationWrapper.CLASS_NAME, INDEX_NODES_BY_LABEL);
-        final Object value = index.getDefinition().createValue(nid.getRecordId().toString());
-        final Collection<OIdentifiable> foundSet = index.getValuesBetween(value, value);
+        final Object value = indexAndNotify.getDefinition().createValue(nid.getRecordId()
+        .toString());
+        final Collection<OIdentifiable> foundSet = indexAndNotify.getValuesBetween(value, value);
         System.out.println("Found (remove old edges): " + foundSet);
         for (final OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
@@ -166,8 +167,8 @@ public class EdgeModule extends Module<BaseModule> {
         final Object value = index.getDefinition().createValue(true, nid.getAsString());
 
         /* Test */
-        /*final Iterator<OIdentifiable> titer = index.valuesIterator();
-        System.out.println("NumOfEntries in Index: " + index.getSize());
+        /*final Iterator<OIdentifiable> titer = indexAndNotify.valuesIterator();
+        System.out.println("NumOfEntries in Index: " + indexAndNotify.getSize());
         while (titer.hasNext()) {
             System.out.println("Entry : " + titer.next());
         } */
@@ -183,7 +184,7 @@ public class EdgeModule extends Module<BaseModule> {
 
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(value, value);
         /*System.out.println("Found (make live): For Node " + nid.getAsString() + ", " +
-                "" + foundSet + ", index-size: " + index.getSize());*/
+                "" + foundSet + ", indexAndNotify-size: " + indexAndNotify.getSize());*/
         for (final OIdentifiable found : foundSet) {
             makeSingleLabelLive(liveNode, found, commitInfo, changeTracker);
         }
