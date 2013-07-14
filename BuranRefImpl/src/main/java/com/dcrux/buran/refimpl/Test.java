@@ -28,13 +28,12 @@ import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
 import com.dcrux.buran.common.edges.setter.SetEdge;
 import com.dcrux.buran.common.edges.targets.EdgeTargetInc;
 import com.dcrux.buran.common.fields.FieldIndex;
-import com.dcrux.buran.common.fields.getter.FieldGetAll;
-import com.dcrux.buran.common.fields.getter.FieldGetResult;
-import com.dcrux.buran.common.fields.getter.FieldGetStr;
-import com.dcrux.buran.common.fields.getter.SingleGet;
+import com.dcrux.buran.common.fields.getter.*;
+import com.dcrux.buran.common.fields.setter.FieldSetBin;
 import com.dcrux.buran.common.fields.setter.FieldSetInt;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
+import com.dcrux.buran.common.fields.types.BinaryType;
 import com.dcrux.buran.common.fields.types.IntegerType;
 import com.dcrux.buran.common.fields.types.StringType;
 import com.dcrux.buran.common.getterSetter.BulkSet;
@@ -59,6 +58,7 @@ import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -70,6 +70,7 @@ public class Test {
 
     public static final FieldIndex C1_I0 = FieldIndex.c(0);
     public static final FieldIndex C1_I1 = FieldIndex.c(1);
+    public static final FieldIndex C1_I2 = FieldIndex.c(2);
     public static final ClassIndexName C1_I1_INDEX = new ClassIndexName("byI1");
 
 
@@ -88,7 +89,8 @@ public class Test {
         ClassDefinition classDef = new ClassDefinition("Hallo Welt",
                 "kfk lkamdlkmalksml kmalksmld kmalsm sdf asdf sd fsdf sdf sdf a.");
         classDef.getFields().add(C1_I0, new StringType(0, 200), false)
-                .add(C1_I1, IntegerType.cInt16Range(), false);
+                .add(C1_I1, IntegerType.cInt16Range(), false)
+                .add(C1_I2, BinaryType.c(100000000), false);
         classDef.getIndexes().add(C1_I1_INDEX, byField1);
         return classDef;
     }
@@ -121,11 +123,15 @@ public class Test {
                     .add(LabelIndex.c(0l), EdgeTargetInc.unversioned(incNid3))
                     .add(LabelIndex.c(1), EdgeTargetInc.versioned(incNid2));
 
+            byte[] binValue = new byte[80000];
+
             bcr.sync(thisAccount, sender, ComMutate.c(incNid1, BulkSet.c(
                     FieldSetter.c(0, FieldSetStr.c("Hallo Welt")).add(1, FieldSetInt.c(32)))
                     .add(setEdge1)));
-            bcr.sync(thisAccount, sender, ComMutate.c(incNid2, BulkSet.c(
-                    FieldSetter.c(0, FieldSetStr.c("Noch ne welt")).add(1, FieldSetInt.c(32312)))));
+            bcr.sync(thisAccount, sender, ComMutate
+                    .c(incNid2, BulkSet.c(FieldSetter.c(0, FieldSetStr.c("Noch ne welt")))));
+            bcr.sync(thisAccount, sender, ComMutate.c(incNid1,
+                    FieldSetter.c(1, FieldSetInt.c(32312)).add(2, FieldSetBin.c(binValue))));
 
             final ICommitResult comResult =
                     bcr.sync(thisAccount, sender, ComCommit.c(incNid1, incNid2, incNid3));
@@ -190,6 +196,14 @@ public class Test {
                 System.out.println(MessageFormat
                         .format("  - {0}, Value: {1}", fields.getKey(), fields.getValue()));
             }
+
+            /* Das file lesen */
+            final ComFetch<byte[]> binResult =
+                    ComFetch.c(changedNodeCommited, SingleGet.c(C1_I2, new FieldGetBin(0, 100)));
+            final byte[] binResult2 = bcr.sync(thisAccount, sender, binResult);
+            System.out.println("Binary Read: " + Arrays.toString(binResult2));
+
+
 
             /* Get in-nodes */
             GetInClassEdgeResult allInNodes = bcr.sync(thisAccount, sender, ComFetch.c(node3,

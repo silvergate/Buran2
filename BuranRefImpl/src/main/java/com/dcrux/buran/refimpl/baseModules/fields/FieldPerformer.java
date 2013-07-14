@@ -16,9 +16,9 @@ import java.util.Set;
 public abstract class FieldPerformer<TFieldValue extends ITypeDef>
         implements IFieldPerformer<TFieldValue> {
 
-    public static Set<Class<? extends IUnfieldedDataGetter<?>>> getters(Class<? extends
-            IUnfieldedDataGetter<?>>... getters) {
-        final Set<Class<? extends IUnfieldedDataGetter<?>>> set = new HashSet<>();
+    public static Set<Class<? extends IUnfieldedDataGetter>> getters(Class<? extends
+            IUnfieldedDataGetter>... getters) {
+        final Set<Class<? extends IUnfieldedDataGetter>> set = new HashSet<>();
         set.addAll(Arrays.asList(getters));
         return set;
     }

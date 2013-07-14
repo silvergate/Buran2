@@ -8,15 +8,15 @@ import com.dcrux.buran.common.fields.typeDef.TypeMaxMemRequirement;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:22
  */
-public class StringType implements ITypeDef {
+public class BinaryType implements ITypeDef {
 
-    public static final int MINLEN_LIMIT = 0;
-    public static final int MAXLEN_LIMIT = 262144;
+    public static final long MINLEN_LIMIT = 0;
+    public static final long MAXLEN_LIMIT = 1099511627776l;
 
-    private final int minLen;
-    private final int maxLen;
+    private final long minLen;
+    private final long maxLen;
 
-    public StringType(int minLen, int maxLen) {
+    public BinaryType(long minLen, long maxLen) {
         if (minLen < MINLEN_LIMIT) {
             throw new IllegalArgumentException("(minLen<MINLEN_LIMIT)");
         }
@@ -27,25 +27,24 @@ public class StringType implements ITypeDef {
         this.maxLen = maxLen;
     }
 
-    public int getMinLen() {
+    public static BinaryType c(long maxLen) {
+        return new BinaryType(0, maxLen);
+    }
+
+    public long getMinLen() {
         return minLen;
     }
 
-    public int getMaxLen() {
+    public long getMaxLen() {
         return maxLen;
-    }
-
-    public boolean isMinMaxOk(String str) {
-        final int len = str.length();
-        return (len >= this.minLen) && (len <= this.maxLen);
     }
 
     @Override
     public boolean isValid(Object javaData) {
-        if (!(javaData instanceof String)) {
+        if (!(javaData instanceof byte[])) {
             return false;
         }
-        return isMinMaxOk((String) javaData);
+        return true;
     }
 
     @Override

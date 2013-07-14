@@ -48,8 +48,13 @@ public class CommonNode extends DocumentWrapper {
         return "f" + index.getIndex();
     }
 
+    public static String fieldName(FieldIndex index, String append) {
+        return "f" + append + index.getIndex();
+    }
+
     public void setFieldValue(FieldIndex index, Object value, OType type) {
-        System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName(index));
+        /*System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName
+                (index));*/
         getDocument().field(fieldName(index), value, type);
     }
 
@@ -67,6 +72,29 @@ public class CommonNode extends DocumentWrapper {
 
     public boolean hasField(FieldIndex index) {
         return getDocument().containsField(fieldName(index));
+    }
+
+    public void setFieldValue(FieldIndex index, String append, Object value, OType type) {
+        /*System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName
+                (index));*/
+        getDocument().field(fieldName(index, append), value, type);
+    }
+
+
+    public void removeFieldValue(FieldIndex index, String append) {
+        getDocument().removeField(fieldName(index, append));
+    }
+
+    public Object getFieldValue(FieldIndex index, String append, OType type) {
+        return getDocument().field(fieldName(index, append), type);
+    }
+
+    public Object getFieldValue(FieldIndex index, String append) {
+        return getDocument().field(fieldName(index, append));
+    }
+
+    public boolean hasField(FieldIndex index, String append) {
+        return getDocument().containsField(fieldName(index, append));
     }
 
     public void markForDeletion() {

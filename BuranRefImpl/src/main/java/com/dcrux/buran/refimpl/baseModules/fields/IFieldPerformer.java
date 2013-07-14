@@ -7,6 +7,7 @@ import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.typeDef.ITypeDef;
+import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 
@@ -20,18 +21,19 @@ import java.util.Set;
  */
 public interface IFieldPerformer<TFieldType extends ITypeDef> {
 
-    boolean performSetter(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            TFieldType fieldType, FieldIndex fieldIndex, IUnfieldedDataSetter setter)
-            throws FieldConstraintViolationInt;
+    boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, TFieldType fieldType, FieldIndex fieldIndex,
+            IUnfieldedDataSetter setter) throws FieldConstraintViolationInt;
 
     void performCheck(UserId sender, CommonNode node, ClassDefinition classDefinition,
             TFieldType fieldType, ClassFieldsDefinition.FieldEntry fieldEntry,
             FieldIndex fieldIndex) throws FieldConstraintViolationInt;
 
-    Serializable performGetter(LiveNode node, ClassDefinition classDefinition, TFieldType fieldType,
-            FieldIndex fieldIndex, IUnfieldedDataGetter<?> dataGetter);
+    Serializable performGetter(BaseModule baseModule, LiveNode node,
+            ClassDefinition classDefinition, TFieldType fieldType, FieldIndex fieldIndex,
+            IUnfieldedDataGetter<?> dataGetter);
 
-    Set<Class<? extends IUnfieldedDataGetter<?>>> supportedGetters();
+    Set<Class<? extends IUnfieldedDataGetter>> supportedGetters();
 
     Set<Class<? extends IUnfieldedDataSetter>> supportedSetters();
 

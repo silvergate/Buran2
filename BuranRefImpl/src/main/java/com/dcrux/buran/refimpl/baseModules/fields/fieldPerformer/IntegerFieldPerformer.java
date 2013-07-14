@@ -11,6 +11,7 @@ import com.dcrux.buran.common.fields.setter.FieldRemove;
 import com.dcrux.buran.common.fields.setter.FieldSetInt;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.types.IntegerType;
+import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
@@ -27,8 +28,8 @@ import java.util.Set;
  */
 public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
 
-    private final static Set<Class<? extends IUnfieldedDataGetter<?>>> GETTERS =
-            getters(FieldGetInt.class, FieldGetPrim.class);
+    private final static Set<Class<? extends IUnfieldedDataGetter>> GETTERS =
+            getters(FieldGetPrim.class, FieldGetInt.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetInt
             .class, FieldRemove.class);
@@ -51,9 +52,9 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
     }
 
     @Override
-    public boolean performSetter(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            IntegerType integerType, FieldIndex fieldIndex, IUnfieldedDataSetter setter)
-            throws FieldConstraintViolationInt {
+    public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, IntegerType integerType, FieldIndex fieldIndex,
+            IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetInt) {
             final Number value = ((FieldSetInt) setter).getValue();
             if (!integerType.isValid(value)) {
@@ -84,13 +85,14 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
     }
 
     @Override
-    public Serializable performGetter(LiveNode node, ClassDefinition classDefinition,
-            IntegerType integerType, FieldIndex fieldIndex, IUnfieldedDataGetter<?> dataGetter) {
+    public Serializable performGetter(BaseModule baseModule, LiveNode node,
+            ClassDefinition classDefinition, IntegerType integerType, FieldIndex fieldIndex,
+            IUnfieldedDataGetter<?> dataGetter) {
         return (Serializable) node.getFieldValue(fieldIndex, oTypeFrom(integerType));
     }
 
     @Override
-    public Set<Class<? extends IUnfieldedDataGetter<?>>> supportedGetters() {
+    public Set<Class<? extends IUnfieldedDataGetter>> supportedGetters() {
         return GETTERS;
     }
 

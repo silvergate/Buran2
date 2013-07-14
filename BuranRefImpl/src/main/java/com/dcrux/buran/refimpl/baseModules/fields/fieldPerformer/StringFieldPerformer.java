@@ -11,6 +11,7 @@ import com.dcrux.buran.common.fields.setter.FieldRemove;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.types.StringType;
+import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
@@ -27,8 +28,8 @@ import java.util.Set;
  */
 public class StringFieldPerformer extends FieldPerformer<StringType> {
 
-    private final static Set<Class<? extends IUnfieldedDataGetter<?>>> GETTERS =
-            getters(FieldGetStr.class, FieldGetPrim.class);
+    private final static Set<Class<? extends IUnfieldedDataGetter>> GETTERS =
+            getters(FieldGetPrim.class, FieldGetStr.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetStr
             .class, FieldRemove.class);
@@ -36,9 +37,9 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
     public static final StringFieldPerformer SINGLETON = new StringFieldPerformer();
 
     @Override
-    public boolean performSetter(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            StringType stringType, FieldIndex fieldIndex, IUnfieldedDataSetter setter)
-            throws FieldConstraintViolationInt {
+    public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, StringType stringType, FieldIndex fieldIndex,
+            IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetStr) {
             final String value = ((FieldSetStr) setter).getValue();
             if (!stringType.isValid(value)) {
@@ -68,13 +69,17 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
     }
 
     @Override
-    public Serializable performGetter(LiveNode node, ClassDefinition classDefinition,
-            StringType stringType, FieldIndex fieldIndex, IUnfieldedDataGetter<?> dataGetter) {
-        return (Serializable) node.getFieldValue(fieldIndex, OType.STRING);
+    public Serializable performGetter(BaseModule baseModule, LiveNode node,
+            ClassDefinition classDefinition, StringType stringType, FieldIndex fieldIndex,
+            IUnfieldedDataGetter<?> dataGetter) {
+        if (dataGetter instanceof FieldGetPrim) {
+            return (Serializable) node.getFieldValue(fieldIndex, OType.STRING);
+        }
+        throw new IllegalArgumentException("Unknown getter");
     }
 
     @Override
-    public Set<Class<? extends IUnfieldedDataGetter<?>>> supportedGetters() {
+    public Set<Class<? extends IUnfieldedDataGetter>> supportedGetters() {
         return GETTERS;
     }
 

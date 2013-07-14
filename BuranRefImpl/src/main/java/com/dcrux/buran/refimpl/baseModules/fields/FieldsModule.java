@@ -21,6 +21,7 @@ import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -79,7 +80,7 @@ public class FieldsModule extends Module<BaseModule> {
 
                 changeTracker.fieldUpdate(Time.pre, entry.getKey(), node);
                 final boolean unc = performer
-                        .performSetter(sender, node, classDef, typeDef, entry.getKey(),
+                        .performSetter(getBase(), sender, node, classDef, typeDef, entry.getKey(),
                                 entry.getValue());
                 changeTracker.fieldUpdate(Time.post, entry.getKey(), node);
 
@@ -101,14 +102,17 @@ public class FieldsModule extends Module<BaseModule> {
         final ITypeDef typeDef = fieldEntry.getTypeDef();
         final IFieldPerformer performer = REGISTRY.get(typeDef.getClass());
         if (performer == null) {
-            throw new IllegalArgumentException("No performer for this field type found");
+            throw new IllegalArgumentException(MessageFormat.format("No performer for this field " +
+                    "type " +
+                    "found. Type: {0}", typeDef.getClass()));
         }
         if (!performer.supportedGetters().contains(getter.getClass())) {
             throw new IllegalArgumentException(
                     "Performer does not support getter: " + getter.getClass());
         }
 
-        return (T) performer.performGetter(node, classDefinition, typeDef, fieldIndex, getter);
+        return (T) performer
+                .performGetter(getBase(), node, classDefinition, typeDef, fieldIndex, getter);
     }
 
     public Serializable performGetter(LiveNode node, IFieldGetter dataGetter)
