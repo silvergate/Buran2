@@ -9,7 +9,7 @@ import java.util.Collection;
  * @author: ${USER} Date: 03.07.13 Time: 02:58
  */
 public class BulkSet implements IDataSetter {
-    private final Collection<IDataSetter> dataSetterSet = new ArrayList<IDataSetter>();
+    private Collection<IDataSetter> dataSetterSet = new ArrayList<IDataSetter>();
 
     public static BulkSet c(IDataSetter setter) {
         final BulkSet bulkSet = new BulkSet();

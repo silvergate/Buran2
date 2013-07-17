@@ -11,14 +11,17 @@ import com.google.common.base.Optional;
  */
 public class NodeNotFoundException extends ExpectableException {
 
+    private NodeNotFoundException() {
+    }
+
     public static enum Reason {
         wrongVersion,
         deleted,
         doesNotExist
     }
 
-    private final Reason reason;
-    private final Optional<Version> currentVersion;
+    private Reason reason;
+    private Optional<Version> currentVersion;
 
     public static NodeNotFoundException wrongVersion(Version currentVersion) {
         return new NodeNotFoundException(Reason.wrongVersion, Optional.of(currentVersion));

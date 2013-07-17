@@ -8,15 +8,18 @@ import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
  * @author: ${USER} Date: 09.07.13 Time: 21:33
  */
 public class MultiToken implements ITokenInput {
-    private final TextFunction.FuzzinessType fuzzinessType;
-    private final String stringWithTokens;
-    private final TextFunction.ProximityType proximity;
+    private TextFunction.FuzzinessType fuzzinessType;
+    private String stringWithTokens;
+    private TextFunction.ProximityType proximity;
 
     public MultiToken(TextFunction.FuzzinessType fuzzinessType, String stringWithTokens,
             TextFunction.ProximityType proximity) {
         this.fuzzinessType = fuzzinessType;
         this.stringWithTokens = stringWithTokens;
         this.proximity = proximity;
+    }
+
+    private MultiToken() {
     }
 
     public TextFunction.FuzzinessType getFuzzinessType() {

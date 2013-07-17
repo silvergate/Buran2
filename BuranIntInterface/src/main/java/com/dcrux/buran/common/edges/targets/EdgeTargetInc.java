@@ -9,12 +9,15 @@ import com.dcrux.buran.common.edges.IEdgeTargetInc;
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
 public class EdgeTargetInc implements IEdgeTargetInc {
-    private final IIncNid targetNid;
-    private final boolean versioned;
+    private IIncNid targetNid;
+    private boolean versioned;
 
     public EdgeTargetInc(IIncNid targetNid, boolean versioned) {
         this.targetNid = targetNid;
         this.versioned = versioned;
+    }
+
+    private EdgeTargetInc() {
     }
 
     public static EdgeTargetInc unversioned(IIncNid target) {

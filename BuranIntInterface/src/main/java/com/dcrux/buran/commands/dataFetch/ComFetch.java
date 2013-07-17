@@ -16,8 +16,11 @@ public class ComFetch<TRetVal extends Serializable> extends Command<TRetVal> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
-    private final NidVer nidVer;
-    private final IDataGetter<TRetVal> getter;
+    private NidVer nidVer;
+    private IDataGetter<TRetVal> getter;
+
+    private ComFetch() {
+    }
 
     public static <TRetVal extends Serializable> ComFetch<TRetVal> c(NidVer nidVer,
             IDataGetter<TRetVal> dataGetter) {

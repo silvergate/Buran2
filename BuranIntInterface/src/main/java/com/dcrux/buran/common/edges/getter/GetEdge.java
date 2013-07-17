@@ -10,9 +10,9 @@ import com.dcrux.buran.common.edges.LabelIndex;
  * @author: ${USER} Date: 02.07.13 Time: 02:32
  */
 public class GetEdge implements IEdgeGetter<GetEdgeResult> {
-    private final ILabelName labelName;
-    private final LabelIndex fromIndex;
-    private final LabelIndex toIndex;
+    private ILabelName labelName;
+    private LabelIndex fromIndex;
+    private LabelIndex toIndex;
 
     public GetEdge(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {
         if (fromIndex.getIndex() > toIndex.getIndex()) {
@@ -21,6 +21,9 @@ public class GetEdge implements IEdgeGetter<GetEdgeResult> {
         this.labelName = labelName;
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
+    }
+
+    private GetEdge() {
     }
 
     public static GetEdge c(ILabelName labelName, LabelIndex fromIndex, LabelIndex toIndex) {

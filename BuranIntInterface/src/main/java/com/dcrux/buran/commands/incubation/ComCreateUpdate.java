@@ -14,7 +14,10 @@ import java.util.Set;
 public class ComCreateUpdate extends Command<IIncNid> {
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
-    private final NidVer nidVer;
+    private NidVer nidVer;
+
+    private ComCreateUpdate() {
+    }
 
     public static ComCreateUpdate c(NidVer nidVer) {
         return new ComCreateUpdate(nidVer);

@@ -33,7 +33,7 @@ public class FieldSetter implements IFieldSetter {
         return this;
     }
 
-    private final Map<FieldIndex, IUnfieldedDataSetter> setterMap =
+    private Map<FieldIndex, IUnfieldedDataSetter> setterMap =
             new HashMap<FieldIndex, IUnfieldedDataSetter>();
 
     public Map<FieldIndex, IUnfieldedDataSetter> getSetterMap() {

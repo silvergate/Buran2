@@ -6,10 +6,13 @@ package com.dcrux.buran.common.indexing.mapStore;
  * @author: ${USER} Date: 08.07.13 Time: 09:44
  */
 public class MapIndex implements IMapIndex {
-    private final boolean rangeSupport;
+    private boolean rangeSupport;
 
     public MapIndex(boolean rangeSupport) {
         this.rangeSupport = rangeSupport;
+    }
+
+    public MapIndex() {
     }
 
     public boolean isRangeSupport() {

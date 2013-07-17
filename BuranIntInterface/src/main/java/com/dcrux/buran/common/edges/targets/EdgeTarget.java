@@ -12,12 +12,15 @@ import com.google.common.base.Optional;
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
 public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
-    private final INid targetNid;
-    private final Optional<Version> version;
+    private INid targetNid;
+    private Optional<Version> version;
 
     public EdgeTarget(INid targetNid, Optional<Version> version) {
         this.targetNid = targetNid;
         this.version = version;
+    }
+
+    private EdgeTarget() {
     }
 
     @Override

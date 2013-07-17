@@ -16,13 +16,16 @@ public class ComMutate extends Command<VoidType> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
-    private final IIncNid incNid;
+    private IIncNid incNid;
     private IDataSetter setter;
 
     private ComMutate(IIncNid incNid, IDataSetter dataSetter) {
         super(EXCEPTIONS);
         this.incNid = incNid;
         this.setter = dataSetter;
+    }
+
+    private ComMutate() {
     }
 
     public static ComMutate c(IIncNid incNid, IDataSetter dataSetter) {

@@ -10,10 +10,13 @@ import com.dcrux.buran.common.fields.types.BinaryType;
  */
 public class FieldSetBin implements IUnfieldedDataSetter {
 
-    private final byte[] value;
+    private byte[] value;
 
     public FieldSetBin(byte[] value) {
         this.value = value;
+    }
+
+    private FieldSetBin() {
     }
 
     public byte[] getValue() {

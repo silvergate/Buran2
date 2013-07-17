@@ -13,8 +13,8 @@ public class BinaryType implements ITypeDef {
     public static final long MINLEN_LIMIT = 0;
     public static final long MAXLEN_LIMIT = 1099511627776l;
 
-    private final long minLen;
-    private final long maxLen;
+    private long minLen;
+    private long maxLen;
 
     public BinaryType(long minLen, long maxLen) {
         if (minLen < MINLEN_LIMIT) {
@@ -25,6 +25,9 @@ public class BinaryType implements ITypeDef {
         }
         this.minLen = minLen;
         this.maxLen = maxLen;
+    }
+
+    private BinaryType() {
     }
 
     public static BinaryType c(long maxLen) {

@@ -8,10 +8,13 @@ import java.io.Serializable;
  * @author: ${USER} Date: 02.07.13 Time: 19:40
  */
 public final class TypeMaxMemRequirement implements Serializable {
-    private final long bytes;
+    private long bytes;
 
     public TypeMaxMemRequirement(long bytes) {
         this.bytes = bytes;
+    }
+
+    private TypeMaxMemRequirement() {
     }
 
     public long getBytes() {

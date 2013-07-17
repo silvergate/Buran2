@@ -10,10 +10,13 @@ import com.dcrux.buran.common.fields.types.StringType;
  */
 public class FieldSetStr implements IUnfieldedDataSetter {
 
-    private final String value;
+    private String value;
 
     public FieldSetStr(String value) {
         this.value = value;
+    }
+
+    private FieldSetStr() {
     }
 
     public String getValue() {

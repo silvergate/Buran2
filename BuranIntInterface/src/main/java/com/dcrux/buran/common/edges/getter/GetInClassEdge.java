@@ -11,12 +11,12 @@ import com.dcrux.buran.common.edges.LabelIndex;
  * @author: ${USER} Date: 02.07.13 Time: 02:32
  */
 public class GetInClassEdge implements IEdgeGetter<GetInClassEdgeResult> {
-    private final ClassId classId;
+    private ClassId classId;
     //TODO: Ein limit einbauen
     //TODO: Target version berücksichtigen!
-    private final ClassLabelName labelName;
-    private final LabelIndex fromIndex;
-    private final LabelIndex toIndex;
+    private ClassLabelName labelName;
+    private LabelIndex fromIndex;
+    private LabelIndex toIndex;
 
     public GetInClassEdge(ClassId classId, ClassLabelName labelName, LabelIndex fromIndex,
             LabelIndex toIndex) {
@@ -27,6 +27,9 @@ public class GetInClassEdge implements IEdgeGetter<GetInClassEdgeResult> {
         this.labelName = labelName;
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
+    }
+
+    private GetInClassEdge() {
     }
 
     public static GetInClassEdge c(ClassId classId, ClassLabelName labelName, LabelIndex fromIndex,

@@ -12,13 +12,19 @@ import java.util.List;
  * @author: ${USER} Date: 03.07.13 Time: 22:10
  */
 public class GetInClassEdgeResult implements Serializable {
+    private GetInClassEdgeResult() {
+    }
+
     public static class Entry implements Serializable {
-        private final INid source;
-        private final LabelIndex labelIndex;
+        private INid source;
+        private LabelIndex labelIndex;
 
         public Entry(INid source, LabelIndex labelIndex) {
             this.source = source;
             this.labelIndex = labelIndex;
+        }
+
+        private Entry() {
         }
 
         public INid getSource() {

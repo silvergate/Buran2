@@ -14,10 +14,13 @@ import java.io.Serializable;
 public class GetEdgeResult implements Serializable {
 
     //TODO: Sollen sortiert sein? (Vermutlich ja, sind ja auch so in der DB)
-    private final Multimap<LabelIndex, IEdgeTarget> entries;
+    private Multimap<LabelIndex, IEdgeTarget> entries;
 
     public GetEdgeResult(Multimap<LabelIndex, IEdgeTarget> entries) {
         this.entries = entries;
+    }
+
+    private GetEdgeResult() {
     }
 
     public Multimap<LabelIndex, IEdgeTarget> getEntries() {

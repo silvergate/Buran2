@@ -6,4 +6,8 @@ package com.dcrux.buran.common.indexing.mapStore;
  * @author: ${USER} Date: 08.07.13 Time: 09:43
  */
 public class NullMapIndex implements IMapIndex {
+    public static final NullMapIndex SINGLETON = new NullMapIndex();
+
+    private NullMapIndex() {
+    }
 }

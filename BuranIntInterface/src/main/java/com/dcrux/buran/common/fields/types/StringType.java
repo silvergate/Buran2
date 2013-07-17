@@ -13,8 +13,8 @@ public class StringType implements ITypeDef {
     public static final int MINLEN_LIMIT = 0;
     public static final int MAXLEN_LIMIT = 262144;
 
-    private final int minLen;
-    private final int maxLen;
+    private int minLen;
+    private int maxLen;
 
     public StringType(int minLen, int maxLen) {
         if (minLen < MINLEN_LIMIT) {
@@ -25,6 +25,9 @@ public class StringType implements ITypeDef {
         }
         this.minLen = minLen;
         this.maxLen = maxLen;
+    }
+
+    private StringType() {
     }
 
     public int getMinLen() {

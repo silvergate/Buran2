@@ -10,6 +10,9 @@ import com.dcrux.buran.common.fields.typeDef.TypeMaxMemRequirement;
  */
 public class IntegerType implements ITypeDef {
 
+    private IntegerType() {
+    }
+
     public static enum NumOfBits {
         int8((short) 1),
         int16((short) 2),
@@ -22,8 +25,8 @@ public class IntegerType implements ITypeDef {
         }
     }
 
-    private final long minValue;
-    private final long maxValue;
+    private long minValue;
+    private long maxValue;
 
     public IntegerType(long minValue, long maxValue) {
         this.minValue = minValue;

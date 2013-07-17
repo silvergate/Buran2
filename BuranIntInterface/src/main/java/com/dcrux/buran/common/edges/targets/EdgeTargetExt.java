@@ -13,14 +13,17 @@ import com.google.common.base.Optional;
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
 public class EdgeTargetExt implements IEdgeTargetInc, IEdgeTarget {
-    private final UserId userId;
-    private final INid targetNid;
-    private final Optional<Version> version;
+    private UserId userId;
+    private INid targetNid;
+    private Optional<Version> version;
 
     public EdgeTargetExt(UserId userId, INid targetNid, Optional<Version> version) {
         this.userId = userId;
         this.targetNid = targetNid;
         this.version = version;
+    }
+
+    private EdgeTargetExt() {
     }
 
     public UserId getUserId() {

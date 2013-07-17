@@ -12,8 +12,11 @@ import java.util.Set;
  * @author: ${USER} Date: 02.07.13 Time: 14:35
  */
 public class ComCreateNew extends Command<IIncNid> {
-    private final ClassId classId;
+    private ClassId classId;
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
+
+    private ComCreateNew() {
+    }
 
     public static ComCreateNew c(ClassId classId) {
         return new ComCreateNew(classId);

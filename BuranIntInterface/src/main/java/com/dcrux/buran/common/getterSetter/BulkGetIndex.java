@@ -8,10 +8,13 @@ import java.io.Serializable;
  * @author: ${USER} Date: 03.07.13 Time: 02:20
  */
 public class BulkGetIndex<TRetVal> implements Serializable {
-    private final int index;
+    private int index;
 
     public BulkGetIndex(int index) {
         this.index = index;
+    }
+
+    private BulkGetIndex() {
     }
 
     public int getIndex() {

@@ -8,12 +8,15 @@ import com.dcrux.buran.common.fields.FieldIndex;
  * @author: ${USER} Date: 08.07.13 Time: 00:43
  */
 public class FieldTarget implements IFieldTarget {
-    private final FieldIndex field;
-    private final boolean required;
+    private FieldIndex field;
+    private boolean required;
 
     public FieldTarget(FieldIndex field, boolean required) {
         this.field = field;
         this.required = required;
+    }
+
+    private FieldTarget() {
     }
 
     public FieldIndex getField() {

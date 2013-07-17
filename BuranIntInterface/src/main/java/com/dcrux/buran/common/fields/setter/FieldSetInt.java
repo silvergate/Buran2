@@ -10,10 +10,13 @@ import com.dcrux.buran.common.fields.types.IntegerType;
  */
 public class FieldSetInt implements IUnfieldedDataSetter {
 
-    private final Number value;
+    private Number value;
 
     public FieldSetInt(Number value) {
         this.value = value;
+    }
+
+    private FieldSetInt() {
     }
 
     public Number getValue() {

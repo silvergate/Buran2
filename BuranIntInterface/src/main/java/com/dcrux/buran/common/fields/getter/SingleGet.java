@@ -11,12 +11,15 @@ import java.io.Serializable;
  * @author: ${USER} Date: 02.07.13 Time: 18:12
  */
 public class SingleGet<TRetval extends Serializable> implements IFieldGetter<TRetval> {
-    private final FieldIndex fieldIndex;
-    private final IUnfieldedDataGetter<TRetval> fieldGetter;
+    private FieldIndex fieldIndex;
+    private IUnfieldedDataGetter<TRetval> fieldGetter;
 
     public SingleGet(FieldIndex fieldIndex, IUnfieldedDataGetter<TRetval> fieldGetter) {
         this.fieldIndex = fieldIndex;
         this.fieldGetter = fieldGetter;
+    }
+
+    private SingleGet() {
     }
 
     public static <TretvalLocal extends Serializable> SingleGet<TretvalLocal> c(int fieldIndex,
