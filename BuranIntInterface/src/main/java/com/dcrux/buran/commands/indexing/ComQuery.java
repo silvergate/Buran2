@@ -12,12 +12,15 @@ import com.dcrux.buran.common.indexing.keyGen.IKeyGen;
  */
 public class ComQuery extends Command<IQueryResult> {
 
-    private final ResultDirection resultDirection = ResultDirection.normal;
-    private final LimitConfig limitConfig = new LimitConfig(true, Integer.MAX_VALUE);
+    private ResultDirection resultDirection = ResultDirection.normal;
+    private LimitConfig limitConfig = new LimitConfig(true, Integer.MAX_VALUE);
 
-    private final ClassId classId;
-    private final ClassIndexName classIndexName;
-    private final IKeyGen keyGen;
+    private ClassId classId;
+    private ClassIndexName classIndexName;
+    private IKeyGen keyGen;
+
+    private ComQuery() {
+    }
 
     public ComQuery(ClassId classId, ClassIndexName classIndexName, IKeyGen keyGen) {
         super(exceptions());

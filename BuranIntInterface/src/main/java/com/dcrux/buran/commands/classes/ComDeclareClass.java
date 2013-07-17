@@ -14,11 +14,14 @@ import java.util.Set;
 public class ComDeclareClass extends Command<ClassId> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
-    private final ClassDefinition classDefinition;
+    private ClassDefinition classDefinition;
 
     public ComDeclareClass(ClassDefinition classDefinition) {
         super(EXCEPTIONS);
         this.classDefinition = classDefinition;
+    }
+
+    private ComDeclareClass() {
     }
 
     public ClassDefinition getClassDefinition() {

@@ -7,10 +7,13 @@ package com.dcrux.buran.common;
  */
 public final class IncNidConstructor implements IIncNid {
 
-    private final String value;
+    private String value;
 
     public IncNidConstructor(String value) {
         this.value = value;
+    }
+
+    private IncNidConstructor() {
     }
 
     @Override

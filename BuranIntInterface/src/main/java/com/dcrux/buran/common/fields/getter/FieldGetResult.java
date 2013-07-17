@@ -12,9 +12,9 @@ import java.util.Map;
  * @author: ${USER} Date: 30.06.13 Time: 23:28
  */
 public class FieldGetResult implements Serializable {
-    private Map<FieldIndex, Object> values = new HashMap<>();
+    private Map<FieldIndex, Serializable> values = new HashMap<FieldIndex, Serializable>();
 
-    public Map<FieldIndex, Object> getValues() {
+    public Map<FieldIndex, Serializable> getValues() {
         return values;
     }
 }

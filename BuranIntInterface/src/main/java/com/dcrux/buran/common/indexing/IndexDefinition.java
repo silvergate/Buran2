@@ -28,6 +28,9 @@ public class IndexDefinition implements Serializable {
     private Optional<AggregatorType> aggregatorType;
     private Optional<IAggregatorStore> aggregatorStore;
 
+    private IndexDefinition() {
+    }
+
     public IMapInput getMapInput() {
         return mapInput;
     }

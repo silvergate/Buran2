@@ -12,11 +12,14 @@ import java.util.Map;
  * @author: ${USER} Date: 08.07.13 Time: 00:40
  */
 public class EdgeMapInput implements IMapInput {
-    private final Map<VarName, IFieldTarget> fields = new HashMap<>();
-    private final ClassLabelName classLabelName;
+    private Map<VarName, IFieldTarget> fields = new HashMap<VarName, IFieldTarget>();
+    private ClassLabelName classLabelName;
 
     public EdgeMapInput(ClassLabelName classLabelName) {
         this.classLabelName = classLabelName;
+    }
+
+    private EdgeMapInput() {
     }
 
     public ClassLabelName getClassLabelName() {

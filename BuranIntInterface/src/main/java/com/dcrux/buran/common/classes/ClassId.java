@@ -8,10 +8,13 @@ import java.io.Serializable;
  * @author: ${USER} Date: 29.06.13 Time: 15:40
  */
 public final class ClassId implements Serializable {
-    private final long id;
+    private long id;
 
     public ClassId(long id) {
         this.id = id;
+    }
+
+    private ClassId() {
     }
 
     public static ClassId c(long id) {

@@ -12,10 +12,13 @@ public final class LabelIndex implements Serializable {
     public static final LabelIndex MIN = new LabelIndex(Long.MIN_VALUE);
     public static final LabelIndex MAX = new LabelIndex(Long.MAX_VALUE);
 
-    private final long index;
+    private long index;
 
     public LabelIndex(long index) {
         this.index = index;
+    }
+
+    private LabelIndex() {
     }
 
     public static LabelIndex c(long index) {

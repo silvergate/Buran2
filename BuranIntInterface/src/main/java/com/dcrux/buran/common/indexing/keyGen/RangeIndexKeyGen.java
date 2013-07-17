@@ -9,11 +9,11 @@ import com.sun.istack.internal.Nullable;
  */
 public class RangeIndexKeyGen implements IKeyGen {
     @Nullable
-    private final ISingleIndexKeyGen from;
-    private final boolean fromIncluded;
+    private ISingleIndexKeyGen from;
+    private boolean fromIncluded;
     @Nullable
-    private final ISingleIndexKeyGen to;
-    private final boolean toIncluded;
+    private ISingleIndexKeyGen to;
+    private boolean toIncluded;
 
     private RangeIndexKeyGen(ISingleIndexKeyGen from, boolean fromIncluded, ISingleIndexKeyGen to,
             boolean toIncluded) {
@@ -21,6 +21,9 @@ public class RangeIndexKeyGen implements IKeyGen {
         this.fromIncluded = fromIncluded;
         this.to = to;
         this.toIncluded = toIncluded;
+    }
+
+    private RangeIndexKeyGen() {
     }
 
     public static RangeIndexKeyGen between(ISingleIndexKeyGen from, ISingleIndexKeyGen to) {

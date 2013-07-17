@@ -26,7 +26,7 @@ public class IndexModule extends Module<BaseModule> {
     private final MapFunEvaluator mapFunEvaluator = new MapFunEvaluator(getBase());
     private final IndexImpl indexImpl = new IndexImpl(getBase());
     private final MapIndexModule mapIndexModule = new MapIndexModule(getBase());
-    private final KeyGenModule keyGenModule = new KeyGenModule(getBase());
+    private final KeyGenModule keyGenModule = new KeyGenModule();
 
     public IndexModule(BaseModule baseModule) {
         super(baseModule);

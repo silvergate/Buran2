@@ -6,9 +6,12 @@ package com.dcrux.buran.commandBase;
  * @author: ${USER} Date: 02.07.13 Time: 15:03
  */
 public class WrappedExpectableException extends Exception {
-    private final Exception wrappedException;
+    private Exception wrappedException;
 
     public WrappedExpectableException(Exception wrappedException) {
         this.wrappedException = wrappedException;
+    }
+
+    private WrappedExpectableException() {
     }
 }

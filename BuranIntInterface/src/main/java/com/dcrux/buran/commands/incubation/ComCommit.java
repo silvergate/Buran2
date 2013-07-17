@@ -14,10 +14,13 @@ import java.util.Set;
  */
 public class ComCommit extends Command<ICommitResult> {
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
-    private final Set<IIncNid> incNids;
+    private Set<IIncNid> incNids;
+
+    private ComCommit() {
+    }
 
     public static ComCommit c(IIncNid... incNids) {
-        final Set<IIncNid> incNidsSet = new HashSet<>();
+        final Set<IIncNid> incNidsSet = new HashSet<IIncNid>();
         incNidsSet.addAll(Arrays.asList(incNids));
         return new ComCommit(incNidsSet);
     }

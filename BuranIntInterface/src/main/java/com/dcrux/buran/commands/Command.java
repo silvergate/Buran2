@@ -15,9 +15,12 @@ import java.util.Set;
  */
 public class Command<TRetval extends Serializable> implements ICommand<TRetval> {
 
+    protected Command() {
+    }
+
     protected static Set<Class<? extends Exception>> exceptions(
             Class<? extends Exception>... exceptions) {
-        final Set<Class<? extends Exception>> exSet = new HashSet<>();
+        final Set<Class<? extends Exception>> exSet = new HashSet<Class<? extends Exception>>();
         exSet.addAll(Arrays.asList(exceptions));
         return Collections.unmodifiableSet(exSet);
     }
@@ -26,7 +29,7 @@ public class Command<TRetval extends Serializable> implements ICommand<TRetval> 
         this.expectableExceptions = expectableExceptions;
     }
 
-    private final Set<Class<? extends Exception>> expectableExceptions;
+    private Set<Class<? extends Exception>> expectableExceptions;
 
     @Override
     public Set<Class<? extends Exception>> getExpectableExceptions() {

@@ -16,12 +16,15 @@ import java.util.Set;
 public class ClassFieldsDefinition implements Serializable {
 
     public static class FieldEntry implements Serializable {
-        private final ITypeDef typeDef;
-        private final boolean required;
+        private ITypeDef typeDef;
+        private boolean required;
 
         public FieldEntry(ITypeDef typeDef, boolean required) {
             this.typeDef = typeDef;
             this.required = required;
+        }
+
+        private FieldEntry() {
         }
 
         public ITypeDef getTypeDef() {
@@ -33,7 +36,7 @@ public class ClassFieldsDefinition implements Serializable {
         }
     }
 
-    private final Map<FieldIndex, FieldEntry> fieldEntries = new HashMap<>();
+    private final Map<FieldIndex, FieldEntry> fieldEntries = new HashMap<FieldIndex, FieldEntry>();
 
     public ClassFieldsDefinition add(FieldIndex index, ITypeDef def, boolean required) {
         this.fieldEntries.put(index, new FieldEntry(def, required));

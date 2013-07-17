@@ -7,10 +7,13 @@ package com.dcrux.buran.common;
  */
 public final class NidConstructor implements INid {
 
-    private final String value;
+    private String value;
 
     public NidConstructor(String value) {
         this.value = value;
+    }
+
+    private NidConstructor() {
     }
 
     @Override

@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
  */
 public class NumberKeyGen implements ISingleIndexKeyGen {
 
+    private NumberKeyGen() {
+    }
+
     public static enum Type {
         int8(1),
         int16(2),
@@ -25,8 +28,8 @@ public class NumberKeyGen implements ISingleIndexKeyGen {
         }
     }
 
-    private final Type type;
-    private final Number number;
+    private Type type;
+    private Number number;
 
     public NumberKeyGen(Type type, Number number) {
         this.type = type;

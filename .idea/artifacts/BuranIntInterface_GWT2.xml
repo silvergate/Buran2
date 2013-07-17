@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="BuranIntInterface:GWT2">
+    <output-path>$PROJECT_DIR$/out/artifacts/BuranIntInterface_GWT2</output-path>
+    <root id="root">
+      <element id="gwt-compiler-output" facet="BuranIntInterface/gwt/GWT" />
+    </root>
+  </artifact>
+</component>

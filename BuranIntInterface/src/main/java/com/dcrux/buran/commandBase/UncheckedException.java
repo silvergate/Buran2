@@ -6,10 +6,13 @@ package com.dcrux.buran.commandBase;
  * @author: ${USER} Date: 02.07.13 Time: 14:48
  */
 public class UncheckedException extends Exception {
-    private final Throwable wrapped;
+    private Throwable wrapped;
 
     public UncheckedException(Throwable wrapped) {
         this.wrapped = wrapped;
+    }
+
+    private UncheckedException() {
     }
 
     public Throwable getWrapped() {

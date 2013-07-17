@@ -14,11 +14,14 @@ import java.util.Map;
  * @author: ${USER} Date: 01.07.13 Time: 01:52
  */
 public class SetEdge implements IEdgeSetter {
-    private final ILabelName name;
-    private final Map<LabelIndex, IEdgeTargetInc> targets = new HashMap<>();
+    private ILabelName name;
+    private Map<LabelIndex, IEdgeTargetInc> targets = new HashMap<LabelIndex, IEdgeTargetInc>();
 
     public SetEdge(ILabelName name) {
         this.name = name;
+    }
+
+    private SetEdge() {
     }
 
     public static SetEdge c(ILabelName name) {

@@ -15,11 +15,14 @@ import java.util.Set;
 public class ComClassIdByHash extends Command<Optional<ClassId>> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
-    private final ClassHashId classHashId;
+    private ClassHashId classHashId;
 
     public ComClassIdByHash(ClassHashId classHashId) {
         super(EXCEPTIONS);
         this.classHashId = classHashId;
+    }
+
+    private ComClassIdByHash() {
     }
 
     public static ComClassIdByHash c(ClassHashId classHashId) {

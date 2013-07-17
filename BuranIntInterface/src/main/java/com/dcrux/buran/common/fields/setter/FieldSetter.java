@@ -11,7 +11,6 @@ import java.util.Map;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:56
  */
-//TODO: Rename to FieldSetter
 public class FieldSetter implements IFieldSetter {
 
     public static FieldSetter c(int index, IUnfieldedDataSetter setter) {
@@ -34,7 +33,8 @@ public class FieldSetter implements IFieldSetter {
         return this;
     }
 
-    private final Map<FieldIndex, IUnfieldedDataSetter> setterMap = new HashMap<>();
+    private final Map<FieldIndex, IUnfieldedDataSetter> setterMap =
+            new HashMap<FieldIndex, IUnfieldedDataSetter>();
 
     public Map<FieldIndex, IUnfieldedDataSetter> getSetterMap() {
         return setterMap;

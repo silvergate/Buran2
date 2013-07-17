@@ -16,11 +16,14 @@ public class ComClassHashIdById extends Command<ClassHashId> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS =
             exceptions(NodeClassNotFoundException.class);
-    private final ClassId classId;
+    private ClassId classId;
 
     public ComClassHashIdById(ClassId classId) {
         super(EXCEPTIONS);
         this.classId = classId;
+    }
+
+    private ComClassHashIdById() {
     }
 
     public static ComClassHashIdById c(ClassId classId) {

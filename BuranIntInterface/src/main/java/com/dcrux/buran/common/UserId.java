@@ -8,10 +8,13 @@ import java.io.Serializable;
  * @author: ${USER} Date: 29.06.13 Time: 13:55
  */
 public class UserId implements Serializable {
-    private final long id;
+    private long id;
 
     public UserId(long id) {
         this.id = id;
+    }
+
+    private UserId() {
     }
 
     public long getId() {
@@ -33,5 +36,12 @@ public class UserId implements Serializable {
     @Override
     public int hashCode() {
         return (int) (id ^ (id >>> 32));
+    }
+
+    @Override
+    public String toString() {
+        return "UserId{" +
+                "id=" + id +
+                '}';
     }
 }

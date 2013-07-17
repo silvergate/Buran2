@@ -1,13 +1,17 @@
 package com.dcrux.buran.refimpl.commandRunner;
 
+import com.dcrux.buran.callbacksBase.ICallbackCommand;
+import com.dcrux.buran.callbacksBase.ICallbackReceiver;
 import com.dcrux.buran.commandBase.*;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.ICallbackCommandReceiver;
 import com.dcrux.buran.refimpl.commandDispatchBase.CommandDispatcher;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandInvoker;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandRunParamProvider;
 import com.dcrux.buran.refimpl.commands.DispatcherConfigUtil;
+import com.dcrux.buran.refimpl.subscription.SubscriptionModule;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -16,13 +20,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 02.07.13 Time: 15:32
  */
-public class BuranCommandRunner implements ICommandRunner {
+public class BuranCommandRunner implements ICommandRunner, ICallbackReceiver {
 
     private final boolean clearDbs;
 
@@ -30,6 +35,8 @@ public class BuranCommandRunner implements ICommandRunner {
     private final Multimap<UserId, BaseModule> inactiveBaseModulesUnSync = HashMultimap.create();
     private final Multimap<UserId, BaseModule> inactiveBaseModules =
             Multimaps.synchronizedMultimap(this.inactiveBaseModulesUnSync);
+    private final CallbackQueuesRegistry callbackQueuesRegistry = new CallbackQueuesRegistry();
+    private final SubscriptionModule subscriptionModule = new SubscriptionModule();
 
     private final ICommandInvoker commandInvoker = new ICommandInvoker() {
         @Override
@@ -78,10 +85,18 @@ public class BuranCommandRunner implements ICommandRunner {
             if (this.clearDbs) {
                 BaseModule.createNew(receiver, true);
             }
-            final BaseModule newModule = new BaseModule(receiver, sender);
+            final BaseModule newModule =
+                    new BaseModule(receiver, sender, callbackReceiver, subscriptionModule);
             this.baseModuleThreadLocal.set(newModule);
         }
     }
+
+    private final ICallbackCommandReceiver callbackReceiver = new ICallbackCommandReceiver() {
+        @Override
+        public boolean emit(UserId receiver, ICallbackCommand command) {
+            return callbackQueuesRegistry.emit(receiver, command);
+        }
+    };
 
     private void deactivateBaseModule(UserId receiver) {
         BaseModule getActive = getActiveBaseModule();
@@ -112,5 +127,10 @@ public class BuranCommandRunner implements ICommandRunner {
         } finally {
             deactivateBaseModule(receiver);
         }
+    }
+
+    @Override
+    public void register(UserId receiver, Queue<ICallbackCommand> callbackCommandQueue) {
+        this.callbackQueuesRegistry.register(receiver, callbackCommandQueue);
     }
 }

@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl;
 
+import com.dcrux.buran.callbacksBase.ICallbackCommand;
 import com.dcrux.buran.commandBase.UncheckedException;
 import com.dcrux.buran.commands.classes.ComClassHashIdById;
 import com.dcrux.buran.commands.classes.ComClassIdByHash;
@@ -11,6 +12,7 @@ import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.ICommitResult;
 import com.dcrux.buran.commands.indexing.ComQuery;
+import com.dcrux.buran.commands.subscription.ComAddSub;
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
@@ -45,6 +47,8 @@ import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
 import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
 import com.dcrux.buran.common.indexing.mapStore.MapIndex;
+import com.dcrux.buran.common.subscription.SubBlockId;
+import com.dcrux.buran.common.subscription.SubDefinition;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandRunner.BuranCommandRunner;
 import com.dcrux.buran.scripting.functions.FunGet;
@@ -57,9 +61,11 @@ import com.dcrux.buran.scripting.iface.VarName;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Buran.
@@ -73,6 +79,25 @@ public class Test {
     public static final FieldIndex C1_I2 = FieldIndex.c(2);
     public static final ClassIndexName C1_I1_INDEX = new ClassIndexName("byI1");
 
+    public static void registerSubListener(BuranCommandRunner bcr, UserId thisAccount) {
+        final LinkedBlockingDeque<ICallbackCommand> cbq = new LinkedBlockingDeque<>();
+        bcr.register(thisAccount, cbq);
+        final Runnable queueRunner = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    do {
+                        final ICallbackCommand element = cbq.take();
+                        System.out.println("Got new Callack: " + element);
+                    } while (true);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        final Thread nt = new Thread(queueRunner);
+        nt.start();
+    }
 
     public static ClassDefinition cdef1() {
         NodeMapInput nodeMapInput = new NodeMapInput();
@@ -112,8 +137,15 @@ public class Test {
         final UserId sender = new UserId(332);
 
         BuranCommandRunner bcr = new BuranCommandRunner(false);
+        registerSubListener(bcr, thisAccount);
         try {
             ClassId classId = bcr.sync(thisAccount, sender, new ComDeclareClass(cdef1()));
+
+            /* Add subscription */
+            ComAddSub comAddSub = ComAddSub.c(new SubBlockId("daBlock"),
+                    new SubDefinition(classId, C1_I1_INDEX,
+                            RangeIndexKeyGen.from(NumberKeyGen.int64(32313))));
+            bcr.sync(thisAccount, sender, comAddSub);
 
             final IIncNid incNid1 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
             final IIncNid incNid2 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
@@ -192,7 +224,8 @@ public class Test {
             /* Get all fields */
             final FieldGetResult allFields = bcr.sync(thisAccount, sender,
                     ComFetch.c(changedNodeCommited, FieldGetAll.SINGLETON));
-            for (final Map.Entry<FieldIndex, Object> fields : allFields.getValues().entrySet()) {
+            for (final Map.Entry<FieldIndex, Serializable> fields : allFields.getValues()
+                    .entrySet()) {
                 System.out.println(MessageFormat
                         .format("  - {0}, Value: {1}", fields.getKey(), fields.getValue()));
             }
@@ -202,8 +235,6 @@ public class Test {
                     ComFetch.c(changedNodeCommited, SingleGet.c(C1_I2, new FieldGetBin(0, 100)));
             final byte[] binResult2 = bcr.sync(thisAccount, sender, binResult);
             System.out.println("Binary Read: " + Arrays.toString(binResult2));
-
-
 
             /* Get in-nodes */
             GetInClassEdgeResult allInNodes = bcr.sync(thisAccount, sender, ComFetch.c(node3,
@@ -222,5 +253,8 @@ public class Test {
         }
 
         bcr.shutdown();
+
+        Thread.sleep(500);
+        System.exit(0);
     }
 }

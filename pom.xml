@@ -13,6 +13,7 @@
         <module>BuranRefImpl</module>
         <module>BuranIntInterface</module>
         <module>BuranScripting</module>
+        <module>BuranDemoGui</module>
     </modules>
 
     <repositories>
@@ -63,11 +64,30 @@
             <version>14.0.1</version>
         </dependency>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava-gwt</artifactId>
+            <version>14.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.gwtbootstrap</groupId>
+            <artifactId>gwt-bootstrap</artifactId>
+            <version>2.2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.vectomatic</groupId>
+            <artifactId>lib-gwt-file</artifactId>
+            <version>0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.0.0.GA</version>
+        </dependency>
     </dependencies>
 
 

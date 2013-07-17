@@ -8,12 +8,15 @@ import java.io.Serializable;
  * @author: ${USER} Date: 29.06.13 Time: 16:14
  */
 public class Version implements Serializable {
-    private final long version;
+    private long version;
 
     public static final Version INITIAL = new Version(0);
 
     public Version(long version) {
         this.version = version;
+    }
+
+    private Version() {
     }
 
     public long getVersion() {

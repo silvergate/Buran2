@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules;
 
+import com.dcrux.buran.callbacksBase.ICallbackCommand;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.baseModules.auth.AuthModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassesModule;
@@ -16,6 +17,7 @@ import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionsModule;
+import com.dcrux.buran.refimpl.subscription.SubscriptionModule;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -48,6 +50,8 @@ public class BaseModule {
     private final VersionsModule versionsModule = new VersionsModule(this);
     private final NotificationsModule notificationsModule = new NotificationsModule(this);
     private final NodesModule nodesModule = new NodesModule(this);
+    private final ICallbackCommandReceiver callbackReceiver;
+    private final SubscriptionModule subscriptionModule;
 
     ODatabaseDocumentTx db;
 
@@ -83,12 +87,19 @@ public class BaseModule {
         db.close();
     }
 
-    public BaseModule(UserId userId, UserId sender) throws IOException {
+    public BaseModule(UserId userId, UserId sender, ICallbackCommandReceiver callbackReceiver,
+            SubscriptionModule subscriptionModule) throws IOException {
+        this.callbackReceiver = callbackReceiver;
+        this.subscriptionModule = subscriptionModule;
         final File path = getDbPath(userId);
         this.db = ODatabaseDocumentPool.global().acquire(getDbString(path), "admin", "admin");
         setSender(sender);
         getAuthModule().setReceiver(userId);
         setup();
+    }
+
+    public boolean emitCallbackCommand(ICallbackCommand command) {
+        return this.callbackReceiver.emit(getReceiver(), command);
     }
 
     public UserId getReceiver() {
@@ -171,5 +182,9 @@ public class BaseModule {
 
     public NodesModule getNodesModule() {
         return nodesModule;
+    }
+
+    public SubscriptionModule getSubscriptionModule() {
+        return subscriptionModule;
     }
 }

@@ -21,7 +21,7 @@ public class ComFetch<TRetVal extends Serializable> extends Command<TRetVal> {
 
     public static <TRetVal extends Serializable> ComFetch<TRetVal> c(NidVer nidVer,
             IDataGetter<TRetVal> dataGetter) {
-        return new ComFetch<>(nidVer, dataGetter);
+        return new ComFetch<TRetVal>(nidVer, dataGetter);
     }
 
     public ComFetch(NidVer nidVer, IDataGetter<TRetVal> dataGetter) {

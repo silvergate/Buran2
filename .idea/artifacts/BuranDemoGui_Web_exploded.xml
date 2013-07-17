@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="BuranDemoGui:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/BuranDemoGui_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="BuranDemoGui/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="javaee-facet-classes" facet="BuranDemoGui/web/Web" />
+          <element id="module-output" name="BuranIntInterface" />
+          <element id="module-output" name="BuranScripting" />
+          <element id="module-output" name="BuranRefImpl" />
+        </element>
+      </element>
+      <element id="gwt-compiler-output" facet="BuranRefImpl/gwt/GWT" />
+    </root>
+  </artifact>
+</component>

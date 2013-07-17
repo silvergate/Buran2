@@ -12,7 +12,8 @@ import java.util.Map;
  * @author: ${USER} Date: 08.07.13 Time: 10:08
  */
 public class ClassIndexDefinition implements Serializable {
-    private final Map<ClassIndexName, IndexDefinition> indexDefinitionMap = new HashMap<>();
+    private final Map<ClassIndexName, IndexDefinition> indexDefinitionMap =
+            new HashMap<ClassIndexName, IndexDefinition>();
 
     public ClassIndexDefinition add(ClassIndexName name, IndexDefinition definition) {
         this.indexDefinitionMap.put(name, definition);

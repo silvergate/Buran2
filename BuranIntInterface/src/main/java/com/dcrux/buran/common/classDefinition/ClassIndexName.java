@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ClassIndexName implements Serializable {
     public static final int MIN_LEN = 2;
     public static final int MAX_LEN = 32;
-    private final String name;
+    private String name;
 
     public ClassIndexName(String name) {
         if ((name.length() < MIN_LEN) || (name.length() > MAX_LEN)) {
@@ -18,6 +18,9 @@ public class ClassIndexName implements Serializable {
                     "(name.length()<MIN_LEN) || (name.length()" + ">MAX_LEN)");
         }
         this.name = name;
+    }
+
+    private ClassIndexName() {
     }
 
     public String getName() {

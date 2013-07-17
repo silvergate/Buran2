@@ -12,6 +12,9 @@ import java.io.Serializable;
  */
 public class MapFunction implements Serializable {
 
+    private MapFunction() {
+    }
+
     public static enum TextFunctionPos {
         pre,
         post

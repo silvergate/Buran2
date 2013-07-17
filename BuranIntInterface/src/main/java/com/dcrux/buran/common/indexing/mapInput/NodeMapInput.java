@@ -11,7 +11,7 @@ import java.util.Map;
  * @author: ${USER} Date: 08.07.13 Time: 00:40
  */
 public class NodeMapInput implements IMapInput {
-    private final Map<VarName, IFieldTarget> fields = new HashMap<>();
+    private final Map<VarName, IFieldTarget> fields = new HashMap<VarName, IFieldTarget>();
 
     public Map<VarName, IFieldTarget> getFields() {
         return fields;

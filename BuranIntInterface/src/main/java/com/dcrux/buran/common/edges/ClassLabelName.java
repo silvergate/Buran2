@@ -6,10 +6,13 @@ package com.dcrux.buran.common.edges;
  * @author: ${USER} Date: 01.07.13 Time: 02:03
  */
 public class ClassLabelName implements ILabelName {
-    private final short index;
+    private short index;
 
     public ClassLabelName(short index) {
         this.index = index;
+    }
+
+    private ClassLabelName() {
     }
 
     public static ClassLabelName c(int index) {

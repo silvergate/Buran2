@@ -21,8 +21,4 @@ public class ExpectableException extends Exception {
         super(cause);
     }
 
-    public ExpectableException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

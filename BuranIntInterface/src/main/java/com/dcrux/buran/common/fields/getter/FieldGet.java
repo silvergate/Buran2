@@ -22,7 +22,8 @@ public class FieldGet implements IFieldGetter<FieldGetResult> {
         return fieldGet.add(index, getter);
     }
 
-    private final Map<FieldIndex, IUnfieldedDataGetter<?>> entries = new HashMap<>();
+    private final Map<FieldIndex, IUnfieldedDataGetter<?>> entries =
+            new HashMap<FieldIndex, IUnfieldedDataGetter<?>>();
 
     public Map<FieldIndex, IUnfieldedDataGetter<?>> getEntries() {
         return entries;

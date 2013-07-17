@@ -14,8 +14,8 @@ public class ClassDefinition implements Serializable {
     public static final int LONG_MIN = 32;
     public static final int LONG_MAX = 512;
 
-    private final String shortDesc;
-    private final String longDesc;
+    private String shortDesc;
+    private String longDesc;
 
     public ClassDefinition(String shortDesc, String longDesc) {
         if ((shortDesc.length() < SHORT_MIN) || (shortDesc.length() > SHORT_MAX)) {
@@ -32,6 +32,9 @@ public class ClassDefinition implements Serializable {
 
     private final ClassFieldsDefinition fields = new ClassFieldsDefinition();
     private final ClassIndexDefinition indexes = new ClassIndexDefinition();
+
+    private ClassDefinition() {
+    }
 
     public ClassFieldsDefinition getFields() {
         return fields;

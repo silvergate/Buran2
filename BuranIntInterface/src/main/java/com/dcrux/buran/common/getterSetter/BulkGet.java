@@ -10,7 +10,7 @@ import java.util.List;
  * @author: ${USER} Date: 03.07.13 Time: 02:18
  */
 public class BulkGet implements IDataGetter<IBulkGetResult> {
-    private final List<IDataGetter<?>> dataGetterList = new ArrayList<>();
+    private final List<IDataGetter<?>> dataGetterList = new ArrayList<IDataGetter<?>>();
 
     public <TRetval extends Serializable> BulkGetIndex<TRetval> add(
             IDataGetter<TRetval> dataGetter) {

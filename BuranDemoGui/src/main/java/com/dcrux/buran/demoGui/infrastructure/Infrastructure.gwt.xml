@@ -1,0 +1,15 @@
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0//EN"
+        "http://google-web-toolkit.googlecode.com/svn/releases/2.0/distro-source/core/src/gwt-module.dtd">
+<module>
+
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.dcrux.buran.GwtApi"/>
+    <inherits name="com.google.common.collect.Collect"/>
+    <inherits name="com.github.gwtbootstrap.Bootstrap"/>
+    <inherits name="com.dcrux.buran.demoGui.plugins.Plugins"/>
+
+    <entry-point class='com.dcrux.buran.demoGui.infrastructure.client.Infrastructure'/>
+    <servlet path="/BuranService"
+             class="com.dcrux.buran.demoGui.infrastructure.server.BuranServiceImpl"/>
+
+</module>

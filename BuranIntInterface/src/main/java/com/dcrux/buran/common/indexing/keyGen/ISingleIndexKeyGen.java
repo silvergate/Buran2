@@ -12,8 +12,8 @@ import java.util.List;
  */
 public interface ISingleIndexKeyGen extends Serializable, IKeyGen {
 
-    public static class Builder {
-        final List<ISingleIndexKeyGen> elements = new ArrayList<>();
+    public static class Builder implements Serializable {
+        final List<ISingleIndexKeyGen> elements = new ArrayList<ISingleIndexKeyGen>();
     }
 
     int getLength();
