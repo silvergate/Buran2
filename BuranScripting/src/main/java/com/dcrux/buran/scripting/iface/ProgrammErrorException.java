@@ -9,4 +9,7 @@ public class ProgrammErrorException extends Exception {
     public ProgrammErrorException(String message) {
         super(message);
     }
+
+    protected ProgrammErrorException() {
+    }
 }

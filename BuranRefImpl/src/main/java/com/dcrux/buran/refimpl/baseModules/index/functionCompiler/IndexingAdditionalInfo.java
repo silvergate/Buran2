@@ -1,7 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.index.functionCompiler;
 
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
 
 import java.io.Serializable;
 import java.util.Map;

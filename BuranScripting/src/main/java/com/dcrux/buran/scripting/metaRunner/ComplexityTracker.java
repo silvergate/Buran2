@@ -1,4 +1,4 @@
-package com.dcrux.buran.scripting.iface.metaRunner;
+package com.dcrux.buran.scripting.metaRunner;
 
 import com.dcrux.buran.scripting.iface.*;
 

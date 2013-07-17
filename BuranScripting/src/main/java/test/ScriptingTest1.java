@@ -1,5 +1,7 @@
 package test;
 
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
+import com.dcrux.buran.scripting.compiler.ImplProviderRegistry;
 import com.dcrux.buran.scripting.functions.FunAssign;
 import com.dcrux.buran.scripting.functions.FunGet;
 import com.dcrux.buran.scripting.functions.FunRet;
@@ -26,12 +28,10 @@ import com.dcrux.buran.scripting.iface.Block;
 import com.dcrux.buran.scripting.iface.LazyLineNum;
 import com.dcrux.buran.scripting.iface.ProgrammErrorException;
 import com.dcrux.buran.scripting.iface.VarName;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
-import com.dcrux.buran.scripting.iface.compiler.ImplProviderRegistry;
-import com.dcrux.buran.scripting.iface.metaRunner.MetaRunner;
-import com.dcrux.buran.scripting.iface.runner.Runner;
 import com.dcrux.buran.scripting.iface.types.IntegerType;
 import com.dcrux.buran.scripting.iface.types.StringType;
+import com.dcrux.buran.scripting.metaRunner.MetaRunner;
+import com.dcrux.buran.scripting.runner.Runner;
 
 /**
  * Buran.
@@ -75,8 +75,8 @@ public class ScriptingTest1 {
         MetaRunner mr = new MetaRunner(Integer.MAX_VALUE, Integer.MAX_VALUE);
         System.out.println(mr.evaluate(block));
 
-        final com.dcrux.buran.scripting.iface.compiler.Compiler compiler =
-                new com.dcrux.buran.scripting.iface.compiler.Compiler(getRegistry());
+        final com.dcrux.buran.scripting.compiler.Compiler compiler =
+                new com.dcrux.buran.scripting.compiler.Compiler(getRegistry());
         final CompiledBlock compiled = compiler.compile(block);
 
         final Runner runner = new Runner();

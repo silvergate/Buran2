@@ -1,6 +1,5 @@
 package com.dcrux.buran.scripting.iface;
 
-import java.text.MessageFormat;
 
 /**
  * Buran.
@@ -9,11 +8,14 @@ import java.text.MessageFormat;
  */
 public class CpuComplexityOverflow extends ProgrammErrorException {
 
-    private final int limit;
+    private int limit;
 
     public CpuComplexityOverflow(int limit) {
-        super(MessageFormat.format("CPU-limit per branch is set to {0}.", limit));
+        super("CPU-limit per branch is set to " + limit);
         this.limit = limit;
+    }
+
+    private CpuComplexityOverflow() {
     }
 
     public int getLimit() {

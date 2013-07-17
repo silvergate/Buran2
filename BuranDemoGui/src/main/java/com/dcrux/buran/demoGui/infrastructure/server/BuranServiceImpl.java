@@ -57,4 +57,9 @@ public class BuranServiceImpl extends RemoteServiceServlet implements BuranServi
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         return this.bcr.sync(receiver, getSender(), command);
     }
+
+    @Override
+    public void serTest(Serializable obj) {
+        System.out.println("Got " + obj + " from client.");
+    }
 }

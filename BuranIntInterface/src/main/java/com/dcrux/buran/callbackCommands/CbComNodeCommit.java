@@ -1,6 +1,7 @@
 package com.dcrux.buran.callbackCommands;
 
 import com.dcrux.buran.callbacksBase.ICallbackCommand;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.subscription.SubBlockId;
 import com.dcrux.buran.common.subscription.SubId;
 
@@ -12,12 +13,12 @@ import com.dcrux.buran.common.subscription.SubId;
 public class CbComNodeCommit extends ICallbackCommand {
     private SubBlockId subBlockId;
     private SubId subId;
-    private String orid;
+    private NidVer nidVer;
 
-    public CbComNodeCommit(SubBlockId subBlockId, SubId subId, String orid) {
+    public CbComNodeCommit(SubBlockId subBlockId, SubId subId, NidVer nidVer) {
         this.subBlockId = subBlockId;
         this.subId = subId;
-        this.orid = orid;
+        this.nidVer = nidVer;
     }
 
     private CbComNodeCommit() {
@@ -31,8 +32,8 @@ public class CbComNodeCommit extends ICallbackCommand {
         return subId;
     }
 
-    public String getOrid() {
-        return orid;
+    public NidVer getNidVer() {
+        return nidVer;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class CbComNodeCommit extends ICallbackCommand {
         return "CbComNodeCommit{" +
                 "subBlockId=" + subBlockId +
                 ", subId=" + subId +
-                ", orid='" + orid + '\'' +
+                ", nidVer=" + nidVer +
                 '}';
     }
 }

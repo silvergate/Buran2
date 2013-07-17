@@ -3,6 +3,7 @@
   <component name="FacetManager">
     <facet type="gwt" name="GWT">
       <configuration>
+        <setting name="compilerParameters" value="-logLevel TRACE" />
         <setting name="compilerMaxHeapSize" value="256" />
         <setting name="gwtScriptOutputStyle" value="DETAILED" />
         <setting name="gwtSdkUrl" value="file://$USER_HOME$/gwt-2.5.1" />

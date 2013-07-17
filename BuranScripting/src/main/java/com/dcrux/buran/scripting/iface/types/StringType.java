@@ -8,12 +8,15 @@ import com.dcrux.buran.scripting.iface.IType;
  * @author: ${USER} Date: 05.07.13 Time: 10:55
  */
 public class StringType implements IType<String> {
-    private final int minLen;
-    private final int maxLen;
+    private int minLen;
+    private int maxLen;
 
     public StringType(int minLen, int maxLen) {
         this.minLen = minLen;
         this.maxLen = maxLen;
+    }
+
+    private StringType() {
     }
 
     public int getMinLen() {

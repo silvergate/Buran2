@@ -36,7 +36,7 @@ public class ClassFieldsDefinition implements Serializable {
         }
     }
 
-    private final Map<FieldIndex, FieldEntry> fieldEntries = new HashMap<FieldIndex, FieldEntry>();
+    private Map<FieldIndex, FieldEntry> fieldEntries = new HashMap<FieldIndex, FieldEntry>();
 
     public ClassFieldsDefinition add(FieldIndex index, ITypeDef def, boolean required) {
         this.fieldEntries.put(index, new FieldEntry(def, required));
@@ -49,5 +49,12 @@ public class ClassFieldsDefinition implements Serializable {
 
     public Set<FieldIndex> getFieldIndexes() {
         return this.fieldEntries.keySet();
+    }
+
+    @Override
+    public String toString() {
+        return "ClassFieldsDefinition{" +
+                "fieldEntries=" + fieldEntries +
+                '}';
     }
 }

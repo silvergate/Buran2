@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:29
  */
-public final class FieldIndex implements Serializable {
+public class FieldIndex implements Serializable {
     private short index;
 
     public FieldIndex(short index) {

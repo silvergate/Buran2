@@ -9,6 +9,9 @@ import com.dcrux.buran.scripting.iface.IType;
  */
 public final class BoolType implements IType<Boolean> {
 
+    private BoolType() {
+    }
+
     public enum BoolRange {
         trueOnly(true, false),
         falseOnly(false, true),
@@ -30,7 +33,7 @@ public final class BoolType implements IType<Boolean> {
         }
     }
 
-    private final BoolRange range;
+    private BoolRange range;
 
     public BoolType(BoolRange range) {
         this.range = range;

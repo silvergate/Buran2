@@ -1,8 +1,8 @@
-package com.dcrux.buran.scripting.iface.runner;
+package com.dcrux.buran.scripting.runner;
 
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
+import com.dcrux.buran.scripting.compiler.CompiledFunction;
 import com.dcrux.buran.scripting.iface.VarName;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
-import com.dcrux.buran.scripting.iface.compiler.CompiledFunction;
 
 /**
  * Buran.

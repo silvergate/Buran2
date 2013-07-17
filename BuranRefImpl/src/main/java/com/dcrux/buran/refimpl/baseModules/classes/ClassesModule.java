@@ -12,7 +12,7 @@ import com.dcrux.buran.refimpl.baseModules.nodeWrapper.ClassNameUtils;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.IRunner;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransRet;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransaction;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;

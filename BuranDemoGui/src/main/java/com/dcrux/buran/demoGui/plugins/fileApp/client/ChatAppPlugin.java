@@ -1,8 +1,11 @@
 package com.dcrux.buran.demoGui.plugins.fileApp.client;
 
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.demoGui.infrastructure.client.*;
 import com.dcrux.buran.demoGui.plugins.publicTypes.ResultMainApp;
 import com.dcrux.buran.demoGui.plugins.publicTypes.TypeMainApp;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -34,8 +37,21 @@ public class ChatAppPlugin implements PluginIntent<VoidQuery, ResultMainApp> {
     @Override
     public ResultMainApp run(VoidQuery query) {
         if (singletonApp == null) {
-            FileMainUi fileMainUi = new FileMainUi();
-            singletonApp = fileMainUi.getRootElement();
+            FileModule fm = new FileModule(new UserId(0));
+            fm.getFileClassId(new AsyncCallback<ClassId>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    System.out.println("Failure: " + caught);
+                }
+
+                @Override
+                public void onSuccess(ClassId result) {
+                    System.out.println("Success: " + result);
+                }
+            });
+
+            FileUploadUi fileUploadUi = new FileUploadUi();
+            singletonApp = fileUploadUi.getRootElement();
             this.singletonResultMainApp = new ResultMainApp(this.singletonApp);
         }
         return this.singletonResultMainApp;

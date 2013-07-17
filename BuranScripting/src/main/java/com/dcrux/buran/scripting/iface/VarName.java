@@ -8,7 +8,10 @@ import java.io.Serializable;
  * @author: ${USER} Date: 04.07.13 Time: 17:30
  */
 public class VarName implements Serializable {
-    private final String name;
+    private String name;
+
+    private VarName() {
+    }
 
     public String getName() {
         return name;

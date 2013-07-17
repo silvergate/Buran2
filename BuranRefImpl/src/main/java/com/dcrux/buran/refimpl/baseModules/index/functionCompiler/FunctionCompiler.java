@@ -6,6 +6,8 @@ import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
+import com.dcrux.buran.scripting.compiler.ImplProviderRegistry;
 import com.dcrux.buran.scripting.functionsImpl.FunAssignImpl;
 import com.dcrux.buran.scripting.functionsImpl.FunGetImpl;
 import com.dcrux.buran.scripting.functionsImpl.FunRetImpl;
@@ -20,8 +22,6 @@ import com.dcrux.buran.scripting.functionsImpl.string.FunStrLenImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.FunStrLitImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.FunStrTrimImpl;
 import com.dcrux.buran.scripting.iface.Block;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
-import com.dcrux.buran.scripting.iface.compiler.ImplProviderRegistry;
 import com.google.common.base.Optional;
 
 import java.util.HashMap;
@@ -67,8 +67,8 @@ public class FunctionCompiler extends Module<BaseModule> {
             final Optional<Block> singleFunctionOpt = mapFunction.getSingleMapFunction();
             if (singleFunctionOpt.isPresent()) {
                 final Block singleFunction = singleFunctionOpt.get();
-                final com.dcrux.buran.scripting.iface.compiler.Compiler compiler =
-                        new com.dcrux.buran.scripting.iface.compiler.Compiler(getRegistry());
+                final com.dcrux.buran.scripting.compiler.Compiler compiler =
+                        new com.dcrux.buran.scripting.compiler.Compiler(getRegistry());
                 final CompiledBlock compiled = compiler.compile(singleFunction);
                 result.put(entry.getKey(), compiled);
             }

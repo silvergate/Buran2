@@ -11,6 +11,9 @@ import java.util.*;
  */
 public class AltType implements IType<Object> {
 
+    private AltType() {
+    }
+
     public static AltType c(Set<IType<?>> types) {
         final Set<IType<?>> allTypes = new HashSet<>();
         for (final IType<?> type : types) {

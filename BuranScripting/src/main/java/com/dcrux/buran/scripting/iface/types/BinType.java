@@ -8,12 +8,15 @@ import com.dcrux.buran.scripting.iface.IType;
  * @author: ${USER} Date: 05.07.13 Time: 10:55
  */
 public class BinType implements IType<byte[]> {
-    private final int maxBytes;
-    private final int minBytes;
+    private int maxBytes;
+    private int minBytes;
 
     public BinType(int minLen, int minBytes) {
         this.maxBytes = minLen;
         this.minBytes = minBytes;
+    }
+
+    private BinType() {
     }
 
     public int getMaxBytes() {

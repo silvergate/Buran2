@@ -11,10 +11,13 @@ import java.text.MessageFormat;
  */
 public class FunGet<TRetType extends IType<?>> extends FunctionDeclaration<TRetType> {
 
-    private final VarName varName;
+    private VarName varName;
 
     public FunGet(VarName varName) {
         this.varName = varName;
+    }
+
+    private FunGet() {
     }
 
     public VarName getVarName() {

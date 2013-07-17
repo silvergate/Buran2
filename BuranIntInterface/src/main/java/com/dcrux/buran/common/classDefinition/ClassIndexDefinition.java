@@ -23,4 +23,11 @@ public class ClassIndexDefinition implements Serializable {
     public Map<ClassIndexName, IndexDefinition> getIndexDefinitionMap() {
         return indexDefinitionMap;
     }
+
+    @Override
+    public String toString() {
+        return "ClassIndexDefinition{" +
+                "indexDefinitionMap=" + indexDefinitionMap +
+                '}';
+    }
 }

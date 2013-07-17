@@ -25,8 +25,8 @@ import org.vectomatic.file.events.LoadEndHandler;
  *
  * @author: ${USER} Date: 15.07.13 Time: 23:43
  */
-public class FileMainUi {
-    interface FileMainUiUiBinder extends UiBinder<HTMLPanel, FileMainUi> {
+public class FileUploadUi {
+    interface FileMainUiUiBinder extends UiBinder<HTMLPanel, FileUploadUi> {
     }
 
     private static class FileUploadInfo {
@@ -137,7 +137,7 @@ public class FileMainUi {
 
     private static FileMainUiUiBinder ourUiBinder = GWT.create(FileMainUiUiBinder.class);
 
-    public FileMainUi() {
+    public FileUploadUi() {
         this.rootElement = ourUiBinder.createAndBindUi(this);
         showUploadDropinfo(true);
         this.reader = new FileReader();

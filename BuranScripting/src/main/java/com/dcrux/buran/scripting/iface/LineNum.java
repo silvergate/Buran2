@@ -5,11 +5,14 @@ package com.dcrux.buran.scripting.iface;
  *
  * @author: ${USER} Date: 05.07.13 Time: 07:39
  */
-public final class LineNum implements ILineNumProvider {
-    private final int num;
+public class LineNum implements ILineNumProvider {
+    private int num;
 
     public LineNum(int num) {
         this.num = num;
+    }
+
+    private LineNum() {
     }
 
     public int getNum() {

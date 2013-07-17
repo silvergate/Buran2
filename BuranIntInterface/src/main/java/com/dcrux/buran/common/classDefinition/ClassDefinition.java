@@ -51,4 +51,14 @@ public class ClassDefinition implements Serializable {
     public ClassIndexDefinition getIndexes() {
         return indexes;
     }
+
+    @Override
+    public String toString() {
+        return "ClassDefinition{" +
+                "shortDesc='" + shortDesc + '\'' +
+                ", longDesc='" + longDesc + '\'' +
+                ", fields=" + fields +
+                ", indexes=" + indexes +
+                '}';
+    }
 }

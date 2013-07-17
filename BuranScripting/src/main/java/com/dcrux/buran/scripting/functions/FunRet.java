@@ -10,6 +10,9 @@ import com.dcrux.buran.scripting.iface.types.VoidType;
  */
 public class FunRet<TInputType extends IType> extends FunctionDeclaration<VoidType> {
 
+    private FunRet() {
+    }
+
     public static <TInputTypeLocal extends IType> FunRet<TInputTypeLocal> c(
             IFunctionDeclaration<TInputTypeLocal> input) {
         return new FunRet<TInputTypeLocal>(input);

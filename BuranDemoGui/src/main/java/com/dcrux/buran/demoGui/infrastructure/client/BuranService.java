@@ -36,4 +36,6 @@ public interface BuranService extends RemoteService {
 
     <TRetVal extends Serializable> TRetVal run(UserId receiver, ICommand<TRetVal> command)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException;
+
+    void serTest(Serializable obj);
 }

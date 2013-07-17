@@ -1,6 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.notifications;
 
 import com.dcrux.buran.callbackCommands.CbComNodeCommit;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.subscription.SubBlockId;
@@ -58,7 +59,7 @@ public class NotificationsModule extends Module<BaseModule> {
         for (BlockAndSubId blockAndSubId : blockAndSubIds) {
             getBase().emitCallbackCommand(
                     new CbComNodeCommit(blockAndSubId.getBlockId(), blockAndSubId.getSubId(),
-                            versionsRecord.toString()));
+                            new NidVer(versionsRecord.toString())));
         }
     }
 

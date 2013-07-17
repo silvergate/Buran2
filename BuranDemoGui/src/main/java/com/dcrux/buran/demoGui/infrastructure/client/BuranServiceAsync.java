@@ -14,4 +14,6 @@ import java.io.Serializable;
 public interface BuranServiceAsync {
     <TRetVal extends Serializable> void run(UserId receiver, ICommand<TRetVal> command,
             AsyncCallback<TRetVal> async);
+
+    void serTest(Serializable obj, AsyncCallback<Void> async);
 }

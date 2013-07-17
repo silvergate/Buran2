@@ -1,11 +1,8 @@
 package com.dcrux.buran.common.indexing;
 
-import com.dcrux.buran.common.indexing.aggregatorFunction.AggregatorType;
-import com.dcrux.buran.common.indexing.aggregatorStore.IAggregatorStore;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.common.indexing.mapInput.IMapInput;
 import com.dcrux.buran.common.indexing.mapStore.IMapIndex;
-import com.google.common.base.Optional;
 
 import java.io.Serializable;
 
@@ -25,8 +22,8 @@ public class IndexDefinition implements Serializable {
     private IMapInput mapInput;
     private MapFunction mapFunction;
     private IMapIndex mapIndexType;
-    private Optional<AggregatorType> aggregatorType;
-    private Optional<IAggregatorStore> aggregatorStore;
+    //private Optional<AggregatorType> aggregatorType;
+    //private Optional<IAggregatorStore> aggregatorStore;
 
     private IndexDefinition() {
     }

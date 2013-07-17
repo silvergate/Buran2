@@ -15,7 +15,7 @@ public class Block implements Serializable {
         return new Block();
     }
 
-    private final List<IFunctionDeclaration<?>> functions = new ArrayList<>();
+    private List<IFunctionDeclaration<?>> functions = new ArrayList<>();
 
     public LineNum addLn(IFunctionDeclaration<?> functionDeclaration) {
         functions.add(functionDeclaration);

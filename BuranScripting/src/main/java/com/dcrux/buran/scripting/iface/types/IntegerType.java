@@ -11,6 +11,9 @@ import java.io.Serializable;
  */
 public final class IntegerType implements IType<Number> {
 
+    private IntegerType() {
+    }
+
     public static enum NumOfBits implements Serializable {
         int8((short) 1),
         int16((short) 2),
@@ -40,8 +43,8 @@ public final class IntegerType implements IType<Number> {
         return NumOfBits.int64;
     }
 
-    private final long minValue;
-    private final long maxValue;
+    private long minValue;
+    private long maxValue;
 
     public IntegerType(long minValue, long maxValue) {
         if (maxValue < minValue) {

@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="gwt" name="GWT">
+      <configuration>
+        <setting name="compilerMaxHeapSize" value="256" />
+        <setting name="gwtScriptOutputStyle" value="DETAILED" />
+        <setting name="gwtSdkUrl" value="file://$USER_HOME$/gwt-2.5.1" />
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -27,6 +36,7 @@
     <orderEntry type="library" name="Maven: com.github.gwtbootstrap:gwt-bootstrap:2.2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.vectomatic:lib-gwt-file:0.3.3" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.0.0.GA" level="project" />
+    <orderEntry type="library" name="gwt-user" level="project" />
   </component>
 </module>
 

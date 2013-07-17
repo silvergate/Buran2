@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class CommandList implements Serializable {
 
-    private final List<ICommand> list = new ArrayList<ICommand>();
+    private List<ICommand> list = new ArrayList<ICommand>();
 
     public CommandIndex add(ICommand command) {
         this.list.add(command);

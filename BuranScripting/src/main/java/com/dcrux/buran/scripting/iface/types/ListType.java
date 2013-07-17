@@ -17,6 +17,9 @@ public class ListType implements IType<Object[]> {
 
     private List<IType<?>> types;
 
+    private ListType() {
+    }
+
     public List<IType<?>> getTypes() {
         return types;
     }

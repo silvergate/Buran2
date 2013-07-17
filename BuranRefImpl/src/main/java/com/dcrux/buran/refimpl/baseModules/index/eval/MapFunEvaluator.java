@@ -9,10 +9,10 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.scripting.compiler.CompiledBlock;
 import com.dcrux.buran.scripting.iface.Block;
 import com.dcrux.buran.scripting.iface.VarName;
-import com.dcrux.buran.scripting.iface.compiler.CompiledBlock;
-import com.dcrux.buran.scripting.iface.runner.Runner;
+import com.dcrux.buran.scripting.runner.Runner;
 import com.google.common.base.Optional;
 
 import java.util.Collection;

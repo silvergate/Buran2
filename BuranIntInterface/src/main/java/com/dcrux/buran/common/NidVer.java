@@ -41,4 +41,11 @@ public class NidVer implements INidCommon {
     public int hashCode() {
         return nidVer.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "NidVer{" +
+                "nidVer='" + nidVer + '\'' +
+                '}';
+    }
 }

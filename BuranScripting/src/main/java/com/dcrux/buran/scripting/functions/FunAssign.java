@@ -10,7 +10,10 @@ import com.dcrux.buran.scripting.iface.types.VoidType;
  */
 public class FunAssign<TInputType extends IType> extends FunctionDeclaration<VoidType> {
 
-    private final VarName varName;
+    private VarName varName;
+
+    private FunAssign() {
+    }
 
     public static <TInputTypeLocal extends IType> FunAssign<TInputTypeLocal> c(VarName varName,
             IFunctionDeclaration<TInputTypeLocal> input) {

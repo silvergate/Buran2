@@ -1,4 +1,4 @@
-package com.dcrux.buran.scripting.iface.compiler;
+package com.dcrux.buran.scripting.compiler;
 
 import java.io.Serializable;
 

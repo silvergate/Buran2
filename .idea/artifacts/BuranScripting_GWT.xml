@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="BuranScripting:GWT">
+    <output-path>$PROJECT_DIR$/out/artifacts/BuranScripting_GWT</output-path>
+    <root id="root">
+      <element id="gwt-compiler-output" facet="BuranScripting/gwt/GWT" />
+    </root>
+  </artifact>
+</component>

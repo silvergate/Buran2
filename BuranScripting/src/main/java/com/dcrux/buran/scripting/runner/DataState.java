@@ -1,4 +1,4 @@
-package com.dcrux.buran.scripting.iface.runner;
+package com.dcrux.buran.scripting.runner;
 
 import com.dcrux.buran.scripting.iface.IDataState;
 import com.dcrux.buran.scripting.iface.VarName;
