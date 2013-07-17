@@ -3,7 +3,7 @@ package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.classes.ClassId;
-import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -35,21 +35,22 @@ public class IncubationNode extends CommonNode {
     }
 
     public static IncubationNode createUpdate(ClassId classId, final long addTime, UserId sender,
-            ONid update, Version updateVersion) {
+            ONidVer update) {
         final ODocument document = new ODocument(ClassNameUtils.generateNodeClasName(classId));
         final IncubationNode incNode = new IncubationNode(document);
         incNode.getDocument().field(CommonNode.FIELD_COMMON_LIVE, false, OType.BOOLEAN);
         incNode.setAddTime(addTime);
         incNode.setSender(sender);
         incNode.setUpdateNid(update);
-        incNode.setUpdateVersion(updateVersion);
         return incNode;
     }
 
+    @Deprecated
     public void setUpdateVersion(Version version) {
         getDocument().field(INC_FIELD_UPDATE_VERSION, version.getVersion(), OType.LONG);
     }
 
+    @Deprecated
     @Nullable
     public Version getUpdateVersion() {
         final Long version = getDocument().field(INC_FIELD_UPDATE_VERSION, OType.LONG);
@@ -59,21 +60,21 @@ public class IncubationNode extends CommonNode {
         return new Version(version);
     }
 
-    public void setUpdateNid(ONid onid) {
-        getDocument().field(INC_FIELD_UPDATE_NODE, onid.getRecordId(), OType.LINK);
+    public void setUpdateNid(ONidVer onid) {
+        getDocument().field(INC_FIELD_UPDATE_NODE, onid.getoIdentifiable(), OType.LINK);
     }
 
     @Nullable
-    public ONid getUpdateNid() {
+    public ONidVer getUpdateNid() {
         final ORecordId recordId = getDocument().field(INC_FIELD_UPDATE_NODE, OType.LINK);
         if (recordId == null) {
             return null;
         }
-        return new ONid(recordId);
+        return new ONidVer(recordId);
     }
 
     public boolean isUpdate() {
-        ONid updateNid = getUpdateNid();
+        ONidVer updateNid = getUpdateNid();
         return (updateNid != null);
     }
 

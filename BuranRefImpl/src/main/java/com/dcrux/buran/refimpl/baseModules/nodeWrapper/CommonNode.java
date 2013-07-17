@@ -4,6 +4,7 @@ import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.refimpl.baseModules.common.DocumentWrapper;
+import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
@@ -109,5 +110,9 @@ public class CommonNode extends DocumentWrapper {
     public void deleteNow() {
         getDocument().clear();
         markForDeletion();
+    }
+
+    public OIncNid getIncNid() {
+        return new OIncNid(getDocument().getIdentity());
     }
 }

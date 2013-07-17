@@ -1,7 +1,7 @@
 package com.dcrux.buran.commands.incubation;
 
 import com.dcrux.buran.commands.Command;
-import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @author: ${USER} Date: 02.07.13 Time: 14:35
  */
-public class ComCreateUpdate extends Command<IIncNid> {
+public class ComCreateUpdate extends Command<IncNid> {
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
     private NidVer nidVer;

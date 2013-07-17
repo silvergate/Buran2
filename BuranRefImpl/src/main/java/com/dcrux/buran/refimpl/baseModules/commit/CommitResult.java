@@ -1,9 +1,8 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
-import com.dcrux.buran.common.IIncNid;
-import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.classes.ClassId;
-import com.orientechnologies.orient.core.id.ORID;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 
 import java.util.Collection;
 import java.util.Map;
@@ -17,9 +16,9 @@ public class CommitResult {
 
     public static class IndexResult {
         private final ClassId classId;
-        private final ORID versionsRecord;
+        private final ONidVer versionsRecord;
 
-        public IndexResult(ClassId classId, ORID versionsRecord) {
+        public IndexResult(ClassId classId, ONidVer versionsRecord) {
             this.classId = classId;
             this.versionsRecord = versionsRecord;
         }
@@ -28,14 +27,14 @@ public class CommitResult {
             return classId;
         }
 
-        public ORID getVersionsRecord() {
+        public ONidVer getVersionsRecord() {
             return versionsRecord;
         }
     }
 
-    private final Map<IIncNid, NidVer> nidVersMap;
+    private final Map<IncNid, ONidVer> nidVersMap;
 
-    public CommitResult(Map<IIncNid, NidVer> nidVersMap,
+    public CommitResult(Map<IncNid, ONidVer> nidVersMap,
             Collection<IndexResult> removeFromIndexesCauseRemoved,
             Collection<IndexResult> removeFromIndexesCauseUpdated,
             Collection<IndexResult> addToIndexes) {
@@ -49,7 +48,7 @@ public class CommitResult {
     private final Collection<IndexResult> removeFromIndexesCauseUpdated;
     private final Collection<IndexResult> addToIndexes;
 
-    public Map<IIncNid, NidVer> getNidVersMap() {
+    public Map<IncNid, ONidVer> getNidVersMap() {
         return nidVersMap;
     }
 

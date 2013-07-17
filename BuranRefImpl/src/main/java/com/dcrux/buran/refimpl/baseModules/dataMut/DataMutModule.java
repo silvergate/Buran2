@@ -1,6 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.dataMut;
 
-import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.IncNodeNotFound;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.edges.IEdgeSetter;
@@ -75,7 +75,7 @@ public class DataMutModule extends Module<BaseModule> {
         getBase().getDeltaRecorderModule().record(node, setter);
     }
 
-    public void setData(UserId sender, IIncNid incNid, IDataSetter setter,
+    public void setData(UserId sender, IncNid incNid, IDataSetter setter,
             IChangeTracker changeTracker)
             throws IncNodeNotFound, NodeClassNotFoundException, FieldConstraintViolationInt {
         final Optional<IncubationNode> iNode =

@@ -1,7 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.dataFetch;
 
 import com.dcrux.buran.common.INid;
-import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.NidVerOld;
 import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.edges.IEdgeGetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
@@ -15,6 +15,7 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.id.ORID;
@@ -43,11 +44,16 @@ public class DataFetchModule extends Module<BaseModule> {
     }
 
     public LiveNode getNode(ORID versionsRecord) throws NodeNotFoundException {
-        final NidVer nidVer = getBase().getVersionsModule().getNidVer(versionsRecord);
+        final NidVerOld nidVer = getBase().getVersionsModule().getNidVer(versionsRecord);
         if (nidVer == null) {
             throw NodeNotFoundException.deleted();
         }
-        return getNodeReq(nidVer);
+        final Optional<LiveNode> node = getNode(nidVer.getNid());
+        return node.get();
+    }
+
+    public LiveNode getNode(ONidVer oNidVer) throws NodeNotFoundException {
+        return getNode(oNidVer.getoIdentifiable());
     }
 
     public void assertVersion(LiveNode node, Version version) throws NodeNotFoundException {
@@ -60,28 +66,9 @@ public class DataFetchModule extends Module<BaseModule> {
         }
     }
 
-    public Optional<LiveNode> getNode(final NidVer nidVer) throws NodeNotFoundException {
-        final ONid oNid = IfaceUtils.getONid(nidVer.getNid());
-
-        final Optional<LiveNode> nodeStored = getNode(oNid);
-        if (!nodeStored.isPresent()) {
-            return nodeStored;
-        }
-        assertVersion(nodeStored.get(), nidVer.getVersion());
-        return nodeStored;
-    }
-
-    public LiveNode getNodeReq(final NidVer nidVer) throws NodeNotFoundException {
-        final Optional<LiveNode> nodeOpt = getNode(nidVer);
-        if (nodeOpt.isPresent()) {
-            return nodeOpt.get();
-        }
-        throw NodeNotFoundException.doesNotExist();
-    }
-
-    public <TRetVal extends Serializable> TRetVal getData(NidVer nidVer,
+    public <TRetVal extends Serializable> TRetVal getData(ONidVer nidVer,
             IDataGetter<TRetVal> getter) throws NodeNotFoundException, NodeClassNotFoundException {
-        final LiveNode node = getNodeReq(nidVer);
+        final LiveNode node = getNode(nidVer);
         return (TRetVal) getData(node, getter);
     }
 

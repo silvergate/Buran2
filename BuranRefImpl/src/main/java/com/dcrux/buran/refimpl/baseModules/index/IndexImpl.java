@@ -9,6 +9,7 @@ import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.index.eval.EvaluatedMap;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.id.ORID;
@@ -42,7 +43,7 @@ public class IndexImpl extends Module<BaseModule> {
         getBase().getNotificationsModule().removedOrUpdated(classId, versionsRecord, causeIsRemove);
     }
 
-    public void indexAndNotify(ORID versionsRecord, ClassId classId)
+    public void indexAndNotify(ONidVer versionsRecord, ClassId classId)
             throws NodeNotFoundException, NodeClassNotFoundException {
         final LiveNode node = getBase().getDataFetchModule().getNode(versionsRecord);
         final ClassDefExt classDefExt =
@@ -54,10 +55,12 @@ public class IndexImpl extends Module<BaseModule> {
 
         /* Store in map index */
         getBase().getIndexModule().getMapIndexModule()
-                .addToMapStorage(classId, classDefExt, versionsRecord, evalResult);
+                .addToMapStorage(classId, classDefExt, versionsRecord.getoIdentifiable(),
+                        evalResult);
 
         /* Notify notification manager */
-        getBase().getNotificationsModule().notifyAddedToIndex(classId, versionsRecord, evalResult);
+        getBase().getNotificationsModule()
+                .notifyAddedToIndex(classId, versionsRecord.getoIdentifiable(), evalResult);
     }
 
 

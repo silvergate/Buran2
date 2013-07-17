@@ -1,23 +1,26 @@
 package com.dcrux.buran.refimpl.commands.incubation;
 
 import com.dcrux.buran.commands.incubation.ComCommit;
-import com.dcrux.buran.commands.incubation.ICommitResult;
-import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitResult;
+import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.tx.OTransaction;
 
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 02.07.13 Time: 15:15
  */
-public class ComCommitImpl implements ICommandImpl<BaseModule, ICommitResult, ComCommit> {
+public class ComCommitImpl implements
+        ICommandImpl<BaseModule, com.dcrux.buran.commands.incubation.CommitResult, ComCommit> {
     public static final ComCommitImpl SINGLETON = new ComCommitImpl();
 
     @Override
@@ -31,7 +34,8 @@ public class ComCommitImpl implements ICommandImpl<BaseModule, ICommitResult, Co
     }
 
     @Override
-    public ICommitResult run(ComCommit command, BaseModule baseModule) throws Exception {
+    public com.dcrux.buran.commands.incubation.CommitResult run(ComCommit command,
+            BaseModule baseModule) throws Exception {
         final ODatabaseDocument database = baseModule.getDb();
         database.begin(OTransaction.TXTYPE.OPTIMISTIC);
 
@@ -53,26 +57,23 @@ public class ComCommitImpl implements ICommandImpl<BaseModule, ICommitResult, Co
         }
         for (CommitResult.IndexResult removeFromIndex : commitResult
                 .getRemoveFromIndexesCauseRemoved()) {
-            baseModule.getIndexModule().removeFromIndex(removeFromIndex.getVersionsRecord(),
-                    removeFromIndex.getClassId(), true);
+            baseModule.getIndexModule()
+                    .removeFromIndex(removeFromIndex.getVersionsRecord().getoIdentifiable(),
+                            removeFromIndex.getClassId(), true);
         }
         for (CommitResult.IndexResult removeFromIndex : commitResult
                 .getRemoveFromIndexesCauseUpdated()) {
-            baseModule.getIndexModule().removeFromIndex(removeFromIndex.getVersionsRecord(),
-                    removeFromIndex.getClassId(), false);
+            baseModule.getIndexModule()
+                    .removeFromIndex(removeFromIndex.getVersionsRecord().getoIdentifiable(),
+                            removeFromIndex.getClassId(), false);
         }
 
-        return new ICommitResult() {
-            @Override
-            public NidVer getNid(IIncNid incNid) {
-                return commitResult.getNidVersMap().get(incNid);
-            }
-
-            @Override
-            public Set<IIncNid> getIncNids() {
-                return commitResult.getNidVersMap().keySet();
-            }
-        };
+        /* Prepare commit result */
+        final Map<IncNid, NidVer> resultMap = new HashMap<>();
+        for (final Map.Entry<IncNid, ONidVer> entry : commitResult.getNidVersMap().entrySet()) {
+            resultMap.put(entry.getKey(), IfaceUtils.toOutput(entry.getValue()));
+        }
+        return new com.dcrux.buran.commands.incubation.CommitResult(resultMap);
     }
 
     private CommitResult transactionOne(ComCommit command, BaseModule baseModule) throws Exception {

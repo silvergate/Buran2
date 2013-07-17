@@ -1,10 +1,11 @@
 package com.dcrux.buran.refimpl.baseModules.versions;
 
-import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.NidVerOld;
 import com.dcrux.buran.common.Version;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -48,13 +49,22 @@ public class VersionsModule extends Module<BaseModule> {
     }
 
     @Nullable
-    public NidVer getNidVer(ORID versionsRecord) {
+    public NidVerOld getNidVer(ORID versionsRecord) {
         final ODocument doc = getBase().getDb().load(versionsRecord);
         if (doc == null) {
+            System.out.println("Node " + versionsRecord + " not found.");
             return null;
         }
         final VersionWrapper versionWrapper = new VersionWrapper(doc);
-        return new NidVer(versionWrapper.getONid(), versionWrapper.getVersion());
+        return new NidVerOld(versionWrapper.getONid(), versionWrapper.getVersion());
+    }
+
+    public VersionWrapper removeNodeVersion(ONidVer oNidVer) {
+        final ODocument doc = getBase().getDb().load(oNidVer.getoIdentifiable());
+        final VersionWrapper nodeVersion = new VersionWrapper(doc);
+        nodeVersion.deactivate();
+        nodeVersion.getDocument().save();
+        return nodeVersion;
     }
 
     @Nullable

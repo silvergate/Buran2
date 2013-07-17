@@ -4,6 +4,7 @@ import com.dcrux.buran.common.Version;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.DocumentWrapper;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -51,6 +52,10 @@ public class VersionWrapper extends DocumentWrapper {
             return ONid.fromString(target);
         }
         return null;
+    }
+
+    public ONidVer getONidVer() {
+        return new ONidVer(getDocument().getIdentity());
     }
 
     public void deactivate() {

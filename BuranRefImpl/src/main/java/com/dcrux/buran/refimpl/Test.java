@@ -10,10 +10,10 @@ import com.dcrux.buran.commands.dataMut.ComMutate;
 import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
-import com.dcrux.buran.commands.incubation.ICommitResult;
+import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.commands.indexing.ComQuery;
 import com.dcrux.buran.commands.subscription.ComAddSub;
-import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
@@ -114,7 +114,7 @@ public class Test {
         ClassDefinition classDef = new ClassDefinition("Hallo Welt",
                 "kfk lkamdlkmalksml kmalksmld kmalsm sdf asdf sd fsdf sdf sdf a.");
         classDef.getFields().add(C1_I0, new StringType(0, 200), false)
-                .add(C1_I1, IntegerType.cInt16Range(), false)
+                .add(C1_I1, IntegerType.cInt32Range(), false)
                 .add(C1_I2, BinaryType.c(100000000), false);
         classDef.getIndexes().add(C1_I1_INDEX, byField1);
         return classDef;
@@ -144,12 +144,12 @@ public class Test {
             /* Add subscription */
             ComAddSub comAddSub = ComAddSub.c(new SubBlockId("daBlock"),
                     new SubDefinition(classId, C1_I1_INDEX,
-                            RangeIndexKeyGen.from(NumberKeyGen.int64(32313))));
+                            RangeIndexKeyGen.from(NumberKeyGen.int64(Integer.MIN_VALUE))));
             bcr.sync(thisAccount, sender, comAddSub);
 
-            final IIncNid incNid1 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
-            final IIncNid incNid2 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
-            final IIncNid incNid3 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
+            final IncNid incNid1 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
+            final IncNid incNid2 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
+            final IncNid incNid3 = bcr.sync(thisAccount, sender, ComCreateNew.c(classId));
 
             final SetEdge setEdge1 = SetEdge.c(ClassLabelName.c(0))
                     .add(LabelIndex.c(0l), EdgeTargetInc.unversioned(incNid3))
@@ -160,12 +160,15 @@ public class Test {
             bcr.sync(thisAccount, sender, ComMutate.c(incNid1, BulkSet.c(
                     FieldSetter.c(0, FieldSetStr.c("Hallo Welt")).add(1, FieldSetInt.c(32)))
                     .add(setEdge1)));
+            bcr.sync(thisAccount, sender, ComMutate.c(incNid2, BulkSet.c(
+                    FieldSetter.c(0, FieldSetStr.c("Ich bin Node 1")).add(1, FieldSetInt.c(344333)))
+                    .add(setEdge1)));
             bcr.sync(thisAccount, sender, ComMutate
                     .c(incNid2, BulkSet.c(FieldSetter.c(0, FieldSetStr.c("Noch ne welt")))));
             bcr.sync(thisAccount, sender, ComMutate.c(incNid1,
                     FieldSetter.c(1, FieldSetInt.c(32312)).add(2, FieldSetBin.c(binValue))));
 
-            final ICommitResult comResult =
+            final CommitResult comResult =
                     bcr.sync(thisAccount, sender, ComCommit.c(incNid1, incNid2, incNid3));
 
             final NidVer comNode = comResult.getNid(incNid1);
@@ -196,7 +199,7 @@ public class Test {
             /* Update comNode */
             ComCreateUpdate comCreateUpdate = ComCreateUpdate.c(comNode);
 
-            IIncNid changedNode = bcr.sync(thisAccount, sender, comCreateUpdate);
+            IncNid changedNode = bcr.sync(thisAccount, sender, comCreateUpdate);
 
             final IDataSetter changeLabelSetter = BulkSet.c(
                     FieldSetter.c(0, FieldSetStr.c("Ich bin eine Änderung!"))
@@ -240,12 +243,12 @@ public class Test {
             GetInClassEdgeResult allInNodes = bcr.sync(thisAccount, sender, ComFetch.c(node3,
                     GetInClassEdge
                             .c(classId, ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX)));
-            System.out.println("All in nodes to node " + node3.getNid().getAsString() + ": " +
+            System.out.println("All in nodes to node " + node3.getAsString() + ": " +
                     allInNodes);
 
             /* Index-Abfrage */
             ComQuery cq = new ComQuery(classId, C1_I1_INDEX,
-                    RangeIndexKeyGen.from(NumberKeyGen.int64(666)));
+                    RangeIndexKeyGen.from(NumberKeyGen.int64(Integer.MIN_VALUE)));
             bcr.sync(thisAccount, sender, cq);
 
         } catch (UncheckedException uce) {

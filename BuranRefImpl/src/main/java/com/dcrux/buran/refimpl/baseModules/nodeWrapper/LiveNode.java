@@ -1,7 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 
 import com.dcrux.buran.common.INid;
-import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.NidVerOld;
 import com.dcrux.buran.common.Version;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -39,10 +39,10 @@ public class LiveNode extends CommonNode {
         getDocument().field(FIELD_VERSION, version + 1, OType.LONG);
     }
 
-    public NidVer getNidVer() {
+    public NidVerOld getNidVer() {
         final INid nid = getNid();
         final Version version = getVersion();
-        return new NidVer(nid, version);
+        return new NidVerOld(nid, version);
     }
 
 

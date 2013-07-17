@@ -2,6 +2,7 @@ package com.dcrux.buran.refimpl.commands.dataFetch;
 
 import com.dcrux.buran.commands.dataFetch.ComFetch;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
 
 import java.io.Serializable;
@@ -18,7 +19,8 @@ public class ComFetchImpl<TRetVal extends Serializable>
     @Override
     protected TRetVal transactional(ComFetch<TRetVal> command, BaseModule baseModule)
             throws Exception {
-        return baseModule.getDataFetchModule().getData(command.getNidVer(), command.getGetter());
+        return baseModule.getDataFetchModule()
+                .getData(IfaceUtils.toInput(command.getNidVer()), command.getGetter());
     }
 
     @Override

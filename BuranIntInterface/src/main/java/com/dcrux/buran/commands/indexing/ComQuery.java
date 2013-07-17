@@ -10,7 +10,7 @@ import com.dcrux.buran.common.indexing.keyGen.IKeyGen;
  *
  * @author: ${USER} Date: 09.07.13 Time: 18:07
  */
-public class ComQuery extends Command<IQueryResult> {
+public class ComQuery extends Command<QueryResult> {
 
     private ResultDirection resultDirection = ResultDirection.normal;
     private LimitConfig limitConfig = new LimitConfig(true, Integer.MAX_VALUE);
@@ -39,5 +39,9 @@ public class ComQuery extends Command<IQueryResult> {
 
     public ClassIndexName getClassIndexName() {
         return classIndexName;
+    }
+
+    public LimitConfig getLimitConfig() {
+        return limitConfig;
     }
 }

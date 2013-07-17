@@ -100,11 +100,10 @@ public class MapIndexModule extends Module<BaseModule> {
 
     @Nullable
     public Collection<ORID> get(ClassId classId, ClassIndexName name, MapKey mapKey,
-            long maxValuesToFetch) {
+            int maxValuesToFetch) {
         final OIndex<?> index = getIndex(classId, name);
 
         final Object result;
-        final long limit = maxValuesToFetch + 1;
 
         if ((mapKey.getBegin() != null) && (mapKey.getEnd() != null)) {
             if (mapKey.getBegin() == mapKey.getEnd()) {
@@ -112,15 +111,15 @@ public class MapIndexModule extends Module<BaseModule> {
             } else {
                 result = index.getValuesBetween(new ComparableBinary(mapKey.getBegin()),
                         mapKey.isBeginIncluded(), new ComparableBinary(mapKey.getEnd()),
-                        mapKey.isEndIncluded(), (int) limit);
+                        mapKey.isEndIncluded(), maxValuesToFetch);
             }
         } else {
             if (mapKey.getBegin() != null) {
                 result = index.getValuesMajor(new ComparableBinary(mapKey.getBegin()),
-                        mapKey.isBeginIncluded(), (int) limit);
+                        mapKey.isBeginIncluded(), maxValuesToFetch);
             } else if (mapKey.getEnd() != null) {
                 result = index.getValuesMinor(new ComparableBinary(mapKey.getEnd()),
-                        mapKey.isEndIncluded(), (int) limit);
+                        mapKey.isEndIncluded(), maxValuesToFetch);
             } else {
                 throw new IllegalArgumentException("End and Begin are both null");
             }
@@ -131,10 +130,6 @@ public class MapIndexModule extends Module<BaseModule> {
             resCollection = (Collection) result;
         } else {
             resCollection = Collections.singletonList(result);
-        }
-
-        if (resCollection.size() > maxValuesToFetch) {
-            return null;
         }
 
         return resCollection;

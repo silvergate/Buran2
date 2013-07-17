@@ -1,29 +1,44 @@
 package com.dcrux.buran.common;
 
-import java.io.Serializable;
-
 /**
  * Buran.
  *
- * @author: ${USER} Date: 30.06.13 Time: 23:33
+ * @author: ${USER} Date: 17.07.13 Time: 10:02
  */
-public class NidVer implements Serializable {
-    private INid nid;
-    private Version version;
+public class NidVer implements INidCommon {
 
-    public NidVer(INid nid, Version version) {
-        this.nid = nid;
-        this.version = version;
+    private String nidVer;
+
+    public NidVer(String nidVer) {
+        if ((nidVer.length() > INidCommon.MAX_LEN) || (nidVer.length() < INidCommon.MIN_LEN)) {
+            throw new IllegalArgumentException(
+                    "(nidVer.length()>INidCommon.MAX_LEN) || (nidVer.length()<INidCommon.MIN_LEN)");
+        }
+        this.nidVer = nidVer;
     }
 
     private NidVer() {
     }
 
-    public INid getNid() {
-        return nid;
+    @Override
+    public String getAsString() {
+        return this.nidVer;
     }
 
-    public Version getVersion() {
-        return version;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NidVer nid1 = (NidVer) o;
+
+        if (!nidVer.equals(nid1.nidVer)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return nidVer.hashCode();
     }
 }

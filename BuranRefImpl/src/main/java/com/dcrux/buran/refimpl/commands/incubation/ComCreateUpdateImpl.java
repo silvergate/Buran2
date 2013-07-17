@@ -1,23 +1,32 @@
 package com.dcrux.buran.refimpl.commands.incubation;
 
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
-import com.dcrux.buran.common.IIncNid;
+import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.commands.TransactionalCommand;
+import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
+import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
+import com.dcrux.buran.refimpl.commands.TransactionalCommandPost;
 
 /**
  * Buran.
  *
  * @author: ${USER} Date: 02.07.13 Time: 15:15
  */
-public class ComCreateUpdateImpl extends TransactionalCommand<IIncNid, ComCreateUpdate> {
+public class ComCreateUpdateImpl
+        extends TransactionalCommandPost<IncNid, ComCreateUpdate, OIncNid> {
     public static final ComCreateUpdateImpl SINGLETON = new ComCreateUpdateImpl();
 
     @Override
-    protected IIncNid transactional(ComCreateUpdate command, BaseModule baseModule)
+    protected IncNid postprocess(OIncNid oIncNid) {
+        return IfaceUtils.toOutput(oIncNid);
+    }
+
+    @Override
+    protected OIncNid transactional(ComCreateUpdate command, BaseModule baseModule)
             throws Exception {
         return baseModule.getIncubationModule()
-                .createIncUpdate(baseModule.getAuthModule().getSender(), command.getNidVer());
+                .createIncUpdate(baseModule.getAuthModule().getSender(),
+                        IfaceUtils.toInput(command.getNidVer()));
     }
 
     @Override

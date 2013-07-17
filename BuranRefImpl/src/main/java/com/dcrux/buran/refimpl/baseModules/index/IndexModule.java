@@ -6,6 +6,7 @@ import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.index.eval.MapFunEvaluator;
 import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.FunctionCompiler;
 import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.IndexingAdditionalInfo;
@@ -58,7 +59,7 @@ public class IndexModule extends Module<BaseModule> {
         getIndexImpl().removeFromIndexAndNotify(versionsRecord, classId, causeIsRemove);
     }
 
-    public void index(ORID versionsRecord, ClassId classId)
+    public void index(ONidVer versionsRecord, ClassId classId)
             throws NodeNotFoundException, NodeClassNotFoundException {
         getIndexImpl().indexAndNotify(versionsRecord, classId);
         System.out.println("   - ADD TO INDEX: " + versionsRecord);

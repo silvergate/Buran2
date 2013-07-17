@@ -1,12 +1,16 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
-import com.dcrux.buran.common.*;
+import com.dcrux.buran.common.IncNid;
+import com.dcrux.buran.common.IncNodeNotFound;
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.NullChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.IRecordPlayer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
@@ -49,7 +53,8 @@ public class CommitModule extends Module<BaseModule> {
             IChangeTracker changeTracker,
             Collection<CommitResult.IndexResult> outRemoveFromIndexCauseRemoved,
             Collection<CommitResult.IndexResult> outRemoveFromIndexCauseUpdate,
-            Collection<CommitResult.IndexResult> outAddToIndex) throws Exception {
+            Collection<CommitResult.IndexResult> outAddToIndex, ONidVer[] outNidVer)
+            throws Exception {
         final boolean update = incubationNode.isUpdate();
         if (!update) {
             incubationNode.goLive();
@@ -61,14 +66,14 @@ public class CommitModule extends Module<BaseModule> {
             /* Add version */
             final VersionWrapper addedVers = getBase().getVersionsModule()
                     .addNodeVersion(incubationNode.getNid(), Version.INITIAL);
-            outAddToIndex
-                    .add(new CommitResult.IndexResult(storeNode.getClassId(), addedVers.getOrid()));
+            outNidVer[0] = addedVers.getONidVer();
+            outAddToIndex.add(new CommitResult.IndexResult(storeNode.getClassId(),
+                    addedVers.getONidVer()));
 
             return storeNode;
         } else {
-            final ONid upOnid = incubationNode.getUpdateNid();
-            final Version upVersion = incubationNode.getUpdateVersion();
-            LiveNode up = getBase().getDataFetchModule().getNodeReq(new NidVer(upOnid, upVersion));
+            final ONidVer upOnid = incubationNode.getUpdateNid();
+            LiveNode up = getBase().getDataFetchModule().getNode(upOnid);
 
             playRecordedDeltas(sender, incubationNode, up, outCommittableRelations, changeTracker);
 
@@ -78,29 +83,30 @@ public class CommitModule extends Module<BaseModule> {
 
             /* Remove old version, add new */
             final VersionWrapper removedVers =
-                    getBase().getVersionsModule().removeNodeVersion(upOnid, upVersion);
+                    getBase().getVersionsModule().removeNodeVersion(upOnid);
             if (up.isMarkedForDeletion()) {
-                outRemoveFromIndexCauseRemoved
-                        .add(new CommitResult.IndexResult(up.getClassId(), removedVers.getOrid()));
+                outRemoveFromIndexCauseRemoved.add(new CommitResult.IndexResult(up.getClassId(),
+                        removedVers.getONidVer()));
             } else {
-                outRemoveFromIndexCauseUpdate
-                        .add(new CommitResult.IndexResult(up.getClassId(), removedVers.getOrid()));
+                outRemoveFromIndexCauseUpdate.add(new CommitResult.IndexResult(up.getClassId(),
+                        removedVers.getONidVer()));
             }
             if (!up.isMarkedForDeletion()) {
                 /* No need to index deleted nodes */
                 final VersionWrapper addedVers =
-                        getBase().getVersionsModule().addNodeVersion(upOnid, up.getVersion());
+                        getBase().getVersionsModule().addNodeVersion(up.getNid(), up.getVersion());
+                outNidVer[0] = addedVers.getONidVer();
                 outAddToIndex
-                        .add(new CommitResult.IndexResult(up.getClassId(), addedVers.getOrid()));
+                        .add(new CommitResult.IndexResult(up.getClassId(), addedVers.getONidVer()));
             }
 
             return up;
         }
     }
 
-    public CommitResult commit(final UserId sender, final Collection<IIncNid> incNids)
+    public CommitResult commit(final UserId sender, final Collection<IncNid> incNids)
             throws Exception {
-        final Map<IIncNid, NidVer> result = new HashMap<>();
+        final Map<IncNid, ONidVer> result = new HashMap<>();
         final CommitInfo commitInfo = new CommitInfo();
 
         final Multimap<OIdentifiable, OIdentifiable> committableRelationsByNode =
@@ -116,7 +122,7 @@ public class CommitModule extends Module<BaseModule> {
         final Collection<LiveNode> nodesMarkedAsDeleted = new ArrayList<>();
 
         /* Commit node */
-        for (final IIncNid incNid : incNids) {
+        for (final IncNid incNid : incNids) {
             final Optional<IncubationNode> iNode =
                     getBase().getIncubationModule().getIncNode(sender, incNid);
             if (!iNode.isPresent()) {
@@ -124,8 +130,9 @@ public class CommitModule extends Module<BaseModule> {
             }
             final IncubationNode node = iNode.get();
             final Set<OIdentifiable> commitableRelations = new HashSet<>();
+            final ONidVer[] onidVers = new ONidVer[1];
             final LiveNode liveNode = commitNode(sender, node, commitableRelations, changeTracker,
-                    removeFromIndexCauseRemoved, removeFromIndexCauseUpdated, addToIndex);
+                    removeFromIndexCauseRemoved, removeFromIndexCauseUpdated, addToIndex, onidVers);
             if (liveNode.isMarkedForDeletion()) {
                 nodesMarkedAsDeleted.add(liveNode);
             }
@@ -134,7 +141,7 @@ public class CommitModule extends Module<BaseModule> {
                 committableRelationsByNode.put(liveNode.getDocument(), commitable);
             }
 
-            result.put(incNid, liveNode.getNidVer());
+            result.put(incNid, onidVers[0]);
             commitInfo.add(new CommitInfo.CommitEntry(node, liveNode));
         }
 

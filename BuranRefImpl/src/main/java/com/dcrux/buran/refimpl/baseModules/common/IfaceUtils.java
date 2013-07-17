@@ -2,6 +2,8 @@ package com.dcrux.buran.refimpl.baseModules.common;
 
 import com.dcrux.buran.common.IIncNid;
 import com.dcrux.buran.common.INid;
+import com.dcrux.buran.common.IncNid;
+import com.dcrux.buran.common.NidVer;
 import com.orientechnologies.orient.core.id.ORecordId;
 
 /**
@@ -18,11 +20,28 @@ public class IfaceUtils {
         }
     }
 
+    public static ONid getOincNid(IncNid nid) {
+        return new ONid(new ORecordId(nid.getAsString()));
+    }
+
     public static ONid getOincNid(IIncNid incNid) {
         if (incNid instanceof ONid) {
             return (ONid) incNid;
         } else {
             return new ONid(new ORecordId(incNid.getAsString()));
         }
+    }
+
+    public static NidVer toOutput(ONidVer oNidVer) {
+        return new NidVer(oNidVer.getoIdentifiable().toString());
+    }
+
+    public static IncNid toOutput(OIncNid oIncNid) {
+        return new IncNid(oIncNid.getoIdentifiable().toString());
+    }
+
+
+    public static ONidVer toInput(NidVer nidVer) {
+        return new ONidVer(new ORecordId(nidVer.getAsString()));
     }
 }
