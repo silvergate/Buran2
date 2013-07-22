@@ -65,7 +65,7 @@ public class CommandDispatcher {
         } catch (Throwable throwable) {
             final Set<Class<? extends Exception>> checkedExceptions =
                     command.getExpectableExceptions();
-            if (checkedExceptions.contains(throwable.getClass())) {
+            if (checkedExceptions != null && checkedExceptions.contains(throwable.getClass())) {
                 throw new WrappedExpectableException((Exception) throwable);
             }
             throw new UncheckedException(throwable);

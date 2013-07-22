@@ -10,6 +10,7 @@
 
     <source path="common"/>
     <source path="common/classes"/>
+    <source path="common/indexing"/>
     <source path="common/classDefinition"/>
     <source path="common/subscription"/>
 

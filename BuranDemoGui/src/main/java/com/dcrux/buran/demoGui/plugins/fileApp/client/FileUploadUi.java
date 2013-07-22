@@ -1,5 +1,11 @@
 package com.dcrux.buran.demoGui.plugins.fileApp.client;
 
+import com.dcrux.buran.commandBase.VoidType;
+import com.dcrux.buran.commands.incubation.CommitResult;
+import com.dcrux.buran.common.IncNid;
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.demoGui.plugins.listview.client.DescModule;
+import com.github.gwtbootstrap.client.ui.Alert;
 import com.github.gwtbootstrap.client.ui.ProgressBar;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
@@ -7,9 +13,12 @@ import com.google.gwt.event.dom.client.DragEnterEvent;
 import com.google.gwt.event.dom.client.DragLeaveEvent;
 import com.google.gwt.event.dom.client.DragOverEvent;
 import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.typedarrays.client.Int8ArrayNative;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import org.vectomatic.dnd.DataTransferExt;
 import org.vectomatic.dnd.DropPanel;
@@ -29,11 +38,15 @@ public class FileUploadUi {
     interface FileMainUiUiBinder extends UiBinder<HTMLPanel, FileUploadUi> {
     }
 
+    private FileModule fileModule = new FileModule(new UserId(0));
+    private DescModule descModule = new DescModule(new UserId(0));
+
     private static class FileUploadInfo {
         private int fileIndex;
         private File file;
         private long start;
         private long end;
+        private IncNid incNid;
 
         private int getFileIndex() {
             return fileIndex;
@@ -65,6 +78,14 @@ public class FileUploadUi {
 
         private void setEnd(long end) {
             this.end = end;
+        }
+
+        private IncNid getIncNid() {
+            return incNid;
+        }
+
+        private void setIncNid(IncNid incNid) {
+            this.incNid = incNid;
         }
     }
 
@@ -118,7 +139,7 @@ public class FileUploadUi {
 
     private HTMLPanel rootElement;
 
-    private static final int UPLOAD_CHUNK = 8192;
+    private static final int UPLOAD_CHUNK = 8192 * 4;
 
     @UiField
     DropPanel dropPanel;
@@ -132,6 +153,8 @@ public class FileUploadUi {
     DivElement uploadOverallInfoText;
     @UiField
     ProgressBar uploadOverallInfoProgress;
+    @UiField
+    Alert statusField;
 
     private FileReader reader;
 
@@ -169,14 +192,40 @@ public class FileUploadUi {
         event.preventDefault();
     }
 
+    private static byte[] toByte(ArrayBuffer arrayBuffer) {
+        Int8ArrayNative uint8Array = Int8ArrayNative.create(arrayBuffer, 0);
+        final byte[] result = new byte[arrayBuffer.byteLength()];
+        for (int i = 0; i < arrayBuffer.byteLength(); i++) {
+            byte element = uint8Array.get(i);
+            result[i] = (byte) (element);
+        }
+        return result;
+    }
+
     private final LoadEndHandler loadHandler = new LoadEndHandler() {
         @Override
         public void onLoadEnd(LoadEndEvent loadEndEvent) {
-            /* Increase start and end */
-            uploadInfo.getFileUploadInfo().setStart(uploadInfo.getFileUploadInfo().getEnd() + 1);
-            uploadInfo.getFileUploadInfo()
-                    .setEnd(uploadInfo.getFileUploadInfo().getStart() + UPLOAD_CHUNK);
-            doNextUploadStep();
+            final IncNid incNid = uploadInfo.getFileUploadInfo().getIncNid();
+
+            final byte[] data;
+            data = toByte(FileUploadUi.this.reader.getArrayBufferResult());
+            FileUploadUi.this.fileModule.append(incNid, data, new AsyncCallback<VoidType>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    FileUploadUi.this.uploadInfoText.setInnerText("Error: " + caught);
+                }
+
+                @Override
+                public void onSuccess(VoidType result) {
+                    /* Increase start and end */
+                    uploadInfo.getFileUploadInfo()
+                            .setStart(uploadInfo.getFileUploadInfo().getEnd() + 1);
+                    uploadInfo.getFileUploadInfo()
+                            .setEnd(uploadInfo.getFileUploadInfo().getStart() + UPLOAD_CHUNK);
+                    doNextUploadStep();
+                }
+            });
+
         }
     };
 
@@ -185,6 +234,11 @@ public class FileUploadUi {
     private void showUploadDropinfo(boolean dropInfo) {
         this.uploadInfoContainer.setVisible(!dropInfo);
         this.dropPanel.setVisible(dropInfo);
+    }
+
+    private void setEndStatusText(String endStatusText) {
+        this.statusField.setVisible(true);
+        this.statusField.setText(endStatusText);
     }
 
     private void doNextUploadStep() {
@@ -200,36 +254,73 @@ public class FileUploadUi {
                 if (fileIndex >= this.uploadInfo.getFileList().getLength()) {
                     /* Processed last file */
                     showUploadDropinfo(true);
+                    setEndStatusText(this.uploadInfo.getFileList().getLength() + " Files " +
+                            "uploaded.");
                 }
-                FileUploadInfo fileUploadInfo = new FileUploadInfo();
+                final FileUploadInfo fileUploadInfo = new FileUploadInfo();
                 fileUploadInfo.setFileIndex(fileIndex);
                 fileUploadInfo.setStart(0);
                 fileUploadInfo.setEnd(UPLOAD_CHUNK);
                 fileUploadInfo.setFile(this.uploadInfo.getFileList().getItem(fileIndex));
                 this.uploadInfo.setFileUploadInfo(fileUploadInfo);
-                doNextUploadStep();
+
+                /* Create node */
+                String mime = fileUploadInfo.getFile().getType();
+                if (mime == null) {
+                    mime = "application/octet-stream";
+                }
+                this.fileModule.createFile(mime, new AsyncCallback<IncNid>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        FileUploadUi.this.uploadInfoText.setInnerText("Error: " + caught);
+                    }
+
+                    @Override
+                    public void onSuccess(IncNid result) {
+                        fileUploadInfo.setIncNid(result);
+                        doNextUploadStep();
+                    }
+                });
+
             } else {
                 /* Continue */
-                FileUploadInfo fileUploadInfo = this.uploadInfo.getFileUploadInfo();
+                final FileUploadInfo fileUploadInfo = this.uploadInfo.getFileUploadInfo();
                 long fileSize = fileUploadInfo.getFile().getSize();
 
                 if (fileUploadInfo.getEnd() >= fileSize) {
                     fileUploadInfo.setEnd(fileSize);
                 }
                 if (fileUploadInfo.getStart() >= fileUploadInfo.getEnd()) {
+                    /* Commit file */
+                    this.fileModule
+                            .commit(fileUploadInfo.getIncNid(), fileUploadInfo.getFile().getName(),
+                                    new AsyncCallback<CommitResult>() {
+
+                                        @Override
+                                        public void onFailure(Throwable caught) {
+                                            FileUploadUi.this.uploadInfoText
+                                                    .setInnerText("Error: " + caught);
+                                        }
+
+                                        @Override
+                                        public void onSuccess(CommitResult result) {
                             /* Next file (or end) */
-                    this.uploadInfo.setFileIndex(this.uploadInfo.getFileIndex() + 1);
-                    this.uploadInfo.setFileUploadInfo(null);
-                    doNextUploadStep();
+                                            FileUploadUi.this.uploadInfo.setFileIndex(
+                                                    FileUploadUi.this.uploadInfo.getFileIndex() +
+                                                            1);
+                                            FileUploadUi.this.uploadInfo.setFileUploadInfo(null);
+                                            doNextUploadStep();
+                                        }
+                                    });
                 } else {
-                        /* Display info */
+                    /* Display info */
                     int percentage =
                             (int) (((float) fileUploadInfo.getStart() / (float) fileSize) * 100f);
                     this.uploadInfoText.setInnerText("Uploading file " +
                             fileUploadInfo.getFile().getName() + "): " + percentage + "%");
                     this.uploadInfoProgress.setPercent(percentage);
 
-                        /* Display overall info */
+                    /* Display overall info */
                     int overallPercentage =
                             (int) ((float) this.uploadInfo.getCompletelyProcessedSize() /
                                     (float) this.uploadInfo.getCombinedFileSize() * 100f);
@@ -240,11 +331,11 @@ public class FileUploadUi {
                             overallPercentage + "%");
                     this.uploadOverallInfoProgress.setPercent(overallPercentage);
 
-                        /* Read from file */
+                    /* Read from file */
                     Blob blob = fileUploadInfo.getFile()
                             .slice(fileUploadInfo.getStart(), fileUploadInfo.getEnd());
-                    this.reader.readAsBinaryString(blob);
-                                                /* Processed size */
+                    this.reader.readAsArrayBuffer(blob);
+                     /* Processed size */
                     this.uploadInfo.setCompletelyProcessedSize(
                             this.uploadInfo.getCompletelyProcessedSize() +
                                     (fileUploadInfo.getEnd() - fileUploadInfo.getStart()));

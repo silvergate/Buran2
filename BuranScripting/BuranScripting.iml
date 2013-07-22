@@ -3,13 +3,14 @@
   <component name="FacetManager">
     <facet type="gwt" name="GWT">
       <configuration>
+        <setting name="compilerParameters" value="-logLevel TRACE -compileReport" />
         <setting name="compilerMaxHeapSize" value="256" />
         <setting name="gwtScriptOutputStyle" value="DETAILED" />
         <setting name="gwtSdkUrl" value="file://$USER_HOME$/gwt-2.5.1" />
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -18,8 +19,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.6" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="gwt-user" level="project" />
     <orderEntry type="library" name="Maven: com.orientechnologies:orientdb-core:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.orientechnologies:orient-commons:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: com.orientechnologies:orientdb-nativeos:1.4.1" level="project" />
@@ -36,7 +38,6 @@
     <orderEntry type="library" name="Maven: com.github.gwtbootstrap:gwt-bootstrap:2.2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.vectomatic:lib-gwt-file:0.3.3" level="project" />
     <orderEntry type="library" name="Maven: javax.validation:validation-api:1.0.0.GA" level="project" />
-    <orderEntry type="library" name="gwt-user" level="project" />
   </component>
 </module>
 

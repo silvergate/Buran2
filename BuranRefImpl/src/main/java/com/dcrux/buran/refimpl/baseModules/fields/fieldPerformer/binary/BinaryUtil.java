@@ -91,7 +91,7 @@ public class BinaryUtil {
             if (modulo != 0) {
                 final int remainingSpace = CHUNK_SIZE - modulo;
                 final int blockSize = CHUNK_SIZE - remainingSpace;
-                final int block = (int) (currentSize / CHUNK_SIZE) + 1;
+                final int block = (int) (currentSize / CHUNK_SIZE);
                 final byte[] partialBuf = new byte[remainingSpace];
                 final int actuallyRead = inputStream.read(partialBuf, 0, remainingSpace);
 

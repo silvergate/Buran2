@@ -13,6 +13,9 @@ public class FieldSetStr implements IUnfieldedDataSetter {
     private String value;
 
     public FieldSetStr(String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value==null");
+        }
         this.value = value;
     }
 

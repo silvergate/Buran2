@@ -28,10 +28,12 @@ public class ClassDefinition implements Serializable {
         }
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
+        this.fields = new ClassFieldsDefinition();
+        this.indexes = new ClassIndexDefinition();
     }
 
-    private final ClassFieldsDefinition fields = new ClassFieldsDefinition();
-    private final ClassIndexDefinition indexes = new ClassIndexDefinition();
+    private ClassFieldsDefinition fields;
+    private ClassIndexDefinition indexes;
 
     private ClassDefinition() {
     }

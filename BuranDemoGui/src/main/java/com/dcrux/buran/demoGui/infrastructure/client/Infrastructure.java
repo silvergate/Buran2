@@ -3,6 +3,7 @@ package com.dcrux.buran.demoGui.infrastructure.client;
 import com.dcrux.buran.demoGui.plugins.fileApp.client.ChatAppPlugin;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.Cookies;
 
 /**
  * Buran.
@@ -20,5 +21,6 @@ public class Infrastructure implements EntryPoint {
         MainPage mainPage = new MainPage();
         Document.get().getBody().appendChild(mainPage.getRootElement().getElement());
         //loadSidebar();
+        Cookies.setCookie(BuranService.COOKIE_USER_NAME, "23");
     }
 }

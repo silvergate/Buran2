@@ -27,11 +27,11 @@ public class MetaRunner {
         final ComplexityTracker complexityTracker =
                 new ComplexityTracker(this.cpuComplexityLimit, this.memoryLimit);
         final TypeState state = new TypeState(complexityTracker);
-        Set<IType> retTypes = new HashSet<>();
-        Collection<TypeState> brachedStates = new HashSet<>();
+        Set<IType> retTypes = new HashSet<IType>();
+        Collection<TypeState> brachedStates = new HashSet<TypeState>();
         brachedStates.add(state);
         evaluateInt(block, state, 0, retTypes, brachedStates);
-        Set<IType<?>> types = new HashSet<>();
+        Set<IType<?>> types = new HashSet<IType<?>>();
         for (IType functionMeta : retTypes) {
             types.add(functionMeta);
         }

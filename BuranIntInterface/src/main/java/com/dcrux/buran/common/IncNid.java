@@ -40,4 +40,11 @@ public class IncNid implements INidCommon {
     public int hashCode() {
         return incNid.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "IncNid{" +
+                "incNid='" + incNid + '\'' +
+                '}';
+    }
 }

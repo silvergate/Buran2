@@ -10,6 +10,7 @@ public class UncheckedException extends Exception {
 
     public UncheckedException(Throwable wrapped) {
         this.wrapped = wrapped;
+        wrapped.printStackTrace();
     }
 
     private UncheckedException() {

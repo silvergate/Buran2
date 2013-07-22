@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.edge;
 
+import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.edges.IEdgeTarget;
 import com.dcrux.buran.common.edges.targets.EdgeTarget;
 import com.dcrux.buran.common.edges.targets.EdgeTargetExt;
@@ -17,7 +18,7 @@ public class RelWrapToLabelTarget {
             return new EdgeTargetExt(wrapper.getTargetUserId(), wrapper.getTarget(),
                     Optional.fromNullable(wrapper.getTargetVersion()));
         }
-        return new EdgeTarget(wrapper.getTarget(),
+        return new EdgeTarget(new Nid(wrapper.getTarget().getAsString()),
                 Optional.fromNullable(wrapper.getTargetVersion()));
     }
 }

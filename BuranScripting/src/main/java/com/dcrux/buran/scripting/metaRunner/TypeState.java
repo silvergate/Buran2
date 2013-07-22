@@ -16,8 +16,8 @@ import java.util.Set;
  */
 public class TypeState implements ITypeState {
 
-    private final Map<String, IType<?>> typesMap = new HashMap<>();
-    private final Set<String> finalfields = new HashSet<>();
+    private final Map<String, IType<?>> typesMap = new HashMap<String, IType<?>>();
+    private final Set<String> finalfields = new HashSet<String>();
 
     private IType retType;
     private LineNum jumpTo;

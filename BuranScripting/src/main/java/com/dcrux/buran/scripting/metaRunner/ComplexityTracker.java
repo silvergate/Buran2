@@ -23,7 +23,7 @@ public class ComplexityTracker implements IComplexityTracker {
     private final int memoryLimit;
 
     /* Allocated types */
-    private final Set<AllocType<?>> allocTypeSet = new HashSet<>();
+    private final Set<AllocType<?>> allocTypeSet = new HashSet<AllocType<?>>();
 
     public ComplexityTracker(int cpuComplexityLimit, int memoryLimit) {
         this.cpuComplexityLimit = cpuComplexityLimit;
@@ -76,14 +76,14 @@ public class ComplexityTracker implements IComplexityTracker {
     public <TType extends IType<?>> AllocType<TType> alloc(TType type)
             throws MemoryRequirementOverflow {
         allocateMemory(type.getMemoryMaxMemoryRequirement());
-        final AllocType<TType> allocType = new AllocType<>(type, false);
+        final AllocType<TType> allocType = new AllocType<TType>(type, false);
         this.allocTypeSet.add(allocType);
         return allocType;
     }
 
     @Override
     public <TType extends IType<?>> AllocType<TType> allocLiteral(TType type) {
-        final AllocType<TType> allocType = new AllocType<>(type, true);
+        final AllocType<TType> allocType = new AllocType<TType>(type, true);
         this.allocTypeSet.add(allocType);
         return allocType;
     }

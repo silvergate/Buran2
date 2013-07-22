@@ -1,8 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.dataFetch;
 
-import com.dcrux.buran.common.INid;
-import com.dcrux.buran.common.NidVerOld;
-import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.*;
 import com.dcrux.buran.common.edges.IEdgeGetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
@@ -17,8 +15,10 @@ import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
+import com.dcrux.buran.refimpl.baseModules.versions.VersionWrapper;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
 import java.io.Serializable;
@@ -41,6 +41,28 @@ public class DataFetchModule extends Module<BaseModule> {
         final ODocument doc = getBase().getDb().load(oNid.getRecordId());
         final LiveNode incubationNode = new LiveNode(doc);
         return Optional.of(incubationNode);
+    }
+
+    public ONid toOnid(INidOrNidVer nidOrNidVer) throws NodeNotFoundException {
+        if (nidOrNidVer instanceof Nid) {
+            final String str = ((Nid) nidOrNidVer).getAsString();
+            return new ONid(new ORecordId(str));
+        } else {
+            NidVer nidVer = (NidVer) nidOrNidVer;
+            LiveNode liveNode = getNode(new ORecordId(((NidVer) nidOrNidVer).getAsString()));
+            return liveNode.getNid();
+        }
+    }
+
+    public ONidVer toNidVer(Nid nid) throws NodeNotFoundException {
+        final ODocument doc = getBase().getDb().load(new ORecordId(nid.getAsString()));
+        if (doc == null) {
+            throw NodeNotFoundException.doesNotExist();
+        }
+        final LiveNode incubationNode = new LiveNode(doc);
+        final VersionWrapper nidVer =
+                getBase().getVersionsModule().getNodeVersion(incubationNode.getNid());
+        return nidVer.getONidVer();
     }
 
     public LiveNode getNode(ORID versionsRecord) throws NodeNotFoundException {

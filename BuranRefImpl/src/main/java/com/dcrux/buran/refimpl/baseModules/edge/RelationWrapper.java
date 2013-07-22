@@ -10,6 +10,7 @@ import com.dcrux.buran.common.edges.LabelIndex;
 import com.dcrux.buran.common.edges.targets.EdgeTarget;
 import com.dcrux.buran.common.edges.targets.EdgeTargetExt;
 import com.dcrux.buran.common.edges.targets.EdgeTargetInc;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
@@ -58,7 +59,6 @@ public class RelationWrapper {
     public static final String FIELD_UNCOMMITTED = "isuncom";
     public static final String FIELD_ISCOM = "iscom";
 
-
     /* Target */
     public static final String FIELD_TARGET_IS_INC = "tinc";
     public static final String FIELD_TARGET = "target";
@@ -67,7 +67,8 @@ public class RelationWrapper {
     public static final String FIELD_TARGET_USERID = "tuid";
 
     public static RelationWrapper from(ONid source, ClassId sourceClass, ClassLabelName labelName,
-            LabelIndex index, IEdgeTargetInc targetInc) {
+            LabelIndex index, IEdgeTargetInc targetInc, BaseModule baseModule)
+            throws NodeNotFoundException {
         final ONid target;
         final @Nullable Version targetVersion;
         final @Nullable UserId targetUserId;
@@ -75,7 +76,8 @@ public class RelationWrapper {
 
         if (targetInc instanceof EdgeTarget) {
             final EdgeTarget labelTarget = (EdgeTarget) targetInc;
-            target = IfaceUtils.getONid(labelTarget.getTargetNid());
+            target = baseModule.getDataFetchModule().toOnid(labelTarget.getTargetNid());
+            //target = IfaceUtils.getONid(labelTarget.getTargetNid());
             targetVersion = labelTarget.getVersion().orNull();
             targetUserId = null;
             targetType = TargetType.liveTarget;

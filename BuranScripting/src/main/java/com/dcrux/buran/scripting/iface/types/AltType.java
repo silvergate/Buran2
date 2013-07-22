@@ -15,7 +15,7 @@ public class AltType implements IType<Object> {
     }
 
     public static AltType c(Set<IType<?>> types) {
-        final Set<IType<?>> allTypes = new HashSet<>();
+        final Set<IType<?>> allTypes = new HashSet<IType<?>>();
         for (final IType<?> type : types) {
             extractSingles(type, allTypes);
         }
@@ -23,7 +23,7 @@ public class AltType implements IType<Object> {
     }
 
     public static AltType c(IType<?>... types) {
-        final Set<IType<?>> allTypes = new HashSet<>();
+        final Set<IType<?>> allTypes = new HashSet<IType<?>>();
         for (final IType<?> type : types) {
             allTypes.add(type);
         }
@@ -47,7 +47,7 @@ public class AltType implements IType<Object> {
     }
 
     private static Map<Class<?>, IType<?>> getCombinedMap(Set<IType<?>> types) {
-        final Map<Class<?>, IType<?>> newMap = new HashMap<>();
+        final Map<Class<?>, IType<?>> newMap = new HashMap<Class<?>, IType<?>>();
 
         for (final IType<?> type : types) {
             if (!newMap.containsKey(type.getClass())) {
@@ -68,7 +68,7 @@ public class AltType implements IType<Object> {
     @Override
     public IType<Object> combineWith(IType<?> other) {
         final AltType otherCast = (AltType) other;
-        final Set<IType<?>> allTypes = new HashSet<>();
+        final Set<IType<?>> allTypes = new HashSet<IType<?>>();
         extractSingles(this, allTypes);
         extractSingles(otherCast, allTypes);
         return new AltType(getCombinedMap(allTypes));

@@ -7,6 +7,7 @@
     <inherits name="org.vectomatic.libgwtfile"/>
 
     <source path="fileApp/client"/>
+    <source path="listview/client"/>
     <source path="publicTypes"/>
 
 </module>

@@ -12,7 +12,8 @@
                         <b:Well>Drop files here</b:Well>
                     </b:Column>
                     <b:Column size="4">
-                        <b:Alert addStyleNames="alert alert-success">4 Files uploaded</b:Alert>
+                        <b:Alert addStyleNames="alert alert-success" visible="false"
+                                 ui:field="statusField"/>
                     </b:Column>
                 </b:FluidRow>
             </b:FluidContainer>

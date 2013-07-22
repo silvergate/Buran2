@@ -28,7 +28,7 @@ public class Compiler {
 
     private CompiledFunction compileFunction(IFunctionDeclaration declaration) {
         final List<IFunctionDeclaration<?>> inputs = declaration.getInput();
-        final List<CompiledFunction> compiledArgs = new ArrayList<>();
+        final List<CompiledFunction> compiledArgs = new ArrayList<CompiledFunction>();
         for (final IFunctionDeclaration<?> arg : inputs) {
             compiledArgs.add(compileFunction(arg));
         }

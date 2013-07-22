@@ -1,7 +1,7 @@
 package com.dcrux.buran.commands.dataFetch;
 
 import com.dcrux.buran.commands.Command;
-import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.INidOrNidVer;
 import com.dcrux.buran.common.getterSetter.IDataGetter;
 
 import java.io.Serializable;
@@ -16,24 +16,24 @@ public class ComFetch<TRetVal extends Serializable> extends Command<TRetVal> {
 
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
-    private NidVer nidVer;
+    private INidOrNidVer nidVer;
     private IDataGetter<TRetVal> getter;
 
     private ComFetch() {
     }
 
-    public static <TRetVal extends Serializable> ComFetch<TRetVal> c(NidVer nidVer,
+    public static <TRetVal extends Serializable> ComFetch<TRetVal> c(INidOrNidVer nidVer,
             IDataGetter<TRetVal> dataGetter) {
         return new ComFetch<TRetVal>(nidVer, dataGetter);
     }
 
-    public ComFetch(NidVer nidVer, IDataGetter<TRetVal> dataGetter) {
+    public ComFetch(INidOrNidVer nidVer, IDataGetter<TRetVal> dataGetter) {
         super(EXCEPTIONS);
         this.nidVer = nidVer;
         this.getter = dataGetter;
     }
 
-    public NidVer getNidVer() {
+    public INidOrNidVer getNidVer() {
         return nidVer;
     }
 

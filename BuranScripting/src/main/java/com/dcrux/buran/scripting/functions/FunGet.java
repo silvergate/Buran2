@@ -2,8 +2,6 @@ package com.dcrux.buran.scripting.functions;
 
 import com.dcrux.buran.scripting.iface.*;
 
-import java.text.MessageFormat;
-
 /**
  * Buran.
  *
@@ -26,15 +24,14 @@ public class FunGet<TRetType extends IType<?>> extends FunctionDeclaration<TRetT
 
     public static <TRetTypeLocal extends IType<?>> FunGet<TRetTypeLocal> c(VarName varName,
             Class<TRetTypeLocal> clazz) {
-        return new FunGet<>(varName);
+        return new FunGet<TRetTypeLocal>(varName);
     }
 
     @Override
     public AllocType<TRetType> getMeta(ITypeState state) throws ProgrammErrorException {
         final IType<?> type = state.getType(getVarName());
         if (type == null) {
-            throw new ProgrammErrorException(
-                    MessageFormat.format("Variable {0} is not set.", getVarName()));
+            throw new ProgrammErrorException("Variable " + getVarName() + " is not set.");
         }
 
         return (AllocType<TRetType>) state.getCompTracker().alloc(type);

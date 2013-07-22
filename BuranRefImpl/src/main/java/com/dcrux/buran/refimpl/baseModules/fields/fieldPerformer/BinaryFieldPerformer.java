@@ -36,7 +36,7 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
             getters(FieldGetPrim.class, FieldGetBin.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetBin
-            .class, FieldRemove.class);
+            .class, FieldRemove.class, FieldAppendBin.class);
 
     public static final BinaryFieldPerformer SINGLETON = new BinaryFieldPerformer();
 

@@ -6,9 +6,11 @@ import com.dcrux.buran.common.edges.getter.GetEdgeResult;
 import com.dcrux.buran.common.edges.getter.GetInClassEdge;
 import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
 import com.dcrux.buran.common.edges.setter.SetEdge;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitInfo;
+import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
@@ -23,6 +25,7 @@ import com.sun.istack.internal.Nullable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -99,14 +102,15 @@ public class EdgeModule extends Module<BaseModule> {
         for (OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
             final RelationWrapper relationWrapper = new RelationWrapper(doc);
-            entries.add(new GetInClassEdgeResult.Entry(relationWrapper.getSource(),
-                    relationWrapper.getLabelIndex()));
+            entries.add(
+                    new GetInClassEdgeResult.Entry(IfaceUtils.toOutput(relationWrapper.getSource()),
+                            relationWrapper.getLabelIndex()));
         }
         return new GetInClassEdgeResult(entries);
     }
 
     public void performLabelSet(final CommonNode incubationNode, IEdgeSetter labelSet,
-            @Nullable Set<OIdentifiable> outCommitableRelations) {
+            @Nullable Set<OIdentifiable> outCommitableRelations) throws NodeNotFoundException {
         if (labelSet instanceof SetEdge) {
             final SetEdge setEdge = (SetEdge) labelSet;
             final ILabelName labelName = setEdge.getName();
@@ -118,7 +122,7 @@ public class EdgeModule extends Module<BaseModule> {
                     final LabelIndex index = target.getKey();
                     final RelationWrapper relationWrapper = RelationWrapper
                             .from(incubationNode.getNid(), incubationNode.getClassId(),
-                                    classLabelName, index, labelTargetInc);
+                                    classLabelName, index, labelTargetInc, getBase());
 
                     //TODO: Überprüfen, ob targets verfügbar ist (zwar: Eher erst beim
                     // commitOld).
@@ -206,6 +210,12 @@ public class EdgeModule extends Module<BaseModule> {
             CommitInfo.CommitEntry possibleNewEntry =
                     commitInfo.getByIncNid(relationWrapper.getTarget().getRecordId());
             newTarget = possibleNewEntry.getLiveNode();
+            if (newTarget == null) {
+                throw new IllegalArgumentException(MessageFormat
+                        .format("Node with IncNid {0} not " +
+                                "found in commit. Node need to be in commit!",
+                                relationWrapper.getTarget().getRecordId()));
+            }
         } else {
             newTarget = null;
         }

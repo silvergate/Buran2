@@ -1,4 +1,4 @@
-package com.dcrux.buran.demoGui.plugins.fileApp.client;
+package com.dcrux.buran.demoGui.plugins.listview.client;
 
 import com.dcrux.buran.demoGui.infrastructure.client.*;
 import com.dcrux.buran.demoGui.plugins.publicTypes.ResultMainApp;
@@ -8,22 +8,22 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Buran.
  *
- * @author: ${USER} Date: 15.07.13 Time: 00:12
+ * @author: ${USER} Date: 22.07.13 Time: 01:19
  */
-public class ChatAppPlugin implements PluginIntent<VoidQuery, ResultMainApp> {
+public class ListViewEntry implements PluginIntent<VoidQuery, ResultMainApp> {
     private Widget singletonApp;
     private ResultMainApp singletonResultMainApp;
     private final static IntentRef REF =
-            new IntentRef("com.dcrux.buran.demoGui.plugins.chatApp" + ".client.ChatAppPlugin");
+            new IntentRef("com.dcrux.buran.demoGui.plugins.itemsApp" + ".client.Items");
 
     @Override
     public Description getDescription() {
-        return new Description("Files");
+        return new Description("Items");
     }
 
     @Override
     public Description getDescription(VoidQuery query) {
-        return new Description("Files");
+        return new Description("Items");
     }
 
     @Override
@@ -34,20 +34,7 @@ public class ChatAppPlugin implements PluginIntent<VoidQuery, ResultMainApp> {
     @Override
     public ResultMainApp run(VoidQuery query) {
         if (singletonApp == null) {
-            /*FileModule fm = new FileModule(new UserId(0));
-            fm.getDescClassId(new AsyncCallback<ClassId>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    System.out.println("Failure: " + caught);
-                }
-
-                @Override
-                public void onSuccess(ClassId result) {
-                    System.out.println("Success: " + result);
-                }
-            }); */
-
-            FileUploadUi fileUploadUi = new FileUploadUi();
+            ViewList fileUploadUi = new ViewList();
             singletonApp = fileUploadUi.getRootElement();
             this.singletonResultMainApp = new ResultMainApp(this.singletonApp);
         }

@@ -1,6 +1,6 @@
 package com.dcrux.buran.common.edges.targets;
 
-import com.dcrux.buran.common.INid;
+import com.dcrux.buran.common.INidOrNidVer;
 import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.edges.IEdgeTarget;
 import com.dcrux.buran.common.edges.IEdgeTargetInc;
@@ -12,12 +12,16 @@ import com.google.common.base.Optional;
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
 public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
-    private INid targetNid;
+    private INidOrNidVer targetNid;
     private Optional<Version> version;
 
-    public EdgeTarget(INid targetNid, Optional<Version> version) {
+    public EdgeTarget(INidOrNidVer targetNid, Optional<Version> version) {
         this.targetNid = targetNid;
         this.version = version;
+    }
+
+    public static EdgeTarget unversioned(INidOrNidVer targetNid) {
+        return new EdgeTarget(targetNid, Optional.<Version>absent());
     }
 
     private EdgeTarget() {
@@ -28,7 +32,7 @@ public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
         return false;
     }
 
-    public INid getTargetNid() {
+    public INidOrNidVer getTargetNid() {
         return targetNid;
     }
 

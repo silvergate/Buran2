@@ -14,10 +14,13 @@ import java.util.List;
  */
 public class FunListNew extends FunctionDeclaration<ListType> {
 
-    private final int numberOfInputs;
+    private int numberOfInputs;
+
+    private FunListNew() {
+    }
 
     public static class Builder {
-        final List<IFunctionDeclaration<?>> inputs = new ArrayList<>();
+        final List<IFunctionDeclaration<?>> inputs = new ArrayList<IFunctionDeclaration<?>>();
 
         public Builder add(IFunctionDeclaration<?> input) {
             this.inputs.add(input);
@@ -48,8 +51,8 @@ public class FunListNew extends FunctionDeclaration<ListType> {
     public AllocType<ListType> getMeta(ITypeState state) throws ProgrammErrorException {
         state.getCompTracker().calc(1);
 
-        final List<AllocType<?>> allocTypes = new ArrayList<>();
-        final List<IType<?>> types = new ArrayList<>();
+        final List<AllocType<?>> allocTypes = new ArrayList<AllocType<?>>();
+        final List<IType<?>> types = new ArrayList<IType<?>>();
 
         final int numOfInputs = getInput().size();
         for (int i = 0; i < numOfInputs; i++) {

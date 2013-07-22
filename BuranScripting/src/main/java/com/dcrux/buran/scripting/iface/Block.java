@@ -1,5 +1,7 @@
 package com.dcrux.buran.scripting.iface;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,19 +11,18 @@ import java.util.List;
  *
  * @author: ${USER} Date: 05.07.13 Time: 07:34
  */
-public class Block implements Serializable {
+public class Block implements Serializable, IsSerializable {
 
     public static Block c() {
         return new Block();
     }
 
-    private List<IFunctionDeclaration<?>> functions = new ArrayList<>();
+    private List<IFunctionDeclaration<?>> functions = new ArrayList<IFunctionDeclaration<?>>();
 
     public LineNum addLn(IFunctionDeclaration<?> functionDeclaration) {
         functions.add(functionDeclaration);
         return new LineNum(this.functions.size() - 1);
     }
-
 
     public LazyLineNum addLz(IFunctionDeclaration<?> functionDeclaration) {
         final LazyLineNum lazyLineNum = new LazyLineNum();

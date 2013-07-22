@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class FunctionDeclaration<TRetType extends IType>
         implements IFunctionDeclaration<TRetType> {
 
-    private final List<IFunctionDeclaration<?>> input = new ArrayList<>();
+    private final List<IFunctionDeclaration<?>> input = new ArrayList<IFunctionDeclaration<?>>();
 
     protected void addInput(IFunctionDeclaration<?> function) {
         this.input.add(function);

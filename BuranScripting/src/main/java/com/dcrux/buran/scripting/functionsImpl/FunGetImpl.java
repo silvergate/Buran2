@@ -20,7 +20,7 @@ public class FunGetImpl<TJavaRet, TRetType extends IType<TJavaRet>>
             public IFunctionImplementation<TJavaRetLocal, TRetTypeLocal,
                     FunGet<TRetTypeLocal>> getImplementation(
                     FunGet<TRetTypeLocal> function) {
-                return new FunGetImpl<>(function.getVarName());
+                return new FunGetImpl<TJavaRetLocal, TRetTypeLocal>(function.getVarName());
             }
 
             @Override

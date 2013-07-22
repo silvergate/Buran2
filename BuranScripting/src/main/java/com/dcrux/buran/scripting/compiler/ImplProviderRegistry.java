@@ -14,7 +14,8 @@ import java.util.Map;
  */
 public class ImplProviderRegistry implements IImplementationProvider {
 
-    private final Map<Class, IFunctionImplFactory> factoryMap = new HashMap<>();
+    private final Map<Class, IFunctionImplFactory> factoryMap =
+            new HashMap<Class, IFunctionImplFactory>();
 
     public void register(IFunctionImplFactory factory) {
         this.factoryMap.put(factory.getFuncDeclClass(), factory);

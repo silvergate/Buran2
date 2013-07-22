@@ -26,13 +26,14 @@ public class Command<TRetval extends Serializable> implements ICommand<TRetval> 
     }
 
     public Command(Set<Class<? extends Exception>> expectableExceptions) {
-        this.expectableExceptions = expectableExceptions;
+        //this.expectableExceptions = expectableExceptions;
     }
 
-    private Set<Class<? extends Exception>> expectableExceptions;
+    //private Set<Class<? extends Exception>> expectableExceptions;
 
     @Override
     public Set<Class<? extends Exception>> getExpectableExceptions() {
-        return this.expectableExceptions;
+        return null;
+        //return this.expectableExceptions;
     }
 }

@@ -49,6 +49,20 @@ public class VersionsModule extends Module<BaseModule> {
     }
 
     @Nullable
+    public VersionWrapper getNodeVersion(ONid nodeId) {
+        final OIndex index = getBase().getDbUtils()
+                .getIndex(VersionWrapper.ORIENT_CLASS, VersionWrapper.INDEX_NOID_VERSION);
+        final Object value = index.getDefinition().createValue(nodeId.getAsString());
+        final Collection entries = index.getValuesBetween(value, value);
+        if ((entries == null) || (entries.isEmpty())) {
+            return null;
+        } else {
+            final ODocument doc = getBase().getDb().load((ORID) entries.iterator().next());
+            return new VersionWrapper(doc);
+        }
+    }
+
+    @Nullable
     public NidVerOld getNidVer(ORID versionsRecord) {
         final ODocument doc = getBase().getDb().load(versionsRecord);
         if (doc == null) {

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class DataState implements IDataState {
 
-    private final Map<String, Object> varValues = new HashMap<>();
+    private final Map<String, Object> varValues = new HashMap<String, Object>();
     private Integer jumpTo;
     private Object ret;
     private boolean isRet;

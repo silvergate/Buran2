@@ -42,11 +42,13 @@ public class BuranServiceImpl extends RemoteServiceServlet implements BuranServi
     private UserId getSender() {
         final HttpServletRequest request = this.getThreadLocalRequest();
         final Cookie[] cookies = request.getCookies();
-        for (final Cookie cookie : cookies) {
-            if (cookie.getName().equals(COOKIE_USER_NAME)) {
-                String cookieValue = cookie.getValue();
-                final Long userIdLong = Long.parseLong(cookieValue);
-                return new UserId(userIdLong);
+        if (cookies != null) {
+            for (final Cookie cookie : cookies) {
+                if (cookie.getName().equals(COOKIE_USER_NAME)) {
+                    String cookieValue = cookie.getValue();
+                    final Long userIdLong = Long.parseLong(cookieValue);
+                    return new UserId(userIdLong);
+                }
             }
         }
         throw new IllegalArgumentException("Sender cookie is not set!");

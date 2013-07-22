@@ -6,7 +6,7 @@
     <inherits name="com.dcrux.buran.GwtApi"/>
     <inherits name="com.dcrux.buran.scripting.GwtApi"/>
 
-    <entry-point class='com.dcrux.buran.demoGui.client.BuranDemoGui'/>
+    <entry-point class='com.dcrux.buran.demoGui.infrastructure.client.Infrastructure'/>
     <servlet path="/com.dcrux.buran.demoGui.BuranDemoGui/BuranGwtService"
              class="com.dcrux.buran.demoGui.server.BuranGwtServiceImpl"/>
 

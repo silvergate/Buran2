@@ -5,6 +5,7 @@ import com.dcrux.buran.common.IncNodeNotFound;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.edges.IEdgeSetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
+import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
@@ -19,6 +20,7 @@ import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.sun.istack.internal.Nullable;
 
+import java.text.MessageFormat;
 import java.util.Set;
 
 /**
@@ -34,7 +36,7 @@ public class DataMutModule extends Module<BaseModule> {
     public boolean setDataDirect(final UserId sender, final CommonNode node,
             final IDataSetter setter, @Nullable final Set<OIdentifiable> outCommittableRelations,
             IChangeTracker changeTracker)
-            throws NodeClassNotFoundException, FieldConstraintViolationInt {
+            throws NodeClassNotFoundException, FieldConstraintViolationInt, NodeNotFoundException {
 
         if (setter instanceof BulkSet) {
             final BulkSet bulkSet = (BulkSet) setter;
@@ -77,11 +79,12 @@ public class DataMutModule extends Module<BaseModule> {
 
     public void setData(UserId sender, IncNid incNid, IDataSetter setter,
             IChangeTracker changeTracker)
-            throws IncNodeNotFound, NodeClassNotFoundException, FieldConstraintViolationInt {
+            throws IncNodeNotFound, NodeClassNotFoundException, FieldConstraintViolationInt,
+            NodeNotFoundException {
         final Optional<IncubationNode> iNode =
                 getBase().getIncubationModule().getIncNode(sender, incNid);
         if (!iNode.isPresent()) {
-            throw new IncNodeNotFound("Inc node not found");
+            throw new IncNodeNotFound(MessageFormat.format("Inc node {0} not found", incNid));
         }
         final IncubationNode node = iNode.get();
 

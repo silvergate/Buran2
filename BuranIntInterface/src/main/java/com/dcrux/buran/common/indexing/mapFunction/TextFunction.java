@@ -34,4 +34,60 @@ public class TextFunction implements Serializable {
     private boolean removeStopwords;
     private EnumSet<FuzzinessType> supportedFuzzinessTypes;
     private EnumSet<ProximityType> supportedProximityTypes;
+
+    public IFieldTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(IFieldTarget target) {
+        this.target = target;
+    }
+
+    public int getInputStrLimit() {
+        return inputStrLimit;
+    }
+
+    public void setInputStrLimit(int inputStrLimit) {
+        this.inputStrLimit = inputStrLimit;
+    }
+
+    public int getNumOfTokenLimit() {
+        return numOfTokenLimit;
+    }
+
+    public void setNumOfTokenLimit(int numOfTokenLimit) {
+        this.numOfTokenLimit = numOfTokenLimit;
+    }
+
+    public int getTokenLengthLimit() {
+        return tokenLengthLimit;
+    }
+
+    public void setTokenLengthLimit(int tokenLengthLimit) {
+        this.tokenLengthLimit = tokenLengthLimit;
+    }
+
+    public boolean isRemoveStopwords() {
+        return removeStopwords;
+    }
+
+    public void setRemoveStopwords(boolean removeStopwords) {
+        this.removeStopwords = removeStopwords;
+    }
+
+    public EnumSet<FuzzinessType> getSupportedFuzzinessTypes() {
+        return supportedFuzzinessTypes;
+    }
+
+    public void setSupportedFuzzinessTypes(EnumSet<FuzzinessType> supportedFuzzinessTypes) {
+        this.supportedFuzzinessTypes = supportedFuzzinessTypes;
+    }
+
+    public EnumSet<ProximityType> getSupportedProximityTypes() {
+        return supportedProximityTypes;
+    }
+
+    public void setSupportedProximityTypes(EnumSet<ProximityType> supportedProximityTypes) {
+        this.supportedProximityTypes = supportedProximityTypes;
+    }
 }

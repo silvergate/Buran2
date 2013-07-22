@@ -1,6 +1,6 @@
 package com.dcrux.buran.common.edges.getter;
 
-import com.dcrux.buran.common.INid;
+import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.edges.LabelIndex;
 
 import java.io.Serializable;
@@ -16,10 +16,10 @@ public class GetInClassEdgeResult implements Serializable {
     }
 
     public static class Entry implements Serializable {
-        private INid source;
+        private Nid source;
         private LabelIndex labelIndex;
 
-        public Entry(INid source, LabelIndex labelIndex) {
+        public Entry(Nid source, LabelIndex labelIndex) {
             this.source = source;
             this.labelIndex = labelIndex;
         }
@@ -27,7 +27,7 @@ public class GetInClassEdgeResult implements Serializable {
         private Entry() {
         }
 
-        public INid getSource() {
+        public Nid getSource() {
             return source;
         }
 
