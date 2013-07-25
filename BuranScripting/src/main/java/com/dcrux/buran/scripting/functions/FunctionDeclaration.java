@@ -25,6 +25,10 @@ public abstract class FunctionDeclaration<TRetType extends IType>
         return (IFunctionDeclaration<TType>) this.input.get(index);
     }
 
+    protected int getNumberOfInputs() {
+        return this.input.size();
+    }
+
     @Override
     public IFunctionDeclaration<?> getInput(int index) {
         return this.input.get(index);

@@ -12,7 +12,7 @@ public class MapIndex implements IMapIndex {
         this.rangeSupport = rangeSupport;
     }
 
-    public MapIndex() {
+    private MapIndex() {
     }
 
     public boolean isRangeSupport() {

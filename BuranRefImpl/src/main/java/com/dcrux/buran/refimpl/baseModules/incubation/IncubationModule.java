@@ -3,6 +3,7 @@ package com.dcrux.buran.refimpl.baseModules.incubation;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classes.ClassId;
+import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
@@ -45,6 +46,14 @@ public class IncubationModule extends Module<BaseModule> {
     }
 
     ;
+
+    public IncubationNode getIncNodeReq(final UserId sender, IncNid nid) throws IncNodeNotFound {
+        final Optional<IncubationNode> incNode = getIncNode(sender, nid);
+        if (!incNode.isPresent()) {
+            throw new IncNodeNotFound();
+        }
+        return incNode.get();
+    }
 
     public Optional<IncubationNode> getIncNode(final UserId sender, IncNid nid) {
         final ONid oIncNid = IfaceUtils.getOincNid(nid);

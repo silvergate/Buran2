@@ -13,6 +13,7 @@ import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.commands.indexing.ComQuery;
 import com.dcrux.buran.commands.subscription.ComAddSub;
+import com.dcrux.buran.common.INidOrNidVer;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
@@ -101,7 +102,7 @@ public class Test {
 
     public static ClassDefinition cdef1() {
         NodeMapInput nodeMapInput = new NodeMapInput();
-        nodeMapInput.getFields().put(VarName.c("input"), new FieldTarget(C1_I1, true));
+        nodeMapInput.getFields().put(VarName.c("input"), FieldTarget.cRequired(C1_I1));
         Block block = new Block();
         block.add(FunRet.c(FunListNew.c().add(FunIntToBin.c(FunGet
                 .c(VarName.c("input"), com.dcrux.buran.scripting.iface.types.IntegerType.class),
@@ -153,7 +154,7 @@ public class Test {
 
             final SetEdge setEdge1 = SetEdge.c(ClassLabelName.c(0))
                     .add(LabelIndex.c(0l), EdgeTargetInc.unversioned(incNid3))
-                    .add(LabelIndex.c(1), EdgeTargetInc.versioned(incNid2));
+                    .add(LabelIndex.c(1), EdgeTargetInc.unversioned(incNid2));
 
             byte[] binValue = new byte[80000];
 
@@ -207,7 +208,7 @@ public class Test {
             bcr.sync(thisAccount, sender, ComMutate.c(changedNode, changeLabelSetter));
 
             final IEdgeSetter newLabel = SetEdge.c(ClassLabelName.c(0))
-                    .add(LabelIndex.c(33), EdgeTargetInc.versioned(changedNode));
+                    .add(LabelIndex.c(33), EdgeTargetInc.unversioned(changedNode));
             bcr.sync(thisAccount, sender, ComMutate.c(changedNode, newLabel));
 
             NidVer changedNodeCommited =
@@ -241,8 +242,8 @@ public class Test {
 
             /* Get in-nodes */
             GetInClassEdgeResult allInNodes = bcr.sync(thisAccount, sender, ComFetch.c(node3,
-                    GetInClassEdge
-                            .c(classId, ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX)));
+                    new GetInClassEdge(Optional.<INidOrNidVer>absent(), Optional.of(classId),
+                            ClassLabelName.c(0), LabelIndex.MIN, LabelIndex.MAX, false)));
             System.out.println("All in nodes to node " + node3.getAsString() + ": " +
                     allInNodes);
 

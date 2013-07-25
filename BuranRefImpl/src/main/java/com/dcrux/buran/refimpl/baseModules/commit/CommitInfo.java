@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.id.ORID;
@@ -17,10 +18,12 @@ public class CommitInfo {
 
         private final IncubationNode incubationNode;
         private final LiveNode liveNode;
+        private final NidVer nidVer;
 
-        public CommitEntry(IncubationNode incubationNode, LiveNode liveNode) {
+        public CommitEntry(IncubationNode incubationNode, LiveNode liveNode, NidVer nidVer) {
             this.incubationNode = incubationNode;
             this.liveNode = liveNode;
+            this.nidVer = nidVer;
         }
 
         public IncubationNode getIncubationNode() {
@@ -34,6 +37,10 @@ public class CommitInfo {
         public boolean isUpdate() {
             return !getIncubationNode().getNid().getRecordId()
                     .equals(getLiveNode().getNid().getRecordId());
+        }
+
+        public NidVer getNidVer() {
+            return nidVer;
         }
     }
 

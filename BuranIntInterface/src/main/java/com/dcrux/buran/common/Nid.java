@@ -5,7 +5,7 @@ package com.dcrux.buran.common;
  *
  * @author: ${USER} Date: 17.07.13 Time: 10:02
  */
-public class Nid implements INidVer, INidOrNidVer {
+public class Nid implements INidOrNidVer, INidCommon {
 
     private String nid;
 

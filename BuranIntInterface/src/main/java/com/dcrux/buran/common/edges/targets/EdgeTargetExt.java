@@ -1,11 +1,9 @@
 package com.dcrux.buran.common.edges.targets;
 
-import com.dcrux.buran.common.INid;
-import com.dcrux.buran.common.UserId;
-import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.IExtNidOrNidVer;
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.edges.IEdgeTarget;
 import com.dcrux.buran.common.edges.IEdgeTargetInc;
-import com.google.common.base.Optional;
 
 /**
  * Buran.
@@ -13,43 +11,29 @@ import com.google.common.base.Optional;
  * @author: ${USER} Date: 01.07.13 Time: 01:44
  */
 public class EdgeTargetExt implements IEdgeTargetInc, IEdgeTarget {
-    private UserId userId;
-    private INid targetNid;
-    private Optional<Version> version;
 
-    public EdgeTargetExt(UserId userId, INid targetNid, Optional<Version> version) {
-        this.userId = userId;
-        this.targetNid = targetNid;
-        this.version = version;
+    private IExtNidOrNidVer extNidOrNidVer;
+    private ClassId targetClassId;
+
+    public EdgeTargetExt(ClassId targetClassId, IExtNidOrNidVer extNidOrNidVer) {
+        this.targetClassId = targetClassId;
+        this.extNidOrNidVer = extNidOrNidVer;
     }
 
     private EdgeTargetExt() {
     }
 
-    public UserId getUserId() {
-        return userId;
+    public IExtNidOrNidVer getExtNidOrNidVer() {
+        return extNidOrNidVer;
     }
 
-    public INid getTargetNid() {
-        return targetNid;
-    }
-
-    public Optional<Version> getVersion() {
-        return version;
+    public ClassId getTargetClassId() {
+        return targetClassId;
     }
 
     @Override
     public boolean isTargetIncubation() {
         return false;
-    }
-
-    @Override
-    public String toString() {
-        return "EdgeTargetExt{" +
-                "userId=" + userId +
-                ", targetNid=" + targetNid +
-                ", version=" + version +
-                '}';
     }
 
     @Override
@@ -59,18 +43,24 @@ public class EdgeTargetExt implements IEdgeTargetInc, IEdgeTarget {
 
         EdgeTargetExt that = (EdgeTargetExt) o;
 
-        if (!targetNid.equals(that.targetNid)) return false;
-        if (!userId.equals(that.userId)) return false;
-        if (!version.equals(that.version)) return false;
+        if (!extNidOrNidVer.equals(that.extNidOrNidVer)) return false;
+        if (!targetClassId.equals(that.targetClassId)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = userId.hashCode();
-        result = 31 * result + targetNid.hashCode();
-        result = 31 * result + version.hashCode();
+        int result = extNidOrNidVer.hashCode();
+        result = 31 * result + targetClassId.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "EdgeTargetExt{" +
+                "extNidOrNidVer=" + extNidOrNidVer +
+                ", targetClassId=" + targetClassId +
+                '}';
     }
 }

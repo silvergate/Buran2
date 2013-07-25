@@ -94,7 +94,7 @@ public class FieldsModule extends Module<BaseModule> {
         throw new IllegalArgumentException("Unkown Data Setter");
     }
 
-    private <T extends Serializable> T performUnfieldedGetter(LiveNode node,
+    public <T extends Serializable> T performUnfieldedGetter(LiveNode node,
             ClassDefinition classDefinition, FieldIndex fieldIndex,
             IUnfieldedDataGetter<T> getter) {
         final ClassFieldsDefinition.FieldEntry fieldEntry =

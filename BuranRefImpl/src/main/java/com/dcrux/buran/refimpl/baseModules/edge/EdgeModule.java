@@ -1,11 +1,16 @@
 package com.dcrux.buran.refimpl.baseModules.edge;
 
+import com.dcrux.buran.common.INidOrNidVer;
+import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.edges.*;
 import com.dcrux.buran.common.edges.getter.GetEdge;
 import com.dcrux.buran.common.edges.getter.GetEdgeResult;
 import com.dcrux.buran.common.edges.getter.GetInClassEdge;
 import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
 import com.dcrux.buran.common.edges.setter.SetEdge;
+import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
@@ -43,8 +48,8 @@ public class EdgeModule extends Module<BaseModule> {
         RelationWrapper.setupDb(getBase());
     }
 
-    public <T extends Serializable> T performLabelGet(final LiveNode node,
-            IEdgeGetter<T> labelGet) {
+    public <T extends Serializable> T performLabelGet(final LiveNode node, IEdgeGetter<T> labelGet)
+            throws NodeNotFoundException {
         if (labelGet instanceof GetEdge) {
             final GetEdge getEdge = (GetEdge) labelGet;
             return (T) performLabelGet_getLabel(node, getEdge);
@@ -86,18 +91,91 @@ public class EdgeModule extends Module<BaseModule> {
     }
 
     private GetInClassEdgeResult performLabelGet_getInClassEdge(LiveNode node,
-            GetInClassEdge getInClassEdge) {
-        final OIndex<?> index = getBase().getDbUtils()
-                .getIndex(RelationWrapper.CLASS_NAME, RelationWrapper.INDEX_IN_EDGES);
-        final Object valueStart = index.getDefinition()
-                .createValue(true, node.getNid().getAsString(),
-                        getInClassEdge.getLabelName().getIndex(),
-                        getInClassEdge.getFromIndex().getIndex());
-        final Object valueEnd = index.getDefinition().createValue(true, node.getNid().getAsString(),
-                getInClassEdge.getLabelName().getIndex(), getInClassEdge.getToIndex().getIndex());
+            GetInClassEdge getInClassEdge) throws NodeNotFoundException {
+
+        final Object valueStart;
+        final Object valueEnd;
+        final OIndex<?> index;
+
+        if (getInClassEdge.getSourceNode().isPresent()) {
+            /* Case one: Source node is given */
+            final INidOrNidVer optSrcNode = getInClassEdge.getSourceNode().get();
+            final LiveNode srcNode = getBase().getDataFetchModule().getNode(optSrcNode);
+            final ClassId classId = srcNode.getClassId();
+            final short classLabelName;
+            final int targetType;
+            if (getInClassEdge.isVersioned()) {
+                targetType = RelationWrapper.TargetType2.versioned.getValue();
+            } else {
+                targetType = RelationWrapper.TargetType2.unversioned.getValue();
+            }
+            if (getInClassEdge.getLabelName() instanceof ClassLabelName) {
+                classLabelName = ((ClassLabelName) getInClassEdge.getLabelName()).getIndex();
+            } else {
+                throw new IllegalArgumentException("Pub Label names not yet implemented");
+            }
+
+            index = getBase().getDbUtils().getIndex(RelationWrapper.CLASS_NAME,
+                    RelationWrapper.INDEX_IN_EDGES_WITH_SRC_NODE);
+            valueStart = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            srcNode.getNid().getAsString(),
+                            getInClassEdge.getFromIndex().getIndex());
+            valueEnd = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            srcNode.getNid().getAsString(), getInClassEdge.getToIndex().getIndex());
+        } else if (getInClassEdge.getSourceClassId().isPresent()) {
+            /* Case two: Source class is given */
+            final ClassId classId = getInClassEdge.getSourceClassId().get();
+            final short classLabelName;
+            final int targetType;
+            if (getInClassEdge.isVersioned()) {
+                targetType = RelationWrapper.TargetType2.versioned.getValue();
+            } else {
+                targetType = RelationWrapper.TargetType2.unversioned.getValue();
+            }
+            if (getInClassEdge.getLabelName() instanceof ClassLabelName) {
+                classLabelName = ((ClassLabelName) getInClassEdge.getLabelName()).getIndex();
+            } else {
+                throw new IllegalArgumentException("Pub Label names not yet implemented");
+            }
+
+            index = getBase().getDbUtils().getIndex(RelationWrapper.CLASS_NAME,
+                    RelationWrapper.INDEX_IN_EDGES_WITH_SRC_CLASS);
+            valueStart = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            classId.getId(), getInClassEdge.getFromIndex().getIndex());
+            valueEnd = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            classId.getId(), getInClassEdge.getToIndex().getIndex());
+        } else {
+            /* Case three: Public label, no classId, no node */
+            final String classLabelName;
+            final int targetType;
+            if (getInClassEdge.isVersioned()) {
+                targetType = RelationWrapper.TargetType2.versioned.getValue();
+            } else {
+                targetType = RelationWrapper.TargetType2.unversioned.getValue();
+            }
+            if (getInClassEdge.getLabelName() instanceof PublicLabelName) {
+                classLabelName = ((PublicLabelName) getInClassEdge.getLabelName()).getName();
+            } else {
+                throw new IllegalArgumentException("No class, no node, need a public label");
+            }
+
+            index = getBase().getDbUtils().getIndex(RelationWrapper.CLASS_NAME,
+                    RelationWrapper.INDEX_IN_EDGES_WITH_PUB_LABEL);
+            valueStart = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            getInClassEdge.getFromIndex().getIndex());
+            valueEnd = index.getDefinition()
+                    .createValue(true, node.getNid().getAsString(), classLabelName, targetType,
+                            getInClassEdge.getToIndex().getIndex());
+        }
+
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(valueStart, valueEnd);
 
-        System.out.println("Found in edges: " + foundSet);
+        System.out.println("Found in edges: " + foundSet + ", in index: " + index.getSize());
         final List<GetInClassEdgeResult.Entry> entries = new ArrayList<>();
         for (OIdentifiable found : foundSet) {
             final ODocument doc = getBase().getDb().load(found.getIdentity());
@@ -109,8 +187,9 @@ public class EdgeModule extends Module<BaseModule> {
         return new GetInClassEdgeResult(entries);
     }
 
-    public void performLabelSet(final CommonNode incubationNode, IEdgeSetter labelSet,
-            @Nullable Set<OIdentifiable> outCommitableRelations) throws NodeNotFoundException {
+    public void performLabelSet(final UserId sender, final CommonNode incubationNode,
+            IEdgeSetter labelSet, @Nullable Set<OIdentifiable> outCommitableRelations)
+            throws NodeNotFoundException, IncNodeNotFound {
         if (labelSet instanceof SetEdge) {
             final SetEdge setEdge = (SetEdge) labelSet;
             final ILabelName labelName = setEdge.getName();
@@ -121,7 +200,7 @@ public class EdgeModule extends Module<BaseModule> {
                     final IEdgeTargetInc labelTargetInc = target.getValue();
                     final LabelIndex index = target.getKey();
                     final RelationWrapper relationWrapper = RelationWrapper
-                            .from(incubationNode.getNid(), incubationNode.getClassId(),
+                            .from(sender, incubationNode.getNid(), incubationNode.getClassId(),
                                     classLabelName, index, labelTargetInc, getBase());
 
                     //TODO: Überprüfen, ob targets verfügbar ist (zwar: Eher erst beim
@@ -206,10 +285,12 @@ public class EdgeModule extends Module<BaseModule> {
 
             /* Adjust target */
         final LiveNode newTarget;
+        final NidVer newTargetNidVer;
         if (relationWrapper.isTargetIsInc()) {
             CommitInfo.CommitEntry possibleNewEntry =
                     commitInfo.getByIncNid(relationWrapper.getTarget().getRecordId());
             newTarget = possibleNewEntry.getLiveNode();
+            newTargetNidVer = possibleNewEntry.getNidVer();
             if (newTarget == null) {
                 throw new IllegalArgumentException(MessageFormat
                         .format("Node with IncNid {0} not " +
@@ -218,9 +299,10 @@ public class EdgeModule extends Module<BaseModule> {
             }
         } else {
             newTarget = null;
+            newTargetNidVer = null;
         }
 
-        relationWrapper.goLive(newTarget);
+        relationWrapper.goLive(newTarget, newTargetNidVer);
         relationWrapper.getDocument().save();
 
         changeTracker.newRelation(source, relationWrapper);

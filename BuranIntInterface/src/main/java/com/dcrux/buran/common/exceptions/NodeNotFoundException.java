@@ -1,6 +1,5 @@
 package com.dcrux.buran.common.exceptions;
 
-import com.dcrux.buran.common.ExpectableException;
 import com.dcrux.buran.common.Version;
 import com.google.common.base.Optional;
 
@@ -11,7 +10,7 @@ import com.google.common.base.Optional;
  */
 public class NodeNotFoundException extends ExpectableException {
 
-    private NodeNotFoundException() {
+    public NodeNotFoundException() {
     }
 
     public static enum Reason {

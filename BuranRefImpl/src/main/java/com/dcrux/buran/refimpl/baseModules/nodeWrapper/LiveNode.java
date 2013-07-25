@@ -1,8 +1,8 @@
 package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 
 import com.dcrux.buran.common.INid;
-import com.dcrux.buran.common.NidVerOld;
 import com.dcrux.buran.common.Version;
+import com.dcrux.buran.refimpl.baseModules.common.NidVerOld;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 

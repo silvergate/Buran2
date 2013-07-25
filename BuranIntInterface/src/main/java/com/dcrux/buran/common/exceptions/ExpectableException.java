@@ -1,4 +1,4 @@
-package com.dcrux.buran.common;
+package com.dcrux.buran.common.exceptions;
 
 /**
  * Buran.

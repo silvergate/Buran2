@@ -1,10 +1,10 @@
 package com.dcrux.buran.common.edges.targets;
 
 import com.dcrux.buran.common.INidOrNidVer;
-import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.Nid;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.edges.IEdgeTarget;
 import com.dcrux.buran.common.edges.IEdgeTargetInc;
-import com.google.common.base.Optional;
 
 /**
  * Buran.
@@ -13,15 +13,17 @@ import com.google.common.base.Optional;
  */
 public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
     private INidOrNidVer targetNid;
-    private Optional<Version> version;
 
-    public EdgeTarget(INidOrNidVer targetNid, Optional<Version> version) {
+    public EdgeTarget(INidOrNidVer targetNid) {
         this.targetNid = targetNid;
-        this.version = version;
     }
 
-    public static EdgeTarget unversioned(INidOrNidVer targetNid) {
-        return new EdgeTarget(targetNid, Optional.<Version>absent());
+    public static EdgeTarget unversioned(Nid targetNid) {
+        return new EdgeTarget(targetNid);
+    }
+
+    public static EdgeTarget versioned(NidVer nidVer) {
+        return new EdgeTarget(nidVer);
     }
 
     private EdgeTarget() {
@@ -36,10 +38,6 @@ public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
         return targetNid;
     }
 
-    public Optional<Version> getVersion() {
-        return version;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,23 +46,19 @@ public class EdgeTarget implements IEdgeTargetInc, IEdgeTarget {
         EdgeTarget that = (EdgeTarget) o;
 
         if (!targetNid.equals(that.targetNid)) return false;
-        if (!version.equals(that.version)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = targetNid.hashCode();
-        result = 31 * result + version.hashCode();
-        return result;
+        return targetNid.hashCode();
     }
 
     @Override
     public String toString() {
         return "EdgeTarget{" +
                 "targetNid=" + targetNid +
-                ", version=" + version +
                 '}';
     }
 }

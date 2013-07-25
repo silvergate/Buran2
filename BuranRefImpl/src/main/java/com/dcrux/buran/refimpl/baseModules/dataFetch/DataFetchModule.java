@@ -10,10 +10,7 @@ import com.dcrux.buran.common.getterSetter.BulkGetIndex;
 import com.dcrux.buran.common.getterSetter.IBulkGetResult;
 import com.dcrux.buran.common.getterSetter.IDataGetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
-import com.dcrux.buran.refimpl.baseModules.common.Module;
-import com.dcrux.buran.refimpl.baseModules.common.ONid;
-import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
+import com.dcrux.buran.refimpl.baseModules.common.*;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionWrapper;
 import com.google.common.base.Optional;
@@ -43,6 +40,15 @@ public class DataFetchModule extends Module<BaseModule> {
         return Optional.of(incubationNode);
     }
 
+    public LiveNode getNode(Nid nid) throws NodeNotFoundException {
+        final ODocument doc = getBase().getDb().load(new ORecordId(nid.getAsString()));
+        if (doc == null) {
+            throw new NodeNotFoundException();
+        }
+        final LiveNode node = new LiveNode(doc);
+        return node;
+    }
+
     public ONid toOnid(INidOrNidVer nidOrNidVer) throws NodeNotFoundException {
         if (nidOrNidVer instanceof Nid) {
             final String str = ((Nid) nidOrNidVer).getAsString();
@@ -51,6 +57,15 @@ public class DataFetchModule extends Module<BaseModule> {
             NidVer nidVer = (NidVer) nidOrNidVer;
             LiveNode liveNode = getNode(new ORecordId(((NidVer) nidOrNidVer).getAsString()));
             return liveNode.getNid();
+        }
+    }
+
+    public LiveNode getNode(INidOrNidVer nidOrNidVer) throws NodeNotFoundException {
+        if (nidOrNidVer instanceof Nid) {
+            return getNode((Nid) nidOrNidVer);
+        } else {
+            NidVer nidVer = (NidVer) nidOrNidVer;
+            return getNode(nidVer);
         }
     }
 
@@ -63,6 +78,10 @@ public class DataFetchModule extends Module<BaseModule> {
         final VersionWrapper nidVer =
                 getBase().getVersionsModule().getNodeVersion(incubationNode.getNid());
         return nidVer.getONidVer();
+    }
+
+    public LiveNode getNode(NidVer nidVer) throws NodeNotFoundException {
+        return getNode(new ORecordId(nidVer.getAsString()));
     }
 
     public LiveNode getNode(ORID versionsRecord) throws NodeNotFoundException {
@@ -95,7 +114,7 @@ public class DataFetchModule extends Module<BaseModule> {
     }
 
     public <TRetVal extends Serializable> Serializable getData(LiveNode node,
-            IDataGetter<TRetVal> getter) throws NodeClassNotFoundException {
+            IDataGetter<TRetVal> getter) throws NodeClassNotFoundException, NodeNotFoundException {
         if (getter instanceof BulkGet) {
             final BulkGet bulkGet = (BulkGet) getter;
             final List<Serializable> results = new ArrayList<>();

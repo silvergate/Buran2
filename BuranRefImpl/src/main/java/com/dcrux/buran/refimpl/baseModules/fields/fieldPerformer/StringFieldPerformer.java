@@ -6,6 +6,7 @@ import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.FieldGetStr;
+import com.dcrux.buran.common.fields.getter.FieldGetStrLimit;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
 import com.dcrux.buran.common.fields.setter.FieldRemove;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
@@ -29,7 +30,7 @@ import java.util.Set;
 public class StringFieldPerformer extends FieldPerformer<StringType> {
 
     private final static Set<Class<? extends IUnfieldedDataGetter>> GETTERS =
-            getters(FieldGetPrim.class, FieldGetStr.class);
+            getters(FieldGetPrim.class, FieldGetStr.class, FieldGetStrLimit.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetStr
             .class, FieldRemove.class);
@@ -72,8 +73,19 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
             ClassDefinition classDefinition, StringType stringType, FieldIndex fieldIndex,
             IUnfieldedDataGetter<?> dataGetter) {
-        if (dataGetter instanceof FieldGetPrim) {
+        if ((dataGetter instanceof FieldGetPrim) || (dataGetter instanceof FieldGetStr)) {
             return (Serializable) node.getFieldValue(fieldIndex, OType.STRING);
+        } else if (dataGetter instanceof FieldGetStrLimit) {
+            FieldGetStrLimit getterLimited = (FieldGetStrLimit) dataGetter;
+            final String str = (String) node.getFieldValue(fieldIndex, OType.STRING);
+            if (str == null) {
+                return null;
+            }
+            if (str.length() > getterLimited.getMaxNumOfChars()) {
+                return str.substring(0, getterLimited.getMaxNumOfChars() - 1);
+            } else {
+                return str;
+            }
         }
         throw new IllegalArgumentException("Unknown getter");
     }

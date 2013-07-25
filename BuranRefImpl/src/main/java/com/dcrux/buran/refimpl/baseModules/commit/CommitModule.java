@@ -1,9 +1,10 @@
 package com.dcrux.buran.refimpl.baseModules.commit;
 
 import com.dcrux.buran.common.IncNid;
-import com.dcrux.buran.common.IncNodeNotFound;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
@@ -142,7 +143,8 @@ public class CommitModule extends Module<BaseModule> {
             }
 
             result.put(incNid, onidVers[0]);
-            commitInfo.add(new CommitInfo.CommitEntry(node, liveNode));
+            commitInfo.add(new CommitInfo.CommitEntry(node, liveNode,
+                    new NidVer(onidVers[0].getoIdentifiable().toString())));
         }
 
         /* Commit edge */

@@ -11,16 +11,14 @@ import com.dcrux.buran.scripting.compiler.ImplProviderRegistry;
 import com.dcrux.buran.scripting.functionsImpl.FunAssignImpl;
 import com.dcrux.buran.scripting.functionsImpl.FunGetImpl;
 import com.dcrux.buran.scripting.functionsImpl.FunRetImpl;
+import com.dcrux.buran.scripting.functionsImpl.bin.FunBinConcatImpl;
 import com.dcrux.buran.scripting.functionsImpl.flow.FunIfImpl;
 import com.dcrux.buran.scripting.functionsImpl.integer.FunIntCmpImpl;
 import com.dcrux.buran.scripting.functionsImpl.integer.FunIntLitImpl;
 import com.dcrux.buran.scripting.functionsImpl.integer.FunIntOpImpl;
 import com.dcrux.buran.scripting.functionsImpl.integer.FunIntToBinImpl;
 import com.dcrux.buran.scripting.functionsImpl.list.FunListNewImpl;
-import com.dcrux.buran.scripting.functionsImpl.string.FunStrConcatImpl;
-import com.dcrux.buran.scripting.functionsImpl.string.FunStrLenImpl;
-import com.dcrux.buran.scripting.functionsImpl.string.FunStrLitImpl;
-import com.dcrux.buran.scripting.functionsImpl.string.FunStrTrimImpl;
+import com.dcrux.buran.scripting.functionsImpl.string.*;
 import com.dcrux.buran.scripting.iface.Block;
 import com.google.common.base.Optional;
 
@@ -38,17 +36,24 @@ public class FunctionCompiler extends Module<BaseModule> {
         final ImplProviderRegistry ipr = new ImplProviderRegistry();
         ipr.register(FunAssignImpl.FACTORY());
         ipr.register(FunGetImpl.FACTORY());
-        ipr.register(FunIntLitImpl.FACTORY);
         ipr.register(FunRetImpl.FACTORY());
+        ipr.register(FunIfImpl.FACTORY);
+
+        ipr.register(FunIntLitImpl.FACTORY);
+        ipr.register(FunIntOpImpl.FACTORY);
+        ipr.register(FunIntCmpImpl.FACTORY);
+        ipr.register(FunIntToBinImpl.FACTORY);
+
         ipr.register(FunStrLitImpl.FACTORY);
         ipr.register(FunStrLenImpl.FACTORY);
         ipr.register(FunStrTrimImpl.FACTORY);
         ipr.register(FunStrConcatImpl.FACTORY);
-        ipr.register(FunIntOpImpl.FACTORY);
-        ipr.register(FunIfImpl.FACTORY);
-        ipr.register(FunIntCmpImpl.FACTORY);
+        ipr.register(FunStrToBinImpl.FACTORY);
+        ipr.register(FunStrHashImpl.FACTORY);
+
+        ipr.register(FunBinConcatImpl.FACTORY);
+
         ipr.register(FunListNewImpl.FACTORY);
-        ipr.register(FunIntToBinImpl.FACTORY);
 
         return ipr;
     }

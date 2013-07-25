@@ -14,6 +14,7 @@
         <module>BuranIntInterface</module>
         <module>BuranScripting</module>
         <module>BuranDemoGui</module>
+        <module>BuranTests</module>
     </modules>
 
     <repositories>

@@ -1,9 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.versions;
 
-import com.dcrux.buran.common.NidVerOld;
 import com.dcrux.buran.common.Version;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.common.NidVerOld;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.orientechnologies.orient.core.id.ORID;

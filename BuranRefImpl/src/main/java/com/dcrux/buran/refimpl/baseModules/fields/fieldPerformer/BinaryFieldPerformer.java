@@ -5,6 +5,7 @@ import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetBin;
+import com.dcrux.buran.common.fields.getter.FieldGetBinLen;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
 import com.dcrux.buran.common.fields.setter.FieldAppendBin;
@@ -33,7 +34,7 @@ import java.util.Set;
 public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
 
     private final static Set<Class<? extends IUnfieldedDataGetter>> GETTERS =
-            getters(FieldGetPrim.class, FieldGetBin.class);
+            getters(FieldGetPrim.class, FieldGetBin.class, FieldGetBinLen.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetBin
             .class, FieldRemove.class, FieldAppendBin.class);
@@ -94,7 +95,7 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
             ClassDefinition classDefinition, BinaryType binaryType, FieldIndex fieldIndex,
             IUnfieldedDataGetter<?> dataGetter) {
-        if (dataGetter instanceof FieldGetPrim) {
+        if ((dataGetter instanceof FieldGetPrim) || (dataGetter instanceof FieldGetBinLen)) {
             final Long len = BinaryUtil.getSize(node, fieldIndex);
             return len;
         } else if (dataGetter instanceof FieldGetBin) {

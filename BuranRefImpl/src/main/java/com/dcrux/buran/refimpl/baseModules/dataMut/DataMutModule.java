@@ -1,9 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.dataMut;
 
 import com.dcrux.buran.common.IncNid;
-import com.dcrux.buran.common.IncNodeNotFound;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.edges.IEdgeSetter;
+import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.IFieldSetter;
@@ -36,7 +36,8 @@ public class DataMutModule extends Module<BaseModule> {
     public boolean setDataDirect(final UserId sender, final CommonNode node,
             final IDataSetter setter, @Nullable final Set<OIdentifiable> outCommittableRelations,
             IChangeTracker changeTracker)
-            throws NodeClassNotFoundException, FieldConstraintViolationInt, NodeNotFoundException {
+            throws NodeClassNotFoundException, FieldConstraintViolationInt, NodeNotFoundException,
+            IncNodeNotFound {
 
         if (setter instanceof BulkSet) {
             final BulkSet bulkSet = (BulkSet) setter;
@@ -59,7 +60,8 @@ public class DataMutModule extends Module<BaseModule> {
 
         if (setter instanceof IEdgeSetter) {
             final IEdgeSetter labelSetter = (IEdgeSetter) setter;
-            getBase().getEdgeModule().performLabelSet(node, labelSetter, outCommittableRelations);
+            getBase().getEdgeModule()
+                    .performLabelSet(sender, node, labelSetter, outCommittableRelations);
             return false;
         }
 

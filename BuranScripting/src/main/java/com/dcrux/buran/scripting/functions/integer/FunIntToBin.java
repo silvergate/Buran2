@@ -8,8 +8,6 @@ import com.dcrux.buran.scripting.iface.ProgrammErrorException;
 import com.dcrux.buran.scripting.iface.types.BinType;
 import com.dcrux.buran.scripting.iface.types.IntegerType;
 
-import java.text.MessageFormat;
-
 /**
  * Buran.
  *
@@ -17,7 +15,10 @@ import java.text.MessageFormat;
  */
 public class FunIntToBin extends FunctionDeclaration<BinType> {
 
-    private final IntegerType.NumOfBits numOfBits;
+    private IntegerType.NumOfBits numOfBits;
+
+    private FunIntToBin() {
+    }
 
     public static FunIntToBin c(IFunctionDeclaration<IntegerType> i1,
             IntegerType.NumOfBits numOfBits) {
@@ -42,9 +43,10 @@ public class FunIntToBin extends FunctionDeclaration<BinType> {
                 .calc(Math.max(this.numOfBits.getBytes(), it1.getRequiredBits().getBytes()));
 
         if (this.numOfBits.getBytes() < it1.getRequiredBits().getBytes()) {
-            throw new ProgrammErrorException(MessageFormat.format("Cannot convert integer " +
-                    "to binary using {0} bytes. The given integer requires at least {1} " +
-                    "bytes.", this.numOfBits.getBytes(), it1.getRequiredBits().getBytes()));
+            throw new ProgrammErrorException("Cannot convert integer " +
+                    "to binary using " + this.numOfBits.getBytes() + " bytes. The given integer " +
+                    "requires at least " + it1.getRequiredBits().getBytes() +
+                    " bytes.");
         }
 
         final AllocType<BinType> allocTypeRet = state.getCompTracker()

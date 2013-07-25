@@ -1,7 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.index.eval;
 
+import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
+import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.common.indexing.mapInput.*;
@@ -9,6 +11,7 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.dcrux.buran.scripting.compiler.CompiledBlock;
 import com.dcrux.buran.scripting.iface.Block;
 import com.dcrux.buran.scripting.iface.VarName;
@@ -31,8 +34,9 @@ public class MapFunEvaluator extends Module<BaseModule> {
         super(baseModule);
     }
 
-    private Map<ClassIndexName, Map<VarName, Object>> fetchNodeInputs(ClassIndexDefinition cid,
-            CommonNode node) {
+    private Map<ClassIndexName, Map<VarName, Object>> fetchNodeInputs(
+            ClassDefinition classDefinition, CommonNode node) {
+        final ClassIndexDefinition cid = classDefinition.getIndexes();
         final Map<ClassIndexName, Map<VarName, Object>> result = new HashMap<>();
 
         final Map<IFieldTarget, Object> inputs = new HashMap<IFieldTarget, Object>();
@@ -64,10 +68,14 @@ public class MapFunEvaluator extends Module<BaseModule> {
                         if ((!hasValue) && (fieldTargetCast.isRequired())) {
                            /* Index gen abort */
                             result.remove(entry.getKey());
-                            //TODO: Falsch, da ein indexAndNotify-input auch kein feld haben kann.
+                            //TODO: Falsch, da ein index-input auch kein feld haben kann.
                             break;
                         } else {
-                            value = node.getFieldValue(fieldTargetCast.getField());
+                            value = getBase().getFieldsModule()
+                                    .performUnfieldedGetter(new LiveNode(node.getDocument()),
+                                            classDefinition, fieldTargetCast.getField(),
+                                            FieldGetPrim.SINGLETON);
+                            //value = node.getFieldValue(fieldTargetCast.getField());
                             inputs.put(fieldTarget, value);
                         }
                     } else {
@@ -87,7 +95,7 @@ public class MapFunEvaluator extends Module<BaseModule> {
     public Map<ClassIndexName, Collection<EvaluatedMap>> eval(ClassDefExt cde, CommonNode node) {
         final Map<ClassIndexName, Collection<EvaluatedMap>> results = new HashMap<>();
         final Map<ClassIndexName, Map<VarName, Object>> requiredNodeInputs =
-                fetchNodeInputs(cde.getClassDefinition().getIndexes(), node);
+                fetchNodeInputs(cde.getClassDefinition(), node);
 
         for (final ClassIndexName correctClassIndexName : requiredNodeInputs.keySet()) {
             final IndexDefinition indexDef =
@@ -106,7 +114,6 @@ public class MapFunEvaluator extends Module<BaseModule> {
                     System.out.println("Runner gives value " + fields.getValue() + " for var " +
                             fields.getKey());
                     runner.setValue(fields.getKey(), fields.getValue());
-
                 }
 
                 Object[] byteAndValue = (Object[]) runner.run(compiled);

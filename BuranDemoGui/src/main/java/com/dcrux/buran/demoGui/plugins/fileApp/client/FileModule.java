@@ -28,6 +28,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  * @author: ${USER} Date: 17.07.13 Time: 23:44
  */
+@Deprecated
 public class FileModule {
 
     private UserId receiver;

@@ -15,6 +15,9 @@ import com.dcrux.buran.scripting.iface.types.StringType;
  */
 public class FunStrLen extends FunctionDeclaration<IntegerType> {
 
+    private FunStrLen() {
+    }
+
     public static FunStrLen c(IFunctionDeclaration<StringType> input) {
         return new FunStrLen(input);
     }
