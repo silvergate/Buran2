@@ -24,7 +24,7 @@ import com.dcrux.buran.scripting.functionsImpl.string.FunStrConcatImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.FunStrLenImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.FunStrLitImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.FunStrTrimImpl;
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.dcrux.buran.scripting.iface.LazyLineNum;
 import com.dcrux.buran.scripting.iface.ProgrammErrorException;
 import com.dcrux.buran.scripting.iface.VarName;
@@ -57,27 +57,27 @@ public class ScriptingTest1 {
         return ipr;
     }
 
-    public static Block loopTest() {
-        final Block block = Block.c();
-        block.add(FunAssign.c(VarName.c("counter"), FunIntLit.c(10)));
-        block.add(FunAssign.c(VarName.c("str"), FunStrLit.c("BEGIN: ")));
-        LazyLineNum decLine = block.addLz(FunAssign.c(VarName.c("counter"),
+    public static Code loopTest() {
+        final Code code = Code.c();
+        code.add(FunAssign.c(VarName.c("counter"), FunIntLit.c(10)));
+        code.add(FunAssign.c(VarName.c("str"), FunStrLit.c("BEGIN: ")));
+        LazyLineNum decLine = code.addLz(FunAssign.c(VarName.c("counter"),
                 FunIntOp.sub(FunGet.c(VarName.c("counter"), IntegerType.class), FunIntLit.c(1))));
-        block.add(FunAssign.c(VarName.c("str"), FunStrConcat
+        code.add(FunAssign.c(VarName.c("str"), FunStrConcat
                 .c(FunGet.c(VarName.c("str"), StringType.class), FunStrLit.c("++plus++"))));
-        block.add(FunIf.c(decLine,
+        code.add(FunIf.c(decLine,
                 FunIntCmp.gt(FunGet.c(VarName.c("counter"), IntegerType.class), FunIntLit.c(0))));
-        block.add(FunRet.c(FunGet.c(VarName.c("str"), StringType.class)));
-        return block;
+        code.add(FunRet.c(FunGet.c(VarName.c("str"), StringType.class)));
+        return code;
     }
 
-    public static void evalAndRun(Block block) throws ProgrammErrorException {
+    public static void evalAndRun(Code code) throws ProgrammErrorException {
         MetaRunner mr = new MetaRunner(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        System.out.println(mr.evaluate(block));
+        System.out.println(mr.evaluate(code));
 
         final com.dcrux.buran.scripting.compiler.Compiler compiler =
                 new com.dcrux.buran.scripting.compiler.Compiler(getRegistry());
-        final CompiledBlock compiled = compiler.compile(block);
+        final CompiledBlock compiled = compiler.compile(code);
 
         final Runner runner = new Runner();
         System.out.println("Run-Result: " + runner.run(compiled));
@@ -87,20 +87,20 @@ public class ScriptingTest1 {
     public static void main(String[] args) throws ProgrammErrorException {
         final ImplProviderRegistry registry = getRegistry();
 
-        final Block block = Block.c();
-        block.add(FunAssign.c(VarName.c("hallo"), FunIntCmp.gt(FunIntLit.c(4), FunIntLit.c(4))));
-        //block.add(FunRet.c(FunGet.c(VarName.c("hallo"), BoolType.class)));
+        final Code code = Code.c();
+        code.add(FunAssign.c(VarName.c("hallo"), FunIntCmp.gt(FunIntLit.c(4), FunIntLit.c(4))));
+        //code.add(FunRet.c(FunGet.c(VarName.c("hallo"), BoolType.class)));
 
-        block.add(FunAssign.c(VarName.c("str"),
+        code.add(FunAssign.c(VarName.c("str"),
                 FunStrConcat.c(FunStrLit.c(" Hallo "), FunStrLit.c("  Welt "))));
-        block.add(FunAssign.c(VarName.c("hallo"),
+        code.add(FunAssign.c(VarName.c("hallo"),
                 FunStrTrim.c(FunStrTrim.c(FunGet.c(VarName.c("str"), StringType.class)))));
-        block.add(FunRet.c(FunIntOp.add(FunStrLen.c(FunGet.c(VarName.c("hallo"), StringType.class)),
+        code.add(FunRet.c(FunIntOp.add(FunStrLen.c(FunGet.c(VarName.c("hallo"), StringType.class)),
                 FunIntLit.c(21212))));
 
-        evalAndRun(block);
+        evalAndRun(code);
 
-        final Block block2 = loopTest();
-        evalAndRun(block2);
+        final Code code2 = loopTest();
+        evalAndRun(code2);
     }
 }

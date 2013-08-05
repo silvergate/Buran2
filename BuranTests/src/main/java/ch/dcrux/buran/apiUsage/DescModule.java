@@ -14,6 +14,7 @@ import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetStr;
@@ -31,6 +32,7 @@ import com.dcrux.buran.common.inRelations.where.InRelWhereClassId;
 import com.dcrux.buran.common.inRelations.where.InRelWhereVersioned;
 import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
 import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
 import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
 import com.dcrux.buran.common.indexing.mapStore.MapIndex;
@@ -40,7 +42,7 @@ import com.dcrux.buran.scripting.functions.FunRet;
 import com.dcrux.buran.scripting.functions.integer.FunIntLit;
 import com.dcrux.buran.scripting.functions.integer.FunIntToBin;
 import com.dcrux.buran.scripting.functions.list.FunListNew;
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.dcrux.buran.scripting.iface.VarName;
 import com.google.common.base.Optional;
 import com.sun.istack.internal.Nullable;
@@ -56,12 +58,11 @@ public class DescModule extends Module<BaseModule> {
 
     private ClassId fileClassId;
 
-    //public static final FieldIndex FIELD_TARGET_CLASSID = FieldIndex.c(3);
     public static final FieldIndex FIELD_TITLE = FieldIndex.c(0);
     public static final FieldIndex FIELD_LONG_DESC = FieldIndex.c(1);
     public static final FieldIndex FIELD_DESCRIBES = FieldIndex.c(2);
-    //public static final ClassLabelName FIELD_TARGET = ClassLabelName.c(0);
-    //public static final LabelIndex FIELD_TARGET_LI = LabelIndex.c(0);
+
+    public static final ClassIndexName INDEX_BY_TITLE = new ClassIndexName("byTitiel");
 
     public DescModule(BaseModule baseModule) {
         super(baseModule);
@@ -73,7 +74,20 @@ public class DescModule extends Module<BaseModule> {
         classDef.getFields().add(FIELD_TITLE, new StringType(0, 255), false)
                 .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false)
                 .add(FIELD_DESCRIBES, LinkType.c(), false);
+        classDef.getIndexes().add(INDEX_BY_TITLE, getIndexByText());
         return classDef;
+    }
+
+    private IndexDefinition getIndexByText() {
+        final NodeMapInput mapInput = new NodeMapInput();
+
+        TextFunction textFunction = TextFunction.c(FIELD_TITLE);
+        MapFunction mapFunction = MapFunction.text(textFunction);
+        MapIndex mapIndex = new MapIndex(true);
+
+        final IndexDefinition indexDefinition =
+                new IndexDefinition(mapInput, mapFunction, mapIndex);
+        return indexDefinition;
     }
 
     private IndexDefinition getIndexByFileSize() {
@@ -81,13 +95,13 @@ public class DescModule extends Module<BaseModule> {
         final NodeMapInput mapInput = new NodeMapInput();
         mapInput.getFields().put(fsVarName, FieldTarget.cRequired(FIELD_TITLE));
 
-        Block mapBlock = new Block();
-        mapBlock.add(FunRet.c(FunListNew.c().add(FunIntToBin
+        Code mapCode = new Code();
+        mapCode.add(FunRet.c(FunListNew.c().add(FunIntToBin
                 .c(FunGet.c(fsVarName, com.dcrux.buran.scripting.iface.types.IntegerType.class),
                         com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
                 .add(FunIntLit.c(0)).get()));
 
-        MapFunction mapFunction = MapFunction.single(mapBlock);
+        MapFunction mapFunction = MapFunction.single(mapCode);
         MapIndex mapIndex = new MapIndex(true);
 
         final IndexDefinition indexDefinition =
@@ -129,20 +143,6 @@ public class DescModule extends Module<BaseModule> {
         return commitResult.getNid(descNode);
     }
 
-    /*public Set<Nid> getDescriptions(final NidVer forNode, boolean versioned)
-            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        final ClassId classId = getDescClassId();
-        final ComFetch<GetInClassEdgeResult> comFetch = ComFetch.c(forNode,
-                GetInClassEdge.classEdge(classId, FIELD_TARGET, FIELD_TARGET_LI, versioned));
-        final GetInClassEdgeResult foundNodes = getBase().sync(comFetch);
-
-        Set<Nid> sources = new HashSet<Nid>();
-        for (GetInClassEdgeResult.Entry entry : foundNodes.getEntries()) {
-            sources.add(entry.getSource());
-        }
-        return sources;
-    } */
-
     @Nullable
     public NidVer getDescription(final NidVer forNode)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
@@ -175,6 +175,10 @@ public class DescModule extends Module<BaseModule> {
             return alternative;
         }
         return getTitle(nid);
+    }
+
+    public void findByTitle(String query) {
+
     }
 
     public String getTitle(NidVer nid)

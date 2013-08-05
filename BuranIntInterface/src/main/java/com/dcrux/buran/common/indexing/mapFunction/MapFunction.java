@@ -1,6 +1,6 @@
 package com.dcrux.buran.common.indexing.mapFunction;
 
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.google.common.base.Optional;
 
 import java.io.Serializable;
@@ -16,35 +16,42 @@ public class MapFunction implements Serializable {
     }
 
     public static enum TextFunctionPos {
-        pre,
+        pre, // Text funktion kann nicht pre sein.
         post
     }
 
-    public static MapFunction single(Block mapFunction) {
-        return new MapFunction(Optional.<TextFunction>absent(), Optional.<TextFunctionPos>absent(),
-                Optional.of(mapFunction));
+    public static MapFunction single(Code mapFunction) {
+        return new MapFunction(Optional.<TextFunction>absent(), Optional.of(mapFunction));
     }
 
-    private MapFunction(Optional<TextFunction> textFunction,
-            Optional<TextFunctionPos> textFunctionPos, Optional<Block> singleMapFunction) {
+    public static MapFunction withText(Code mapFunction, TextFunction textFunction) {
+        return new MapFunction(Optional.<TextFunction>of(textFunction), Optional.of(mapFunction));
+    }
+
+    public static MapFunction text(TextFunction textFunction) {
+        return new MapFunction(Optional.<TextFunction>of(textFunction), Optional.<Code>absent());
+    }
+
+    private MapFunction(Optional<TextFunction> textFunction, Optional<Code> singleMapFunction) {
         this.textFunction = textFunction;
-        this.textFunctionPos = textFunctionPos;
+        this.textFunctionPos = null;
         this.singleMapFunction = singleMapFunction;
     }
 
     private Optional<TextFunction> textFunction;
     private Optional<TextFunctionPos> textFunctionPos;
-    private Optional<Block> singleMapFunction;
+    private Optional<Code> singleMapFunction;
 
     public Optional<TextFunction> getTextFunction() {
         return textFunction;
     }
 
+    @Deprecated
     public Optional<TextFunctionPos> getTextFunctionPos() {
         return textFunctionPos;
     }
 
-    public Optional<Block> getSingleMapFunction() {
+    public Optional<Code> getSingleMapFunction() {
         return singleMapFunction;
     }
 }

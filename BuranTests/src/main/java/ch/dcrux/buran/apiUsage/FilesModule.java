@@ -38,7 +38,7 @@ import com.dcrux.buran.scripting.functions.integer.FunIntLit;
 import com.dcrux.buran.scripting.functions.integer.FunIntToBin;
 import com.dcrux.buran.scripting.functions.list.FunListNew;
 import com.dcrux.buran.scripting.functions.string.FunStrHash;
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.dcrux.buran.scripting.iface.VarName;
 import com.dcrux.buran.scripting.iface.types.IntegerType;
 import com.google.common.base.Optional;
@@ -57,7 +57,6 @@ public class FilesModule extends Module<BaseModule> {
     public static final FieldIndex FIELD_MIME = FieldIndex.c(0);
     public static final FieldIndex FIELD_DATA = FieldIndex.c(1);
     public static final FieldIndex FIELD_DESCRIPTION = FieldIndex.c(2);
-    // public static final ClassLabelName LABEL_DESC = ClassLabelName.c(0);
 
     public static final ClassIndexName INDEX_BY_FILESIZE = new ClassIndexName("byFs");
     public static final ClassIndexName INDEX_BY_MIME_FILESIZE = new ClassIndexName("byMFs");
@@ -72,13 +71,13 @@ public class FilesModule extends Module<BaseModule> {
         final NodeMapInput mapInput = new NodeMapInput();
         mapInput.getFields().put(fsVarName, FieldTarget.cRequired(FIELD_DATA));
 
-        Block mapBlock = new Block();
-        mapBlock.add(FunRet.c(FunListNew.c().add(FunIntToBin
+        Code mapCode = new Code();
+        mapCode.add(FunRet.c(FunListNew.c().add(FunIntToBin
                 .c(FunGet.c(fsVarName, IntegerType.class),
                         com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
                 .add(FunIntLit.c(0)).get()));
 
-        MapFunction mapFunction = MapFunction.single(mapBlock);
+        MapFunction mapFunction = MapFunction.single(mapCode);
         MapIndex mapIndex = new MapIndex(true);
 
         final IndexDefinition indexDefinition =
@@ -95,7 +94,7 @@ public class FilesModule extends Module<BaseModule> {
         mapInput.getFields()
                 .put(fsVarName, FieldTarget.cRequired(FIELD_DATA, FieldGetStrLimit.limit(200)));
 
-        Block mapBlock = new Block();
+        Code mapCode = new Code();
 
         FunStrHash funStrHash = FunStrHash
                 .c(FunGet.c(mimeTypeVarName, com.dcrux.buran.scripting.iface.types.StringType
@@ -103,11 +102,11 @@ public class FilesModule extends Module<BaseModule> {
         FunIntToBin funIntToBin = FunIntToBin.c(FunGet.c(fsVarName, IntegerType.class),
                 com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64);
 
-        mapBlock.add(FunRet.c(
+        mapCode.add(FunRet.c(
                 FunListNew.c().add(FunBinConcat.c(funStrHash, funIntToBin)).add(FunIntLit.c(0))
                         .get()));
 
-        MapFunction mapFunction = MapFunction.single(mapBlock);
+        MapFunction mapFunction = MapFunction.single(mapCode);
         MapIndex mapIndex = new MapIndex(true);
 
         final IndexDefinition indexDefinition =

@@ -49,6 +49,27 @@ public class Test2 {
     public static void main(String[] args)
             throws IOException, InterruptedException, UnknownCommandException, UncheckedException,
             WrappedExpectableException {
+
+        /*
+        ProcessorPack pp = new ProcessorPack();
+        pp.process("This is an #[00000000|silvergate@gmail.com]# english text with 32 " +
+                "numbers " +
+                "from AT&T with: It's " +
+                "Simon's " +
+                "name from somewhere. Microsoft Windows XP 2000", new IEmmitter.ICallback() {
+            @Override
+            public void emit(byte[] data) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+
+        System.out.println("FROM-Key-Range: " + pp.generateKey("Microsoft Windows XP 2000"));
+
+        if (true) {
+            System.exit(0);
+            return;
+        } */
+
         com.dcrux.buran.refimpl.baseModules.BaseModule.createNew(new UserId(0), true);
         final UserId thisAccount = new UserId(0);
         final UserId sender = new UserId(332);

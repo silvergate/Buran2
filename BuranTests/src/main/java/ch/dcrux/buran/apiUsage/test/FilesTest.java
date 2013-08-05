@@ -34,7 +34,7 @@ public class FilesTest {
     public void createAndReadDesc()
             throws UnknownCommandException, WrappedExpectableException, UncheckedException,
             IOException {
-        String fileName = "testFileOne.jpg";
+        String fileName = "testFileOne.jpg Dies ist Microsoft Windows XP 2000.";
         NidVer nidVer = createFile(fileName);
         final String desc = descModule.getBestDescription(nidVer, "unknown");
         System.out.println("Description: " + desc);

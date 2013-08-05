@@ -23,14 +23,14 @@ public class MetaRunner {
         this.memoryLimit = memoryLimit;
     }
 
-    public IType<?> evaluate(Block block) throws ProgrammErrorException {
+    public IType<?> evaluate(Code code) throws ProgrammErrorException {
         final ComplexityTracker complexityTracker =
                 new ComplexityTracker(this.cpuComplexityLimit, this.memoryLimit);
         final TypeState state = new TypeState(complexityTracker);
         Set<IType> retTypes = new HashSet<IType>();
         Collection<TypeState> brachedStates = new HashSet<TypeState>();
         brachedStates.add(state);
-        evaluateInt(block, state, 0, retTypes, brachedStates);
+        evaluateInt(code, state, 0, retTypes, brachedStates);
         Set<IType<?>> types = new HashSet<IType<?>>();
         for (IType functionMeta : retTypes) {
             types.add(functionMeta);
@@ -53,10 +53,10 @@ public class MetaRunner {
         return TypeCombiner.combine(types);
     }
 
-    private void evaluateInt(Block block, TypeState state, int startLine, Set<IType> outRet,
+    private void evaluateInt(Code code, TypeState state, int startLine, Set<IType> outRet,
             Collection<TypeState> outBranchedStates) throws ProgrammErrorException {
-        for (int line = startLine; line < block.getNumberOfLines(); line++) {
-            final IFunctionDeclaration<?> func = block.getLine(line);
+        for (int line = startLine; line < code.getNumberOfLines(); line++) {
+            final IFunctionDeclaration<?> func = code.getLine(line);
             final AllocType<? extends IType> meta = func.getMeta(state);
              /* Deallocate return value */
             state.getCompTracker().free(meta);
@@ -73,7 +73,7 @@ public class MetaRunner {
                  /* Branching */
                 final TypeState branchedState = state.getStateForBranch();
                 outBranchedStates.add(branchedState);
-                evaluateInt(block, branchedState, state.getBranchTo().getNum(), outRet,
+                evaluateInt(code, branchedState, state.getBranchTo().getNum(), outRet,
                         outBranchedStates);
                 state.continueAfterBranch();
             }

@@ -19,7 +19,7 @@ import com.dcrux.buran.scripting.functionsImpl.integer.FunIntOpImpl;
 import com.dcrux.buran.scripting.functionsImpl.integer.FunIntToBinImpl;
 import com.dcrux.buran.scripting.functionsImpl.list.FunListNewImpl;
 import com.dcrux.buran.scripting.functionsImpl.string.*;
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.google.common.base.Optional;
 
 import java.util.HashMap;
@@ -69,9 +69,9 @@ public class FunctionCompiler extends Module<BaseModule> {
                 .entrySet()) {
             final IndexDefinition indexDefinition = entry.getValue();
             final MapFunction mapFunction = indexDefinition.getMapFunction();
-            final Optional<Block> singleFunctionOpt = mapFunction.getSingleMapFunction();
+            final Optional<Code> singleFunctionOpt = mapFunction.getSingleMapFunction();
             if (singleFunctionOpt.isPresent()) {
-                final Block singleFunction = singleFunctionOpt.get();
+                final Code singleFunction = singleFunctionOpt.get();
                 final com.dcrux.buran.scripting.compiler.Compiler compiler =
                         new com.dcrux.buran.scripting.compiler.Compiler(getRegistry());
                 final CompiledBlock compiled = compiler.compile(singleFunction);

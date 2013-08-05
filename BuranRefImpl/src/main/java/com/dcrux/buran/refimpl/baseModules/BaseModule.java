@@ -15,6 +15,7 @@ import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsModule;
 import com.dcrux.buran.refimpl.baseModules.nodes.NodesModule;
 import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
+import com.dcrux.buran.refimpl.baseModules.text.TextModule;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionsModule;
 import com.dcrux.buran.refimpl.subscription.SubscriptionModule;
@@ -52,6 +53,7 @@ public class BaseModule {
     private final ICallbackCommandReceiver callbackReceiver;
     private final SubscriptionModule subscriptionModule;
     private final NewRelationsModule newRelationsModule = new NewRelationsModule(this);
+    private final TextModule textModule = new TextModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -186,5 +188,9 @@ public class BaseModule {
 
     public NewRelationsModule getNewRelationsModule() {
         return newRelationsModule;
+    }
+
+    public TextModule getTextModule() {
+        return textModule;
     }
 }

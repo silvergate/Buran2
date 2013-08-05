@@ -10,13 +10,13 @@ import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
 public class MultiToken implements ITokenInput {
     private TextFunction.FuzzinessType fuzzinessType;
     private String stringWithTokens;
-    private TextFunction.ProximityType proximity;
+    //private TextFunction.ProximityType proximity;
 
-    public MultiToken(TextFunction.FuzzinessType fuzzinessType, String stringWithTokens,
-            TextFunction.ProximityType proximity) {
+    public MultiToken(TextFunction.FuzzinessType fuzzinessType, String stringWithTokens/*,
+            TextFunction.ProximityType proximity*/) {
         this.fuzzinessType = fuzzinessType;
         this.stringWithTokens = stringWithTokens;
-        this.proximity = proximity;
+        //this.proximity = proximity;
     }
 
     private MultiToken() {
@@ -30,7 +30,7 @@ public class MultiToken implements ITokenInput {
         return stringWithTokens;
     }
 
-    public TextFunction.ProximityType getProximity() {
+    /*public TextFunction.ProximityType getProximity() {
         return proximity;
-    }
+    } */
 }

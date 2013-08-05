@@ -9,10 +9,10 @@ import java.util.List;
  *
  * @author: ${USER} Date: 05.07.13 Time: 07:34
  */
-public class Block implements Serializable {
+public class Code implements Serializable {
 
-    public static Block c() {
-        return new Block();
+    public static Code c() {
+        return new Code();
     }
 
     private List<IFunctionDeclaration<?>> functions = new ArrayList<IFunctionDeclaration<?>>();
@@ -29,7 +29,7 @@ public class Block implements Serializable {
         return lazyLineNum;
     }
 
-    public Block add(IFunctionDeclaration<?> functionDeclaration) {
+    public Code add(IFunctionDeclaration<?> functionDeclaration) {
         functions.add(functionDeclaration);
         return this;
     }

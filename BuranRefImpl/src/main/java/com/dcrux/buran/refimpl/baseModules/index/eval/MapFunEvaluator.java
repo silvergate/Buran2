@@ -6,6 +6,7 @@ import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
 import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
 import com.dcrux.buran.common.indexing.mapInput.IFieldTarget;
 import com.dcrux.buran.common.indexing.mapInput.IMapInput;
@@ -15,16 +16,14 @@ import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
+import com.dcrux.buran.refimpl.baseModules.text.processors.IEmmitter;
 import com.dcrux.buran.scripting.compiler.CompiledBlock;
-import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.Code;
 import com.dcrux.buran.scripting.iface.VarName;
 import com.dcrux.buran.scripting.runner.Runner;
 import com.google.common.base.Optional;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Buran.
@@ -98,6 +97,13 @@ public class MapFunEvaluator extends Module<BaseModule> {
         return result;
     }
 
+    private byte[] combine(byte[] one, byte[] two) {
+        final byte[] result = new byte[one.length + two.length];
+        System.arraycopy(one, 0, result, 0, one.length);
+        System.arraycopy(two, 0, result, one.length, two.length);
+        return result;
+    }
+
     public Map<ClassIndexName, Collection<EvaluatedMap>> eval(ClassDefExt cde, CommonNode node) {
         final Map<ClassIndexName, Collection<EvaluatedMap>> results = new HashMap<>();
         final Map<ClassIndexName, Map<VarName, Object>> requiredNodeInputs =
@@ -108,7 +114,10 @@ public class MapFunEvaluator extends Module<BaseModule> {
                     cde.getClassDefinition().getIndexes().getIndexDefinitionMap()
                             .get(correctClassIndexName);
             final MapFunction mapFunction = indexDef.getMapFunction();
-            final Optional<Block> singleMapFunctionOpt = mapFunction.getSingleMapFunction();
+            final Optional<Code> singleMapFunctionOpt = mapFunction.getSingleMapFunction();
+            final Optional<TextFunction> textFunctionOpt = mapFunction.getTextFunction();
+
+            EvaluatedMap evaluatedFromCode = null;
             if (singleMapFunctionOpt.isPresent()) {
                 final CompiledBlock compiled =
                         cde.getCombiledMapFunctions().get(correctClassIndexName);
@@ -125,7 +134,47 @@ public class MapFunEvaluator extends Module<BaseModule> {
                 Object[] byteAndValue = (Object[]) runner.run(compiled);
                 final EvaluatedMap evaluatedMap =
                         new EvaluatedMap((byte[]) byteAndValue[0], byteAndValue[1]);
-                results.put(correctClassIndexName, Collections.singletonList(evaluatedMap));
+                evaluatedFromCode = evaluatedMap;
+            }
+
+            Set<byte[]> evaluatedFromText = null;
+            if (textFunctionOpt.isPresent()) {
+                evaluatedFromText = new HashSet<>();
+                TextFunction textFunction = textFunctionOpt.get();
+                Object value = getBase().getFieldsModule()
+                        .performUnfieldedGetter(new LiveNode(node.getDocument()),
+                                cde.getClassDefinition(), textFunction.getTarget(),
+                                textFunction.getDataGetter());
+                String valueStr = (String) value;
+                final Set<byte[]> evaluatedFromTextFinal = evaluatedFromText;
+                if (valueStr != null) {
+                    getBase().getTextModule().process(valueStr, new IEmmitter.ICallback() {
+                        @Override
+                        public void emit(byte[] data) {
+                            evaluatedFromTextFinal.add(data);
+                        }
+                    });
+                }
+            }
+
+            /* Combine */
+            if (evaluatedFromText == null) {
+                results.put(correctClassIndexName, Collections.singletonList(evaluatedFromCode));
+            } else if (evaluatedFromCode != null) {
+                /* Text and code */
+                final List<EvaluatedMap> combined = new ArrayList<>();
+                for (byte[] fromText : evaluatedFromText) {
+                    byte[] combinedByte = combine(evaluatedFromCode.getKey(), fromText);
+                    combined.add(new EvaluatedMap(combinedByte, evaluatedFromCode.getValue()));
+                }
+                results.put(correctClassIndexName, combined);
+            } else {
+                /* From text only */
+                final List<EvaluatedMap> combined = new ArrayList<>();
+                for (byte[] fromText : evaluatedFromText) {
+                    combined.add(new EvaluatedMap(fromText, 0));
+                }
+                results.put(correctClassIndexName, combined);
             }
         }
 

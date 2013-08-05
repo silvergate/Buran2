@@ -1,9 +1,11 @@
 package com.dcrux.buran.common.indexing.mapFunction;
 
-import com.dcrux.buran.common.indexing.mapInput.IFieldTarget;
+import com.dcrux.buran.common.fields.FieldIndex;
+import com.dcrux.buran.common.fields.getter.FieldGetStr;
+import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
+import com.dcrux.buran.common.fields.types.StringType;
 
 import java.io.Serializable;
-import java.util.EnumSet;
 
 /**
  * Buran.
@@ -13,33 +15,46 @@ import java.util.EnumSet;
 public class TextFunction implements Serializable {
 
     public static final int MAX_TOKEN_LENGTH_LIMIT = 48;
+    public static final int MAX_INPUT_STRING_LENGTH_LIMIT = StringType.MAXLEN_LIMIT;
 
+    @Deprecated
     public static enum FuzzinessType {
-        exact,
         lowFuzziness,
         mediumFuzziness,
         highFuzziness
     }
 
-    public static enum ProximityType {
+    private TextFunction(FieldIndex target, IUnfieldedDataGetter<?> dataGetter, int inputStrLimit) {
+        this.target = target;
+        this.dataGetter = dataGetter;
+        this.inputStrLimit = inputStrLimit;
+    }
+
+    public static TextFunction c(FieldIndex target) {
+        return new TextFunction(target, FieldGetStr.SINGLETON, StringType.MAXLEN_LIMIT);
+    }
+
+    /*public static enum ProximityType {
         following,
         near,
         indocument // This operation is optional
-    }
+    } */
 
-    private IFieldTarget target;
-    private int inputStrLimit = Integer.MAX_VALUE;
-    private int numOfTokenLimit = Integer.MAX_VALUE;
-    private int tokenLengthLimit = MAX_TOKEN_LENGTH_LIMIT;
-    private boolean removeStopwords;
-    private EnumSet<FuzzinessType> supportedFuzzinessTypes;
-    private EnumSet<ProximityType> supportedProximityTypes;
+    private FieldIndex target;
+    private IUnfieldedDataGetter<?> dataGetter;
 
-    public IFieldTarget getTarget() {
+    private int inputStrLimit = MAX_INPUT_STRING_LENGTH_LIMIT;
+    //private int numOfTokenLimit = Integer.MAX_VALUE;
+    //private int tokenLengthLimit = MAX_TOKEN_LENGTH_LIMIT;
+    //private boolean removeStopwords;
+    //private EnumSet<FuzzinessType> supportedFuzzinessTypes;
+    //private EnumSet<ProximityType> supportedProximityTypes;
+
+    public FieldIndex getTarget() {
         return target;
     }
 
-    public void setTarget(IFieldTarget target) {
+    public void setTarget(FieldIndex target) {
         this.target = target;
     }
 
@@ -51,6 +66,11 @@ public class TextFunction implements Serializable {
         this.inputStrLimit = inputStrLimit;
     }
 
+    public IUnfieldedDataGetter<?> getDataGetter() {
+        return dataGetter;
+    }
+
+    /*
     public int getNumOfTokenLimit() {
         return numOfTokenLimit;
     }
@@ -81,13 +101,13 @@ public class TextFunction implements Serializable {
 
     public void setSupportedFuzzinessTypes(EnumSet<FuzzinessType> supportedFuzzinessTypes) {
         this.supportedFuzzinessTypes = supportedFuzzinessTypes;
-    }
+    }   */
 
-    public EnumSet<ProximityType> getSupportedProximityTypes() {
+    /*public EnumSet<ProximityType> getSupportedProximityTypes() {
         return supportedProximityTypes;
     }
 
     public void setSupportedProximityTypes(EnumSet<ProximityType> supportedProximityTypes) {
         this.supportedProximityTypes = supportedProximityTypes;
-    }
+    } */
 }

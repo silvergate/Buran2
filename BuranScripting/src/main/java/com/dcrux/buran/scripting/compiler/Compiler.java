@@ -18,10 +18,10 @@ public class Compiler {
         this.implementationProvider = implementationProvider;
     }
 
-    public CompiledBlock compile(Block block) {
-        final CompiledFunction[] compiledFunctions = new CompiledFunction[block.getNumberOfLines()];
-        for (int i = 0; i < block.getNumberOfLines(); i++) {
-            compiledFunctions[i] = compileFunction(block.getLine(i));
+    public CompiledBlock compile(Code code) {
+        final CompiledFunction[] compiledFunctions = new CompiledFunction[code.getNumberOfLines()];
+        for (int i = 0; i < code.getNumberOfLines(); i++) {
+            compiledFunctions[i] = compileFunction(code.getLine(i));
         }
         return new CompiledBlock(compiledFunctions);
     }
