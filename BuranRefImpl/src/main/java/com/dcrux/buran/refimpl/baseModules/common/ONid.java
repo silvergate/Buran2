@@ -1,6 +1,5 @@
 package com.dcrux.buran.refimpl.baseModules.common;
 
-import com.dcrux.buran.common.INid;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;

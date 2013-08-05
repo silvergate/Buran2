@@ -1,6 +1,5 @@
 package com.dcrux.buran.refimpl.baseModules.common;
 
-import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.NidVer;

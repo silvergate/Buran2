@@ -1,4 +1,6 @@
-package com.dcrux.buran.common;
+package com.dcrux.buran.refimpl.baseModules.common;
+
+import com.dcrux.buran.common.INidCommon;
 
 import java.io.Serializable;
 

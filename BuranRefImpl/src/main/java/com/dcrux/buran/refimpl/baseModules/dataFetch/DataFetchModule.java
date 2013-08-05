@@ -1,6 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.dataFetch;
 
-import com.dcrux.buran.common.*;
+import com.dcrux.buran.common.INidOrNidVer;
+import com.dcrux.buran.common.Nid;
+import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.Version;
 import com.dcrux.buran.common.edges.IEdgeGetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;

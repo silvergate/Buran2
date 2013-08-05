@@ -1,6 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.newRelations;
 
 import com.dcrux.buran.common.Nid;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.inRelations.InRealtionGetter;
@@ -11,6 +12,7 @@ import com.dcrux.buran.common.inRelations.where.InRelWhereClassId;
 import com.dcrux.buran.common.inRelations.where.InRelWhereVersioned;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -161,7 +163,7 @@ public class NewRelationsModule extends Module<BaseModule> {
                 result = size;
             }
         } else if (getter.getSelector() instanceof InRelSelTarget) {
-            ArrayList<Nid> resultNids = new ArrayList<>();
+            ArrayList<NidVer> resultNids = new ArrayList<>();
             int numSkipped = 0;
             for (final Object oIdentObj : values) {
                 if (skip > numSkipped) {
@@ -173,11 +175,12 @@ public class NewRelationsModule extends Module<BaseModule> {
                     final NewRelationsWrapper newRelationsWrapper =
                             new NewRelationsWrapper(newRelation);
                     final Nid source = newRelationsWrapper.getSource();
-                    resultNids.add(source);
+                    ONidVer oNidVer = getBase().getDataFetchModule().toNidVer(source);
+                    resultNids.add(new NidVer(oNidVer.getoIdentifiable().toString()));
                 }
             }
             if ((limited) && (!resultNids.isEmpty())) {
-                resultNids = (ArrayList<Nid>) resultNids.subList(0, resultNids.size() - 1);
+                resultNids = (ArrayList<NidVer>) resultNids.subList(0, resultNids.size() - 1);
             }
             result = resultNids;
         } else {

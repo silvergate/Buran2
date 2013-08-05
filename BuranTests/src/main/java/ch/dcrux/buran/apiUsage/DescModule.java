@@ -12,7 +12,6 @@ import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.common.IncNid;
-import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classes.ClassId;
@@ -145,16 +144,15 @@ public class DescModule extends Module<BaseModule> {
     } */
 
     @Nullable
-    public Nid getDescription(final NidVer forNode)
+    public NidVer getDescription(final NidVer forNode)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        final InRealtionGetter<ArrayList<Nid>> getter =
-                InRealtionGetter.<ArrayList<Nid>>select(InRelSelTarget.SINGLETON).limit(1)
+        final InRealtionGetter<ArrayList<NidVer>> getter =
+                InRealtionGetter.<ArrayList<NidVer>>select(InRelSelTarget.SINGLETON).limit(1)
                         .unversioned()
                         .where(InRelWhereClassId.withFieldIndex(getDescClassId(), FIELD_DESCRIBES))
                         .get();
-        ComFetch<InRelationResult<ArrayList<Nid>>> comFetch = ComFetch.c(forNode, getter);
-        final InRelationResult<ArrayList<Nid>> results = getBase().sync(comFetch);
-
+        ComFetch<InRelationResult<ArrayList<NidVer>>> comFetch = ComFetch.c(forNode, getter);
+        final InRelationResult<ArrayList<NidVer>> results = getBase().sync(comFetch);
 
         final InRealtionGetter<Integer> countGetter =
                 InRealtionGetter.<Integer>select(InRelSelCount.SINGLETON).limit(1).unversioned()
@@ -171,7 +169,7 @@ public class DescModule extends Module<BaseModule> {
 
     public String getBestDescription(final NidVer forNode, final String alternative)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        final Nid nid = getDescription(forNode);
+        final NidVer nid = getDescription(forNode);
         if (nid == null) {
             System.out.println("No description found for Node: " + forNode);
             return alternative;
@@ -179,7 +177,7 @@ public class DescModule extends Module<BaseModule> {
         return getTitle(nid);
     }
 
-    public String getTitle(Nid nid)
+    public String getTitle(NidVer nid)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         ComFetch<String> cf = ComFetch.c(nid, SingleGet.c(FIELD_TITLE, FieldGetStr.SINGLETON));
         return getBase().sync(cf);

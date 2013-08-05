@@ -13,10 +13,7 @@ import com.dcrux.buran.common.fields.setter.FieldRemove;
 import com.dcrux.buran.common.fields.setter.FieldSetLink;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
 import com.dcrux.buran.common.fields.types.LinkType;
-import com.dcrux.buran.common.link.ExtNidLink;
-import com.dcrux.buran.common.link.IncLinkTarget;
-import com.dcrux.buran.common.link.LinkTarget;
-import com.dcrux.buran.common.link.LinkTargetInc;
+import com.dcrux.buran.common.link.*;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
@@ -128,8 +125,22 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                 accountId = null;
                 target = new ORecordId(incLinkTarget.getIncNid().getAsString());
             } else if (linkTargetInc.is(LinkTargetInc.TYPE_NID_VER)) {
-                type = TargetType.nidVer;
-                target = new ORecordId(linkTargetInc.get(LinkTargetInc.TYPE_NID_VER).getAsString());
+                NidVerLinkTarget nidVerLinkTarget = linkTargetInc.get(LinkTargetInc.TYPE_NID_VER);
+                if (nidVerLinkTarget.isVersioned()) {
+                    type = TargetType.nidVer;
+                    target = new ORecordId(nidVerLinkTarget.getNidVer().getAsString());
+                } else {
+                    type = TargetType.nid;
+                    try {
+                        target =
+                                baseModule.getDataFetchModule().toOnid(nidVerLinkTarget.getNidVer())
+                                        .getRecordId();
+                    } catch (NodeNotFoundException e) {
+                        throw new FieldConstraintViolationInt(MessageFormat
+                                .format("Node {0} " + "(versioned) was not found in system.",
+                                        nidVerLinkTarget.getNidVer()));
+                    }
+                }
                 classId = null;
                 accountId = null;
             } else if (linkTargetInc.is(LinkTargetInc.TYPE_NID)) {
@@ -138,16 +149,17 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                 classId = null;
                 accountId = null;
             } else if (linkTargetInc.is(LinkTargetInc.TYPE_EXT)) {
-                final ExtNidLink extNidLink = linkTargetInc.get(LinkTargetInc.TYPE_EXT);
-                if (extNidLink.getExtNidOrNidVer().is(IExtNidOrNidVer.TYPE_EXT_NID)) {
+                final ExtNidLinkTarget extNidLinkTarget = linkTargetInc.get(LinkTargetInc.TYPE_EXT);
+                if (extNidLinkTarget.getExtNidOrNidVer().is(IExtNidOrNidVer.TYPE_EXT_NID)) {
                     final ExtNid extNid =
-                            extNidLink.getExtNidOrNidVer().get(IExtNidOrNidVer.TYPE_EXT_NID);
+                            extNidLinkTarget.getExtNidOrNidVer().get(IExtNidOrNidVer.TYPE_EXT_NID);
                     type = TargetType.extNid;
                     target = new ORecordId(extNid.getNid().getAsString());
                     accountId = extNid.getAccount().getId();
-                } else if (extNidLink.getExtNidOrNidVer().is(IExtNidOrNidVer.TYPE_EXT_NID_VER)) {
-                    final ExtNidVer extNidVer =
-                            extNidLink.getExtNidOrNidVer().get(IExtNidOrNidVer.TYPE_EXT_NID_VER);
+                } else if (extNidLinkTarget.getExtNidOrNidVer()
+                        .is(IExtNidOrNidVer.TYPE_EXT_NID_VER)) {
+                    final ExtNidVer extNidVer = extNidLinkTarget.getExtNidOrNidVer()
+                            .get(IExtNidOrNidVer.TYPE_EXT_NID_VER);
                     type = TargetType.extNidVer;
                     target = new ORecordId(extNidVer.getNidVer().getAsString());
                     accountId = extNidVer.getAccount().getId();
@@ -155,7 +167,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                 } else {
                     throw new IllegalArgumentException("Unknown ext nid type");
                 }
-                classId = extNidLink.getTargetClassId().getId();
+                classId = extNidLinkTarget.getTargetClassId().getId();
             } else {
                 throw new IllegalArgumentException("Unknown target type");
             }

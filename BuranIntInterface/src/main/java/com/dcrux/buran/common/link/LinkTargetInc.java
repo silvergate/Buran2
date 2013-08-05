@@ -14,9 +14,9 @@ import java.io.Serializable;
  */
 public class LinkTargetInc extends WrappedAltType<Serializable> implements Serializable {
 
-    public static final Class<ExtNidLink> TYPE_EXT = ExtNidLink.class;
+    public static final Class<ExtNidLinkTarget> TYPE_EXT = ExtNidLinkTarget.class;
     public static final Class<Nid> TYPE_NID = Nid.class;
-    public static final Class<NidVer> TYPE_NID_VER = NidVer.class;
+    public static final Class<NidVerLinkTarget> TYPE_NID_VER = NidVerLinkTarget.class;
     public static final Class<IncLinkTarget> TYPE_INC = IncLinkTarget.class;
 
     protected LinkTargetInc() {
@@ -27,8 +27,8 @@ public class LinkTargetInc extends WrappedAltType<Serializable> implements Seria
         super(data);
     }
 
-    public static LinkTargetInc extNid(ExtNidLink extNidLink) {
-        return new LinkTargetInc(extNidLink);
+    public static LinkTargetInc extNid(ExtNidLinkTarget extNidLinkTarget) {
+        return new LinkTargetInc(extNidLinkTarget);
     }
 
     public static LinkTargetInc nid(Nid nid) {
@@ -36,7 +36,11 @@ public class LinkTargetInc extends WrappedAltType<Serializable> implements Seria
     }
 
     public static LinkTargetInc nidVer(NidVer nidVer) {
-        return new LinkTargetInc(nidVer);
+        return new LinkTargetInc(NidVerLinkTarget.versioned(nidVer));
+    }
+
+    public static LinkTargetInc nidVerUnversioned(NidVer nidVer) {
+        return new LinkTargetInc(NidVerLinkTarget.unversioned(nidVer));
     }
 
     public static LinkTargetInc incVer(IncNid incNid) {

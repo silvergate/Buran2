@@ -1,6 +1,5 @@
 package com.dcrux.buran.refimpl.baseModules.common;
 
-import com.dcrux.buran.common.INid;
 import com.dcrux.buran.common.Version;
 
 import java.io.Serializable;

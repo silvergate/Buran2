@@ -10,16 +10,16 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 05.08.13 Time: 01:10
  */
-public class ExtNidLink implements Serializable {
+public class ExtNidLinkTarget implements Serializable {
     private IExtNidOrNidVer extNidOrNidVer;
     private ClassId targetClassId;
 
-    public ExtNidLink(IExtNidOrNidVer extNidOrNidVer, ClassId targetClassId) {
+    public ExtNidLinkTarget(IExtNidOrNidVer extNidOrNidVer, ClassId targetClassId) {
         this.extNidOrNidVer = extNidOrNidVer;
         this.targetClassId = targetClassId;
     }
 
-    private ExtNidLink() {
+    private ExtNidLinkTarget() {
     }
 
     public IExtNidOrNidVer getExtNidOrNidVer() {

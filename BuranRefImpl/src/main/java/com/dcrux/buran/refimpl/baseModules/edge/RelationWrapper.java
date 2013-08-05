@@ -9,6 +9,7 @@ import com.dcrux.buran.common.edges.targets.EdgeTargetInc;
 import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.common.INid;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
