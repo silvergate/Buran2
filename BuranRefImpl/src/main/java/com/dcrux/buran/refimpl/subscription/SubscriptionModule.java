@@ -15,7 +15,7 @@ import java.util.Map;
  * @author: ${USER} Date: 17.07.13 Time: 01:49
  */
 public class SubscriptionModule {
-    private final KeyGenModule keyGenModule = new KeyGenModule();
+    private final KeyGenModule keyGenModule = new KeyGenModule(null);
     private final Map<UserId, SubRegistry> registriesUnsynced = new HashMap<>();
     private final Map<UserId, SubRegistry> registries =
             Collections.synchronizedMap(this.registriesUnsynced);

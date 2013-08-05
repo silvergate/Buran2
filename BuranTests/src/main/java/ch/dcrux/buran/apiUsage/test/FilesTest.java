@@ -66,4 +66,9 @@ public class FilesTest {
         System.out.println("File Size: " + size + ", should be: " + avail);
         is.close();
     }
+
+    public void findByTitle()
+            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
+        descModule.findByTitle("Windows");
+    }
 }

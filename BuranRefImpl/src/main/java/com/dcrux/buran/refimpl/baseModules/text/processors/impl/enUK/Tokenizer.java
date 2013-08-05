@@ -51,12 +51,12 @@ public class Tokenizer extends StdTokenizer {
                         begin = i;
                     }
                 } else {
-
                     closeTokenIfPossible = true;
                 }
 
                 /* Close if last character */
-                if (i + 1 == input.length()) {
+                final boolean isLastCharacter = (i + 1 == input.length());
+                if (isLastCharacter) {
                     closeTokenIfPossible = true;
                 }
 
@@ -87,7 +87,13 @@ public class Tokenizer extends StdTokenizer {
                         }
 
                         if (process) {
-                            final String tokenIn = input.substring(begin, i);
+                            final int end;
+                            if (isLastCharacter) {
+                                end = i + 1;
+                            } else {
+                                end = i;
+                            }
+                            final String tokenIn = input.substring(begin, end);
                             if (token != null) {
                                 callback.nextToken(token, false);
                             }

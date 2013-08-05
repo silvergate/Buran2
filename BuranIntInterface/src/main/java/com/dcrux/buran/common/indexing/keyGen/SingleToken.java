@@ -7,6 +7,7 @@ import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
  *
  * @author: ${USER} Date: 09.07.13 Time: 21:33
  */
+@Deprecated
 public class SingleToken implements ITokenInput {
     private TextFunction.FuzzinessType fuzzinessType;
     private String token;

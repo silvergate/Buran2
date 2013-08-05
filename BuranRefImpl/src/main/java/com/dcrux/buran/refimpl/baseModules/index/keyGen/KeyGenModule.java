@@ -3,7 +3,10 @@ package com.dcrux.buran.refimpl.baseModules.index.keyGen;
 import com.dcrux.buran.common.indexing.keyGen.IKeyGen;
 import com.dcrux.buran.common.indexing.keyGen.ISingleIndexKeyGen;
 import com.dcrux.buran.common.indexing.keyGen.RangeIndexKeyGen;
+import com.dcrux.buran.common.indexing.keyGen.Tokens;
+import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.text.processors.KeyRange;
 
 import java.nio.ByteBuffer;
 
@@ -12,9 +15,9 @@ import java.nio.ByteBuffer;
  *
  * @author: ${USER} Date: 09.07.13 Time: 22:58
  */
-public class KeyGenModule extends Module<Void> {
-    public KeyGenModule() {
-        super(null);
+public class KeyGenModule extends Module<BaseModule> {
+    public KeyGenModule(BaseModule baseModule) {
+        super(baseModule);
     }
 
     private byte[] getKeyAsBinary(ISingleIndexKeyGen singleIndexKeyGen) {
@@ -43,6 +46,14 @@ public class KeyGenModule extends Module<Void> {
                         getKeyAsBinary(rangeIndexKeyGen.getTo()));
             } else {
                 throw new IllegalArgumentException("No begin and no end.");
+            }
+        } else if (keyGen instanceof Tokens) {
+            final Tokens tokens = (Tokens) keyGen;
+            final KeyRange key = getBase().getTextModule().generateKey(tokens.getTokens());
+            if (key == null) {
+                return new MapKey(false, new byte[]{}, false, new byte[]{});
+            } else {
+                return new MapKey(true, key.getStartKey(), true, key.getEndKey());
             }
         } else {
             throw new IllegalArgumentException(

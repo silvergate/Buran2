@@ -11,6 +11,8 @@ import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.CommitResult;
+import com.dcrux.buran.commands.indexing.ComQuery;
+import com.dcrux.buran.commands.indexing.QueryResult;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
@@ -31,6 +33,7 @@ import com.dcrux.buran.common.inRelations.selector.InRelSelTarget;
 import com.dcrux.buran.common.inRelations.where.InRelWhereClassId;
 import com.dcrux.buran.common.inRelations.where.InRelWhereVersioned;
 import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.keyGen.Tokens;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
 import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
@@ -177,8 +180,16 @@ public class DescModule extends Module<BaseModule> {
         return getTitle(nid);
     }
 
-    public void findByTitle(String query) {
-
+    public void findByTitle(String query)
+            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
+        ComQuery cq = ComQuery.c(getDescClassId(), INDEX_BY_TITLE, Tokens.c(query));
+        final QueryResult result = getBase().sync(cq);
+        for (NidVer nidVer : result.getResults()) {
+            System.out.println("    -DESCRIPTION FOUND: " + nidVer);
+        }
+        if (result.getResults().isEmpty()) {
+            System.out.println("    -DESCRIPTION FOUND: NONE");
+        }
     }
 
     public String getTitle(NidVer nid)

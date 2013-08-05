@@ -29,6 +29,10 @@ public class ComQuery extends Command<QueryResult> {
         this.keyGen = keyGen;
     }
 
+    public static ComQuery c(ClassId classId, ClassIndexName classIndexName, IKeyGen keyGen) {
+        return new ComQuery(classId, classIndexName, keyGen);
+    }
+
     public IKeyGen getKeyGen() {
         return keyGen;
     }

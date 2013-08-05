@@ -79,6 +79,7 @@ public class Test2 {
 
         final FilesTest filesTest = new FilesTest(bm);
         filesTest.createAndReadDesc();
+        filesTest.findByTitle();
 
         bcr.shutdown();
 

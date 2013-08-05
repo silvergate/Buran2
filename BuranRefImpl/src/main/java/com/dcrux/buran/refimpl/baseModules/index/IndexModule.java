@@ -27,10 +27,11 @@ public class IndexModule extends Module<BaseModule> {
     private final MapFunEvaluator mapFunEvaluator = new MapFunEvaluator(getBase());
     private final IndexImpl indexImpl = new IndexImpl(getBase());
     private final MapIndexModule mapIndexModule = new MapIndexModule(getBase());
-    private final KeyGenModule keyGenModule = new KeyGenModule();
+    private final KeyGenModule keyGenModule;
 
     public IndexModule(BaseModule baseModule) {
         super(baseModule);
+        this.keyGenModule = new KeyGenModule(baseModule);
     }
 
     public void setupDb() {
