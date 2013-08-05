@@ -1,6 +1,7 @@
 package com.dcrux.buran.common.indexing.mapInput;
 
 import com.dcrux.buran.common.edges.ClassLabelName;
+import com.dcrux.buran.common.edges.ILabelName;
 import com.dcrux.buran.scripting.iface.VarName;
 
 import java.util.HashMap;
@@ -13,20 +14,25 @@ import java.util.Map;
  */
 public class EdgeMapInput implements IMapInput {
     private Map<VarName, IFieldTarget> fields = new HashMap<VarName, IFieldTarget>();
-    private ClassLabelName classLabelName;
+    private Map<VarName, EdgeFieldTarget> edgeFields = new HashMap<VarName, EdgeFieldTarget>();
+    private ILabelName labelName;
 
-    public EdgeMapInput(ClassLabelName classLabelName) {
-        this.classLabelName = classLabelName;
+    public EdgeMapInput(ClassLabelName labelName) {
+        this.labelName = labelName;
     }
 
     private EdgeMapInput() {
     }
 
-    public ClassLabelName getClassLabelName() {
-        return classLabelName;
+    public ILabelName getLabelName() {
+        return labelName;
     }
 
     public Map<VarName, IFieldTarget> getFields() {
         return fields;
+    }
+
+    public Map<VarName, EdgeFieldTarget> getEdgeFields() {
+        return edgeFields;
     }
 }

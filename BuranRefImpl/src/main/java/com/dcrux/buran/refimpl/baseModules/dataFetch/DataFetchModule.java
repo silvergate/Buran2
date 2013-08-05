@@ -9,6 +9,7 @@ import com.dcrux.buran.common.getterSetter.BulkGet;
 import com.dcrux.buran.common.getterSetter.BulkGetIndex;
 import com.dcrux.buran.common.getterSetter.IBulkGetResult;
 import com.dcrux.buran.common.getterSetter.IDataGetter;
+import com.dcrux.buran.common.inRelations.InRealtionGetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.*;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
@@ -138,6 +139,11 @@ public class DataFetchModule extends Module<BaseModule> {
         if (getter instanceof IEdgeGetter) {
             final IEdgeGetter labelGetter = (IEdgeGetter) getter;
             return getBase().getEdgeModule().performLabelGet(node, labelGetter);
+        }
+
+        if (getter instanceof InRealtionGetter) {
+            return getBase().getNewRelationsModule()
+                    .processGetter(node.getOrid(), (InRealtionGetter) getter);
         }
 
         throw new IllegalArgumentException("Unkown data getter");

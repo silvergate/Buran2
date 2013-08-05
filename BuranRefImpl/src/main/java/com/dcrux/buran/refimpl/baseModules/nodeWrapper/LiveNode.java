@@ -39,6 +39,7 @@ public class LiveNode extends CommonNode {
         getDocument().field(FIELD_VERSION, version + 1, OType.LONG);
     }
 
+    @Deprecated
     public NidVerOld getNidVer() {
         final INid nid = getNid();
         final Version version = getVersion();

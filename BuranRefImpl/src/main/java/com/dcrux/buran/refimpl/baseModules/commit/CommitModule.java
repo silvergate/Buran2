@@ -4,7 +4,13 @@ import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.Version;
+import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.IncNodeNotFound;
+import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
+import com.dcrux.buran.common.fields.FieldIndex;
+import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
@@ -13,6 +19,10 @@ import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.IRecordPlayer;
+import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
+import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformerRegistry;
+import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
+import com.dcrux.buran.refimpl.baseModules.fields.IFieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionWrapper;
@@ -20,6 +30,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.sun.istack.internal.Nullable;
 
 import java.util.*;
@@ -155,6 +167,9 @@ public class CommitModule extends Module<BaseModule> {
                     .commit(entry.getLiveNode(), additional, commitInfo, changeTracker);
         }
 
+        /* Validate and commit fields */
+        validateAndCommitFields(sender, commitInfo);
+
         /* Remove incubation */
         for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
             if (entry.isUpdate()) {
@@ -164,6 +179,10 @@ public class CommitModule extends Module<BaseModule> {
 
         /* Clear deleted nodes */
         for (final LiveNode nodeMarkedForDeletion : nodesMarkedAsDeleted) {
+            /* Remove relations */
+            getBase().getNewRelationsModule().removeAllRelations(nodeMarkedForDeletion.getOrid());
+
+            /* Remove node document */
             nodeMarkedForDeletion.deleteNow();
             nodeMarkedForDeletion.getDocument().save();
             //TODO: Hier müssen auch noch die edges entfernt werden (nicht nur die node)!
@@ -171,6 +190,47 @@ public class CommitModule extends Module<BaseModule> {
 
         return new CommitResult(result, removeFromIndexCauseRemoved, removeFromIndexCauseUpdated,
                 addToIndex);
+    }
+
+    private void validateAndCommitFields(UserId sender, final CommitInfo commitInfo)
+            throws NodeClassNotFoundException, FieldConstraintViolationInt {
+             /* Validate and commit nodes */
+        final ICommitInfo newCommitInfo = new ICommitInfo() {
+            @Override
+            public ORID getNidVerByIncNid(ORID incNid) {
+                final CommitInfo.CommitEntry cInfoEntry = commitInfo.getByIncNid(incNid);
+                if (cInfoEntry == null) {
+                    return null;
+                }
+                return new ORecordId(cInfoEntry.getNidVer().getAsString());
+            }
+
+            @Override
+            public ORID getNidByIncNid(ORID incNid) {
+                final CommitInfo.CommitEntry cInfoEntry = commitInfo.getByIncNid(incNid);
+                if (cInfoEntry == null) {
+                    return null;
+                }
+                return cInfoEntry.getLiveNode().getNid().getRecordId();
+            }
+        };
+
+        for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
+            final LiveNode node = entry.getLiveNode();
+            final ClassId classId = node.getClassId();
+            final ClassDefinition classDef = getBase().getClassesModule().getClassDefById(classId);
+            for (final Map.Entry<FieldIndex, ClassFieldsDefinition.FieldEntry> fieldEntry : classDef
+                    .getFields().getFieldEntries().entrySet()) {
+                final ITypeDef typeDef = fieldEntry.getValue().getTypeDef();
+                final FieldPerformerRegistry registry =
+                        getBase().getFieldsModule().getFieldPerformerRegistry();
+                final IFieldPerformer<ITypeDef> performer =
+                        (IFieldPerformer<ITypeDef>) registry.get(typeDef.getClass());
+                performer.validateAndCommit(getBase(), sender, node, classDef, typeDef,
+                        fieldEntry.getValue(), fieldEntry.getKey(), newCommitInfo);
+            }
+
+        }
     }
 
     private void removeIncNode(final ONid incNid) {

@@ -17,6 +17,11 @@ public class FieldSetter implements IFieldSetter {
         return c(FieldIndex.c(index), setter);
     }
 
+    public static FieldSetter c() {
+        final FieldSetter bs = new FieldSetter();
+        return bs;
+    }
+
     public static FieldSetter c(FieldIndex index, IUnfieldedDataSetter setter) {
         final FieldSetter bs = new FieldSetter();
         bs.add(index, setter);

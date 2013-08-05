@@ -16,25 +16,37 @@ import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classes.ClassId;
-import com.dcrux.buran.common.edges.ClassLabelName;
-import com.dcrux.buran.common.edges.IEdgeTargetInc;
-import com.dcrux.buran.common.edges.LabelIndex;
-import com.dcrux.buran.common.edges.getter.GetInClassEdge;
-import com.dcrux.buran.common.edges.getter.GetInClassEdgeResult;
-import com.dcrux.buran.common.edges.setter.SetEdge;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetStr;
 import com.dcrux.buran.common.fields.getter.SingleGet;
-import com.dcrux.buran.common.fields.setter.FieldSetInt;
+import com.dcrux.buran.common.fields.setter.FieldSetLink;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
-import com.dcrux.buran.common.fields.types.IntegerType;
+import com.dcrux.buran.common.fields.types.LinkType;
 import com.dcrux.buran.common.fields.types.StringType;
-import com.dcrux.buran.common.getterSetter.BulkSet;
+import com.dcrux.buran.common.inRelations.InRealtionGetter;
+import com.dcrux.buran.common.inRelations.InRelationResult;
+import com.dcrux.buran.common.inRelations.selector.InRelSelCount;
+import com.dcrux.buran.common.inRelations.selector.InRelSelTarget;
+import com.dcrux.buran.common.inRelations.where.InRelWhereClassId;
+import com.dcrux.buran.common.inRelations.where.InRelWhereVersioned;
+import com.dcrux.buran.common.indexing.IndexDefinition;
+import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
+import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
+import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
+import com.dcrux.buran.common.indexing.mapStore.MapIndex;
+import com.dcrux.buran.common.link.LinkTargetInc;
+import com.dcrux.buran.scripting.functions.FunGet;
+import com.dcrux.buran.scripting.functions.FunRet;
+import com.dcrux.buran.scripting.functions.integer.FunIntLit;
+import com.dcrux.buran.scripting.functions.integer.FunIntToBin;
+import com.dcrux.buran.scripting.functions.list.FunListNew;
+import com.dcrux.buran.scripting.iface.Block;
+import com.dcrux.buran.scripting.iface.VarName;
 import com.google.common.base.Optional;
+import com.sun.istack.internal.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * Buran.
@@ -45,11 +57,12 @@ public class DescModule extends Module<BaseModule> {
 
     private ClassId fileClassId;
 
-    public static final FieldIndex FIELD_TARGET_CLASSID = FieldIndex.c(3);
+    //public static final FieldIndex FIELD_TARGET_CLASSID = FieldIndex.c(3);
     public static final FieldIndex FIELD_TITLE = FieldIndex.c(0);
     public static final FieldIndex FIELD_LONG_DESC = FieldIndex.c(1);
-    public static final ClassLabelName FIELD_TARGET = ClassLabelName.c(0);
-    public static final LabelIndex FIELD_TARGET_LI = LabelIndex.c(0);
+    public static final FieldIndex FIELD_DESCRIBES = FieldIndex.c(2);
+    //public static final ClassLabelName FIELD_TARGET = ClassLabelName.c(0);
+    //public static final LabelIndex FIELD_TARGET_LI = LabelIndex.c(0);
 
     public DescModule(BaseModule baseModule) {
         super(baseModule);
@@ -60,12 +73,30 @@ public class DescModule extends Module<BaseModule> {
                 "Eine node welche eine andere node beschreibt.");
         classDef.getFields().add(FIELD_TITLE, new StringType(0, 255), false)
                 .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false)
-                .add(FIELD_TARGET_CLASSID, IntegerType.cInt64Range(), false);
+                .add(FIELD_DESCRIBES, LinkType.c(), false);
         return classDef;
     }
 
-    public IncNid describe(Optional<NidVer> toUpdate, final String shortDesc,
-            final ClassId targetClassId, final IEdgeTargetInc target)
+    private IndexDefinition getIndexByFileSize() {
+        final VarName fsVarName = VarName.c("fileSize");
+        final NodeMapInput mapInput = new NodeMapInput();
+        mapInput.getFields().put(fsVarName, FieldTarget.cRequired(FIELD_TITLE));
+
+        Block mapBlock = new Block();
+        mapBlock.add(FunRet.c(FunListNew.c().add(FunIntToBin
+                .c(FunGet.c(fsVarName, com.dcrux.buran.scripting.iface.types.IntegerType.class),
+                        com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
+                .add(FunIntLit.c(0)).get()));
+
+        MapFunction mapFunction = MapFunction.single(mapBlock);
+        MapIndex mapIndex = new MapIndex(true);
+
+        final IndexDefinition indexDefinition =
+                new IndexDefinition(mapInput, mapFunction, mapIndex);
+        return indexDefinition;
+    }
+
+    public IncNid describe(Optional<NidVer> toUpdate, final String shortDesc, LinkTargetInc target)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         final String shortDescFinal;
         if (shortDesc.length() > 255) {
@@ -85,9 +116,8 @@ public class DescModule extends Module<BaseModule> {
         final IncNid incNid = (IncNid) getBase().sync(updateCommand);
 
         ComMutate cm = ComMutate.c(incNid,
-                BulkSet.c(SetEdge.c(FIELD_TARGET).add(FIELD_TARGET_LI, target)).add(FieldSetter
-                        .c(FIELD_TARGET_CLASSID, FieldSetInt.c(targetClassId.getId()))
-                        .add(FIELD_TITLE, FieldSetStr.c(shortDescFinal))));
+                FieldSetter.c().add(FIELD_TITLE, FieldSetStr.c(shortDescFinal))
+                        .add(FIELD_DESCRIBES, FieldSetLink.c(target)));
         getBase().sync(cm);
 
         return incNid;
@@ -100,7 +130,7 @@ public class DescModule extends Module<BaseModule> {
         return commitResult.getNid(descNode);
     }
 
-    public Set<Nid> getDescriptions(final NidVer forNode, boolean versioned)
+    /*public Set<Nid> getDescriptions(final NidVer forNode, boolean versioned)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         final ClassId classId = getDescClassId();
         final ComFetch<GetInClassEdgeResult> comFetch = ComFetch.c(forNode,
@@ -112,24 +142,41 @@ public class DescModule extends Module<BaseModule> {
             sources.add(entry.getSource());
         }
         return sources;
+    } */
+
+    @Nullable
+    public Nid getDescription(final NidVer forNode)
+            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
+        final InRealtionGetter<ArrayList<Nid>> getter =
+                InRealtionGetter.<ArrayList<Nid>>select(InRelSelTarget.SINGLETON).limit(1)
+                        .unversioned()
+                        .where(InRelWhereClassId.withFieldIndex(getDescClassId(), FIELD_DESCRIBES))
+                        .get();
+        ComFetch<InRelationResult<ArrayList<Nid>>> comFetch = ComFetch.c(forNode, getter);
+        final InRelationResult<ArrayList<Nid>> results = getBase().sync(comFetch);
+
+
+        final InRealtionGetter<Integer> countGetter =
+                InRealtionGetter.<Integer>select(InRelSelCount.SINGLETON).limit(1).unversioned()
+                        .where(InRelWhereVersioned.SINGLETON).get();
+        ComFetch<InRelationResult<Integer>> comFetch1 = ComFetch.c(forNode, countGetter);
+        getBase().sync(comFetch1);
+
+        if (results.getResult().isEmpty()) {
+            return null;
+        } else {
+            return results.getResult().get(0);
+        }
     }
 
     public String getBestDescription(final NidVer forNode, final String alternative)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        final Set<Nid> verResults = getDescriptions(forNode, true);
-        if (verResults.isEmpty()) {
-            /* Unversioned results */
-            final Set<Nid> unVerResults = getDescriptions(forNode, false);
-            if (!unVerResults.isEmpty()) {
-                return getTitle(unVerResults.iterator().next());
-
-            } else {
-                return alternative;
-            }
-
-        } else {
-            return getTitle(verResults.iterator().next());
+        final Nid nid = getDescription(forNode);
+        if (nid == null) {
+            System.out.println("No description found for Node: " + forNode);
+            return alternative;
         }
+        return getTitle(nid);
     }
 
     public String getTitle(Nid nid)

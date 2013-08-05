@@ -10,6 +10,9 @@ import java.io.Serializable;
 public class FieldIndex implements Serializable {
     private short index;
 
+    public static final FieldIndex MIN = new FieldIndex(Short.MIN_VALUE);
+    public static final FieldIndex MAX = new FieldIndex(Short.MAX_VALUE);
+
     public FieldIndex(short index) {
         this.index = index;
     }

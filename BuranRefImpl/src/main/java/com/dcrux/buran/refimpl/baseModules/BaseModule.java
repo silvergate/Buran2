@@ -12,6 +12,7 @@ import com.dcrux.buran.refimpl.baseModules.edge.EdgeModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
+import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsModule;
 import com.dcrux.buran.refimpl.baseModules.nodes.NodesModule;
 import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
@@ -52,6 +53,7 @@ public class BaseModule {
     private final NodesModule nodesModule = new NodesModule(this);
     private final ICallbackCommandReceiver callbackReceiver;
     private final SubscriptionModule subscriptionModule;
+    private final NewRelationsModule newRelationsModule = new NewRelationsModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -69,6 +71,7 @@ public class BaseModule {
         this.deltaRecorderModule.setupDb();
         this.versionsModule.setupDb();
         this.indexModule.setupDb();
+        this.newRelationsModule.setupDb();
     }
 
     public ODatabaseDocument getDb() {
@@ -186,5 +189,9 @@ public class BaseModule {
 
     public SubscriptionModule getSubscriptionModule() {
         return subscriptionModule;
+    }
+
+    public NewRelationsModule getNewRelationsModule() {
+        return newRelationsModule;
     }
 }

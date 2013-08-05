@@ -1,11 +1,13 @@
 package com.dcrux.buran.common;
 
+import com.dcrux.buran.utils.AltType;
+
 /**
  * Buran.
  *
  * @author: ${USER} Date: 17.07.13 Time: 10:02
  */
-public class NidVer implements INidCommon, INidOrNidVer {
+public class NidVer extends AltType<INidOrNidVer> implements INidCommon, INidOrNidVer {
 
     private String nidVer;
 

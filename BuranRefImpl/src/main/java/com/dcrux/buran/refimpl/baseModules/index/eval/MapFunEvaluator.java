@@ -34,6 +34,44 @@ public class MapFunEvaluator extends Module<BaseModule> {
         super(baseModule);
     }
 
+    private void readFields(ClassIndexName classIndexName, ClassDefinition classDefinition,
+            Map<IFieldTarget, Object> inputs, CommonNode node, Map<VarName, IFieldTarget> fields,
+            Map<ClassIndexName, Map<VarName, Object>> result) {
+        /* Eval every field */
+        final Map<VarName, Object> varNameObjectMap = new HashMap<>();
+        result.put(classIndexName, varNameObjectMap);
+        for (Map.Entry<VarName, IFieldTarget> fieldEntry : fields.entrySet()) {
+            final IFieldTarget fieldTarget = fieldEntry.getValue();
+            final Object value;
+            if (!inputs.containsKey(fieldTarget)) {
+                if (fieldTarget instanceof FieldTarget) {
+                    final FieldTarget fieldTargetCast = (FieldTarget) fieldTarget;
+                    final boolean hasValue = node.hasField(fieldTargetCast.getField());
+                    if ((!hasValue) && (fieldTargetCast.isRequired())) {
+                           /* Index gen abort */
+                        result.remove(classIndexName);
+                        //TODO: Falsch, da ein index-input auch kein feld haben kann.
+                        break;
+                    } else {
+                        value = getBase().getFieldsModule()
+                                .performUnfieldedGetter(new LiveNode(node.getDocument()),
+                                        classDefinition, fieldTargetCast.getField(),
+                                        FieldGetPrim.SINGLETON);
+                        //value = node.getFieldValue(fieldTargetCast.getField());
+                        inputs.put(fieldTarget, value);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Unknown IFieldTarget");
+                }
+            } else {
+                value = inputs.get(fieldTarget);
+            }
+
+                /* Add value to set */
+            varNameObjectMap.put(fieldEntry.getKey(), value);
+        }
+    }
+
     private Map<ClassIndexName, Map<VarName, Object>> fetchNodeInputs(
             ClassDefinition classDefinition, CommonNode node) {
         final ClassIndexDefinition cid = classDefinition.getIndexes();
@@ -55,39 +93,7 @@ public class MapFunEvaluator extends Module<BaseModule> {
                 throw new IllegalArgumentException("Unknown map input-type");
             }
 
-            /* Eval every field */
-            final Map<VarName, Object> varNameObjectMap = new HashMap<>();
-            result.put(entry.getKey(), varNameObjectMap);
-            for (Map.Entry<VarName, IFieldTarget> fieldEntry : fields.entrySet()) {
-                final IFieldTarget fieldTarget = fieldEntry.getValue();
-                final Object value;
-                if (!inputs.containsKey(fieldTarget)) {
-                    if (fieldTarget instanceof FieldTarget) {
-                        final FieldTarget fieldTargetCast = (FieldTarget) fieldTarget;
-                        final boolean hasValue = node.hasField(fieldTargetCast.getField());
-                        if ((!hasValue) && (fieldTargetCast.isRequired())) {
-                           /* Index gen abort */
-                            result.remove(entry.getKey());
-                            //TODO: Falsch, da ein index-input auch kein feld haben kann.
-                            break;
-                        } else {
-                            value = getBase().getFieldsModule()
-                                    .performUnfieldedGetter(new LiveNode(node.getDocument()),
-                                            classDefinition, fieldTargetCast.getField(),
-                                            FieldGetPrim.SINGLETON);
-                            //value = node.getFieldValue(fieldTargetCast.getField());
-                            inputs.put(fieldTarget, value);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Unknown IFieldTarget");
-                    }
-                } else {
-                    value = inputs.get(fieldTarget);
-                }
-
-                /* Add value to set */
-                varNameObjectMap.put(fieldEntry.getKey(), value);
-            }
+            readFields(entry.getKey(), classDefinition, inputs, node, fields, result);
         }
         return result;
     }

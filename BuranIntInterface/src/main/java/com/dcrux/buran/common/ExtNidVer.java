@@ -1,5 +1,7 @@
 package com.dcrux.buran.common;
 
+import com.dcrux.buran.utils.AltType;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +9,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 24.07.13 Time: 10:38
  */
-public class ExtNidVer implements IExtNidOrNidVer, Serializable {
+public class ExtNidVer extends AltType<IExtNidOrNidVer> implements IExtNidOrNidVer, Serializable {
     private UserId account;
     private NidVer nidVer;
 

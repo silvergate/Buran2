@@ -33,8 +33,6 @@ public class IncubationModule extends Module<BaseModule> {
         return incubationNode.getIncNid();
     }
 
-    ;
-
     public OIncNid createIncUpdate(final UserId sender, ONidVer nidVerToUpdate)
             throws NodeNotFoundException {
         final LiveNode nodeToUpdate = getBase().getDataFetchModule().getNode(nidVerToUpdate);
@@ -44,8 +42,6 @@ public class IncubationModule extends Module<BaseModule> {
         incubationNode.getDocument().save();
         return incubationNode.getIncNid();
     }
-
-    ;
 
     public IncubationNode getIncNodeReq(final UserId sender, IncNid nid) throws IncNodeNotFound {
         final Optional<IncubationNode> incNode = getIncNode(sender, nid);

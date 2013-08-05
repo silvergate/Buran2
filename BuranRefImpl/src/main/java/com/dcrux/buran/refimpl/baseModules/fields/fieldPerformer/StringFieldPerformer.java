@@ -15,6 +15,7 @@ import com.dcrux.buran.common.fields.types.StringType;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
+import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.metadata.schema.OType;
@@ -58,9 +59,10 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
     }
 
     @Override
-    public void performCheck(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            StringType stringType, ClassFieldsDefinition.FieldEntry fieldEntry,
-            FieldIndex fieldIndex) throws FieldConstraintViolationInt {
+    public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, StringType stringType,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             Object value = node.getFieldValue(fieldIndex, OType.STRING);
             if (value == null) {

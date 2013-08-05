@@ -2,6 +2,7 @@ package com.dcrux.buran.refimpl.baseModules.fields;
 
 import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.BinaryFieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.IntegerFieldPerformer;
+import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.LinkFieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.StringFieldPerformer;
 
 /**
@@ -14,6 +15,6 @@ public class FieldPerformerRegistryUtil {
         registry.register(StringFieldPerformer.SINGLETON);
         registry.register(IntegerFieldPerformer.SINGLETON);
         registry.register(BinaryFieldPerformer.SINGLETON);
-
+        registry.register(LinkFieldPerformer.SINGLETON);
     }
 }

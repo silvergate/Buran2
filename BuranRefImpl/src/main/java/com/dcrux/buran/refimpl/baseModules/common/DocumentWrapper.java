@@ -30,4 +30,11 @@ public class DocumentWrapper {
     public String getOrientClassName() {
         return getDocument().getClassName();
     }
+
+    @Override
+    public String toString() {
+        return "DocumentWrapper{" +
+                "document=" + document +
+                '}';
+    }
 }

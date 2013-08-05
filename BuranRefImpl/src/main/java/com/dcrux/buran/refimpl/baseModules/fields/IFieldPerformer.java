@@ -25,9 +25,10 @@ public interface IFieldPerformer<TFieldType extends ITypeDef> {
             ClassDefinition classDefinition, TFieldType fieldType, FieldIndex fieldIndex,
             IUnfieldedDataSetter setter) throws FieldConstraintViolationInt;
 
-    void performCheck(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            TFieldType fieldType, ClassFieldsDefinition.FieldEntry fieldEntry,
-            FieldIndex fieldIndex) throws FieldConstraintViolationInt;
+    void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, TFieldType fieldType,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ICommitInfo commitInfo) throws FieldConstraintViolationInt;
 
     Serializable performGetter(BaseModule baseModule, LiveNode node,
             ClassDefinition classDefinition, TFieldType fieldType, FieldIndex fieldIndex,

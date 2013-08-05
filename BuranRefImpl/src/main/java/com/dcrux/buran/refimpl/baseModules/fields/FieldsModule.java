@@ -42,6 +42,10 @@ public class FieldsModule extends Module<BaseModule> {
         super(baseModule);
     }
 
+    public FieldPerformerRegistry getFieldPerformerRegistry() {
+        return REGISTRY;
+    }
+
     public boolean performSetter(UserId sender, CommonNode node, IFieldSetter dataSetter,
             IChangeTracker changeTracker)
             throws NodeClassNotFoundException, FieldConstraintViolationInt {

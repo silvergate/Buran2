@@ -16,6 +16,7 @@ import com.dcrux.buran.common.fields.types.BinaryType;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
+import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.binary.BinaryUtil;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
@@ -80,9 +81,10 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
     }
 
     @Override
-    public void performCheck(UserId sender, CommonNode node, ClassDefinition classDefinition,
-            BinaryType binaryType, ClassFieldsDefinition.FieldEntry fieldEntry,
-            FieldIndex fieldIndex) throws FieldConstraintViolationInt {
+    public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
+            ClassDefinition classDefinition, BinaryType binaryType,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             boolean exists = BinaryUtil.exists(node, fieldIndex);
             if (!exists) {
