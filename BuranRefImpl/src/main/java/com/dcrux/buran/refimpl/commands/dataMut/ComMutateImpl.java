@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.commands.dataMut;
 import com.dcrux.buran.commandBase.VoidType;
 import com.dcrux.buran.commands.dataMut.ComMutate;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.changeTracker.NullChangeTracker;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
 
 /**
@@ -23,7 +22,7 @@ public class ComMutateImpl extends TransactionalCommand<VoidType, ComMutate> {
     protected VoidType transactional(ComMutate command, BaseModule baseModule) throws Exception {
         baseModule.getDataMutModule()
                 .setData(baseModule.getAuthModule().getSender(), command.getIncNid(),
-                        command.getSetter(), NullChangeTracker.SINGLETON);
+                        command.getSetter());
         return VoidType.SINGLETON;
     }
 }

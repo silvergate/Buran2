@@ -4,7 +4,6 @@ import com.dcrux.buran.common.INidOrNidVer;
 import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.Version;
-import com.dcrux.buran.common.edges.IEdgeGetter;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.IFieldGetter;
@@ -137,11 +136,6 @@ public class DataFetchModule extends Module<BaseModule> {
         if (getter instanceof IFieldGetter) {
             final IFieldGetter fieldGetter = (IFieldGetter) getter;
             return (TRetVal) getBase().getFieldsModule().performGetter(node, fieldGetter);
-        }
-
-        if (getter instanceof IEdgeGetter) {
-            final IEdgeGetter labelGetter = (IEdgeGetter) getter;
-            return getBase().getEdgeModule().performLabelGet(node, labelGetter);
         }
 
         if (getter instanceof InRealtionGetter) {

@@ -6,7 +6,10 @@ import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
-import com.dcrux.buran.common.indexing.mapInput.*;
+import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
+import com.dcrux.buran.common.indexing.mapInput.IFieldTarget;
+import com.dcrux.buran.common.indexing.mapInput.IMapInput;
+import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
@@ -86,9 +89,6 @@ public class MapFunEvaluator extends Module<BaseModule> {
             if (mapInput instanceof NodeMapInput) {
                 NodeMapInput nodeMapInput = (NodeMapInput) mapInput;
                 fields = nodeMapInput.getFields();
-            } else if (mapInput instanceof EdgeMapInput) {
-                EdgeMapInput edgeMapInput = (EdgeMapInput) mapInput;
-                fields = edgeMapInput.getFields();
             } else {
                 throw new IllegalArgumentException("Unknown map input-type");
             }

@@ -2,7 +2,6 @@ package com.dcrux.buran.refimpl.baseModules.dataMut;
 
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.UserId;
-import com.dcrux.buran.common.edges.IEdgeSetter;
 import com.dcrux.buran.common.exceptions.IncNodeNotFound;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
@@ -11,7 +10,6 @@ import com.dcrux.buran.common.getterSetter.BulkSet;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.common.nodes.INodeSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
@@ -34,8 +32,7 @@ public class DataMutModule extends Module<BaseModule> {
     }
 
     public boolean setDataDirect(final UserId sender, final CommonNode node,
-            final IDataSetter setter, @Nullable final Set<OIdentifiable> outCommittableRelations,
-            IChangeTracker changeTracker)
+            final IDataSetter setter, @Nullable final Set<OIdentifiable> outCommittableRelations)
             throws NodeClassNotFoundException, FieldConstraintViolationInt, NodeNotFoundException,
             IncNodeNotFound {
 
@@ -44,7 +41,7 @@ public class DataMutModule extends Module<BaseModule> {
             boolean saveNode = false;
             for (final IDataSetter entry : bulkSet.getDataSetterSet()) {
                 final boolean needNodeSave =
-                        setDataDirect(sender, node, entry, outCommittableRelations, changeTracker);
+                        setDataDirect(sender, node, entry, outCommittableRelations);
                 if (needNodeSave) {
                     saveNode = true;
                 }
@@ -54,15 +51,8 @@ public class DataMutModule extends Module<BaseModule> {
 
         if (setter instanceof IFieldSetter) {
             final IFieldSetter fieldSetter = (IFieldSetter) setter;
-            getBase().getFieldsModule().performSetter(sender, node, fieldSetter, changeTracker);
+            getBase().getFieldsModule().performSetter(sender, node, fieldSetter);
             return true;
-        }
-
-        if (setter instanceof IEdgeSetter) {
-            final IEdgeSetter labelSetter = (IEdgeSetter) setter;
-            getBase().getEdgeModule()
-                    .performLabelSet(sender, node, labelSetter, outCommittableRelations);
-            return false;
         }
 
         if (setter instanceof INodeSetter) {
@@ -79,8 +69,7 @@ public class DataMutModule extends Module<BaseModule> {
         getBase().getDeltaRecorderModule().record(node, setter);
     }
 
-    public void setData(UserId sender, IncNid incNid, IDataSetter setter,
-            IChangeTracker changeTracker)
+    public void setData(UserId sender, IncNid incNid, IDataSetter setter)
             throws IncNodeNotFound, NodeClassNotFoundException, FieldConstraintViolationInt,
             NodeNotFoundException {
         final Optional<IncubationNode> iNode =
@@ -94,7 +83,7 @@ public class DataMutModule extends Module<BaseModule> {
             setDataIndirect(sender, node, setter);
         } else {
             /* Is not an update, can set data directly */
-            final boolean needSaveNode = setDataDirect(sender, node, setter, null, changeTracker);
+            final boolean needSaveNode = setDataDirect(sender, node, setter, null);
             if (needSaveNode) {
                 iNode.get().getDocument().save();
             }

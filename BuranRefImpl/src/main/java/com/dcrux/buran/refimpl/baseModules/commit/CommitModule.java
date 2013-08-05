@@ -13,8 +13,6 @@ import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.changeTracker.IChangeTracker;
-import com.dcrux.buran.refimpl.baseModules.changeTracker.NullChangeTracker;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
@@ -47,23 +45,21 @@ public class CommitModule extends Module<BaseModule> {
     }
 
     private void playRecordedDeltas(final UserId sender, final IncubationNode incubationNode,
-            final LiveNode applyTo, @Nullable final Set<OIdentifiable> outCommittableRelations,
-            final IChangeTracker changeTracker) throws Exception {
+            final LiveNode applyTo, @Nullable final Set<OIdentifiable> outCommittableRelations)
+            throws Exception {
         getBase().getDeltaRecorderModule()
                 .playRecords(incubationNode.getNid(), new IRecordPlayer() {
 
                     @Override
                     public void entry(ONid onid, IDataSetter setter) throws Exception {
                         getBase().getDataMutModule()
-                                .setDataDirect(sender, applyTo, setter, outCommittableRelations,
-                                        changeTracker);
+                                .setDataDirect(sender, applyTo, setter, outCommittableRelations);
                     }
                 });
     }
 
     private LiveNode commitNode(final UserId sender, final IncubationNode incubationNode,
             @Nullable final Set<OIdentifiable> outCommittableRelations,
-            IChangeTracker changeTracker,
             Collection<CommitResult.IndexResult> outRemoveFromIndexCauseRemoved,
             Collection<CommitResult.IndexResult> outRemoveFromIndexCauseUpdate,
             Collection<CommitResult.IndexResult> outAddToIndex, ONidVer[] outNidVer)
@@ -74,7 +70,6 @@ public class CommitModule extends Module<BaseModule> {
             final LiveNode storeNode = new LiveNode(incubationNode.getDocument());
             storeNode.setVersion(Version.INITIAL);
             incubationNode.getDocument().save();
-            changeTracker.newNode(storeNode);
 
             /* Add version */
             final VersionWrapper addedVers = getBase().getVersionsModule()
@@ -88,11 +83,10 @@ public class CommitModule extends Module<BaseModule> {
             final ONidVer upOnid = incubationNode.getUpdateNid();
             LiveNode up = getBase().getDataFetchModule().getNode(upOnid);
 
-            playRecordedDeltas(sender, incubationNode, up, outCommittableRelations, changeTracker);
+            playRecordedDeltas(sender, incubationNode, up, outCommittableRelations);
 
             up.incVersion();
             up.getDocument().save();
-            changeTracker.updatedNode(up);
 
             /* Remove old version, add new */
             final VersionWrapper removedVers =
@@ -129,9 +123,6 @@ public class CommitModule extends Module<BaseModule> {
         Collection<CommitResult.IndexResult> removeFromIndexCauseUpdated = new ArrayList<>();
         Collection<CommitResult.IndexResult> addToIndex = new ArrayList<>();
 
-        @Deprecated
-        final IChangeTracker changeTracker = NullChangeTracker.SINGLETON;
-
         final Collection<LiveNode> nodesMarkedAsDeleted = new ArrayList<>();
 
         /* Commit node */
@@ -144,8 +135,9 @@ public class CommitModule extends Module<BaseModule> {
             final IncubationNode node = iNode.get();
             final Set<OIdentifiable> commitableRelations = new HashSet<>();
             final ONidVer[] onidVers = new ONidVer[1];
-            final LiveNode liveNode = commitNode(sender, node, commitableRelations, changeTracker,
-                    removeFromIndexCauseRemoved, removeFromIndexCauseUpdated, addToIndex, onidVers);
+            final LiveNode liveNode =
+                    commitNode(sender, node, commitableRelations, removeFromIndexCauseRemoved,
+                            removeFromIndexCauseUpdated, addToIndex, onidVers);
             if (liveNode.isMarkedForDeletion()) {
                 nodesMarkedAsDeleted.add(liveNode);
             }
@@ -157,14 +149,6 @@ public class CommitModule extends Module<BaseModule> {
             result.put(incNid, onidVers[0]);
             commitInfo.add(new CommitInfo.CommitEntry(node, liveNode,
                     new NidVer(onidVers[0].getoIdentifiable().toString())));
-        }
-
-        /* Commit edge */
-        for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
-            final Collection<OIdentifiable> additional =
-                    committableRelationsByNode.get(entry.getLiveNode().getDocument());
-            getBase().getEdgeModule()
-                    .commit(entry.getLiveNode(), additional, commitInfo, changeTracker);
         }
 
         /* Validate and commit fields */
@@ -185,7 +169,6 @@ public class CommitModule extends Module<BaseModule> {
             /* Remove node document */
             nodeMarkedForDeletion.deleteNow();
             nodeMarkedForDeletion.getDocument().save();
-            //TODO: Hier müssen auch noch die edges entfernt werden (nicht nur die node)!
         }
 
         return new CommitResult(result, removeFromIndexCauseRemoved, removeFromIndexCauseUpdated,

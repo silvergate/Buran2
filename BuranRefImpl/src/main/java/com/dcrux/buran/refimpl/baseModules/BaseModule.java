@@ -8,7 +8,6 @@ import com.dcrux.buran.refimpl.baseModules.commit.CommitModule;
 import com.dcrux.buran.refimpl.baseModules.dataFetch.DataFetchModule;
 import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
-import com.dcrux.buran.refimpl.baseModules.edge.EdgeModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
@@ -41,7 +40,6 @@ public class BaseModule {
     private final ClassesModule classesModule = new ClassesModule(this);
     private final FieldsModule fieldsModule = new FieldsModule(this);
     private final DataFetchModule dataFetchModule = new DataFetchModule(this);
-    private final EdgeModule edgeModule = new EdgeModule(this);
     private final DataMutModule dataMutModule = new DataMutModule(this);
     private final CommitModule commitModule = new CommitModule(this);
     private final AuthModule authModule = new AuthModule(this);
@@ -66,7 +64,6 @@ public class BaseModule {
     }
 
     private void setup() {
-        this.edgeModule.setupDb();
         this.classesModule.setupDb();
         this.deltaRecorderModule.setupDb();
         this.versionsModule.setupDb();
@@ -145,10 +142,6 @@ public class BaseModule {
 
     public DataFetchModule getDataFetchModule() {
         return dataFetchModule;
-    }
-
-    public EdgeModule getEdgeModule() {
-        return edgeModule;
     }
 
     public DataMutModule getDataMutModule() {
