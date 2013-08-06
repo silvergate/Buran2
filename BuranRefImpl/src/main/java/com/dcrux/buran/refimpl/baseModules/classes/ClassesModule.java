@@ -1,7 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.classes;
 
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassDependenciesDef;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
+import com.dcrux.buran.common.classDefinition.DependencyIndex;
 import com.dcrux.buran.common.classes.ClassHashId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
@@ -25,7 +27,9 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -62,7 +66,7 @@ public class ClassesModule extends Module<BaseModule> {
     public boolean existsOrientClass(ClassId classId) {
         final String className = ClassNameUtils.generateNodeClasName(classId);
         boolean exists = getBase().getDb().getMetadata().getSchema().existsClass(className);
-        System.out.println("Exists class: '" + className + "', : " + exists);
+        //System.out.println("Exists class: '" + className + "', : " + exists);
         return exists;
     }
 
@@ -142,6 +146,27 @@ public class ClassesModule extends Module<BaseModule> {
             return classIdOpt.get();
         }
 
+        /* Find all dependencies */
+        final Map<DependencyIndex, ClassId> classIdDependencies = new HashMap<>();
+        final ClassDependenciesDef dependencies = classDefinition.getDependencies();
+        for (final DependencyIndex depId : dependencies.getDependencies()) {
+            final ClassHashId classHashIdDep = dependencies.getDependency(depId);
+            final Optional<ClassId> depClassId =
+                    getBase().getDbUtils().run(new ITransRet<Optional<ClassId>>() {
+                        @Override
+                        public Optional<ClassId> run(ODatabaseDocument db, IRunner runner)
+                                throws Throwable {
+                            return getClassIdByClassHash(classHashIdDep);
+                        }
+                    });
+            if (!depClassId.isPresent()) {
+                throw new IllegalArgumentException(MessageFormat.format("Dependency with hash " +
+                        "{0} was not found. Dependencies have to be declared in advance.",
+                        classHashIdDep));
+            }
+            classIdDependencies.put(depId, depClassId.get());
+        }
+
         /* Class is not yet declared. Declare now. */
 
         final int maxNumOfRetries = 100;
@@ -178,7 +203,8 @@ public class ClassesModule extends Module<BaseModule> {
                 .prepareClassForIndexing(classId, classDefinition.getIndexes());
         final Map<ClassIndexName, CompiledBlock> compiledMapFunctions =
                 indexingAdditionalInfo.getCompiledIndexes();
-        ClassDefExt classDefExt = new ClassDefExt(classDefinition, compiledMapFunctions);
+        ClassDefExt classDefExt =
+                new ClassDefExt(classDefinition, compiledMapFunctions, classIdDependencies);
         final byte[] completedBinary = toBinary(classDefExt);
 
         /* Create orientDB-classes */

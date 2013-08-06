@@ -15,6 +15,7 @@
         <module>BuranScripting</module>
         <module>BuranDemoGui</module>
         <module>BuranTests</module>
+        <module>BuranTextExtractor</module>
     </modules>
 
     <repositories>

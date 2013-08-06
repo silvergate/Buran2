@@ -30,10 +30,15 @@ public class ClassDefinition implements Serializable {
         this.longDesc = longDesc;
         this.fields = new ClassFieldsDefinition();
         this.indexes = new ClassIndexDefinition();
+        this.dependencies = new ClassDependenciesDef();
+        this.indexesNew = new ClassIndexDefNew();
     }
 
     private ClassFieldsDefinition fields;
+    @Deprecated
     private ClassIndexDefinition indexes;
+    private ClassIndexDefNew indexesNew;
+    private ClassDependenciesDef dependencies;
 
     private ClassDefinition() {
     }
@@ -50,8 +55,16 @@ public class ClassDefinition implements Serializable {
         return longDesc;
     }
 
+    public ClassDependenciesDef getDependencies() {
+        return dependencies;
+    }
+
     public ClassIndexDefinition getIndexes() {
         return indexes;
+    }
+
+    public ClassIndexDefNew getIndexesNew() {
+        return indexesNew;
     }
 
     @Override

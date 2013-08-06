@@ -192,6 +192,10 @@ public class DescModule extends Module<BaseModule> {
         }
     }
 
+    public void findByTitleAndType(String query, ClassId target) {
+        //TODO
+    }
+
     public String getTitle(NidVer nid)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         ComFetch<String> cf = ComFetch.c(nid, SingleGet.c(FIELD_TITLE, FieldGetStr.SINGLETON));

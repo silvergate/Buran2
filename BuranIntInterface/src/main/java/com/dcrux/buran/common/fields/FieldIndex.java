@@ -1,5 +1,7 @@
 package com.dcrux.buran.common.fields;
 
+import com.dcrux.buran.utils.AltType;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +9,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:29
  */
-public class FieldIndex implements Serializable {
+public class FieldIndex extends AltType<IFieldTarget> implements Serializable, IFieldTarget {
     private short index;
 
     public static final FieldIndex MIN = new FieldIndex(Short.MIN_VALUE);
