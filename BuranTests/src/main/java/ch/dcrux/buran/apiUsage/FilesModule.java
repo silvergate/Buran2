@@ -135,8 +135,8 @@ public class FilesModule extends Module<BaseModule> {
         ClassId classId = getFileClassId();
         final ComCreateNew newFile = ComCreateNew.c(classId);
         IncNid incNid = getBase().sync(newFile);
-        ComMutate comMutate =
-                ComMutate.c(incNid, FieldSetter.c(FIELD_MIME, FieldSetStr.c(mimeType)));
+        ComMutate comMutate = ComMutate
+                .c(incNid, FieldSetter.c(getFileClassId(), FIELD_MIME, FieldSetStr.c(mimeType)));
         getBase().sync(comMutate);
         return incNid;
     }
@@ -146,8 +146,8 @@ public class FilesModule extends Module<BaseModule> {
         IncNid descNode =
                 descModule.describe(Optional.<NidVer>absent(), filename, LinkTargetInc.inc(incNid));
 
-        ComMutate comMutate = ComMutate.c(incNid,
-                FieldSetter.c(FIELD_DESCRIPTION, FieldSetLink.c(LinkTargetInc.inc(descNode))));
+        ComMutate comMutate = ComMutate.c(incNid, FieldSetter.c(getFileClassId(), FIELD_DESCRIPTION,
+                FieldSetLink.c(LinkTargetInc.inc(descNode))));
         getBase().sync(comMutate);
 
         ComCommit comCommit = ComCommit.c(incNid, descNode);
@@ -156,15 +156,15 @@ public class FilesModule extends Module<BaseModule> {
 
     public void append(IncNid incNid, byte[] data)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        ComMutate comMutate =
-                ComMutate.c(incNid, FieldSetter.c(FIELD_DATA, FieldAppendBin.c(data)));
+        ComMutate comMutate = ComMutate
+                .c(incNid, FieldSetter.c(getFileClassId(), FIELD_DATA, FieldAppendBin.c(data)));
         getBase().sync(comMutate);
     }
 
     public long getFileSize(NidVer nidVer)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        ComFetch<Long> comFetch =
-                ComFetch.c(nidVer, SingleGet.c(FIELD_DATA, FieldGetBinLen.SINGLETON));
+        ComFetch<Long> comFetch = ComFetch.c(nidVer,
+                SingleGet.c(getFileClassId(), FIELD_DATA, FieldGetBinLen.SINGLETON));
         return getBase().sync(comFetch);
     }
 

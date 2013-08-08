@@ -1,7 +1,7 @@
 package com.dcrux.buran.common.fields.getter;
 
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.IFieldGetter;
+import com.dcrux.buran.common.fields.IFieldTarget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,27 +13,19 @@ import java.util.Map;
  */
 public class FieldGet implements IFieldGetter<FieldGetResult> {
 
-    public static FieldGet c(int index, IUnfieldedDataGetter<?> getter) {
-        return c(FieldIndex.c(index), getter);
-    }
-
-    public static FieldGet c(FieldIndex index, IUnfieldedDataGetter<?> getter) {
+    public static FieldGet c(IFieldTarget index, IUnfieldedDataGetter<?> getter) {
         final FieldGet fieldGet = new FieldGet();
         return fieldGet.add(index, getter);
     }
 
-    private Map<FieldIndex, IUnfieldedDataGetter<?>> entries =
-            new HashMap<FieldIndex, IUnfieldedDataGetter<?>>();
+    private Map<IFieldTarget, IUnfieldedDataGetter<?>> entries =
+            new HashMap<IFieldTarget, IUnfieldedDataGetter<?>>();
 
-    public Map<FieldIndex, IUnfieldedDataGetter<?>> getEntries() {
+    public Map<IFieldTarget, IUnfieldedDataGetter<?>> getEntries() {
         return entries;
     }
 
-    public FieldGet add(int index, IUnfieldedDataGetter<?> getter) {
-        return add(FieldIndex.c(index), getter);
-    }
-
-    public FieldGet add(FieldIndex index, IUnfieldedDataGetter<?> getter) {
+    public FieldGet add(IFieldTarget index, IUnfieldedDataGetter<?> getter) {
         this.entries.put(index, getter);
         return this;
     }

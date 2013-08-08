@@ -57,7 +57,7 @@ public class DataMutModule extends Module<BaseModule> {
 
         if (setter instanceof INodeSetter) {
             final INodeSetter nodeSetter = (INodeSetter) setter;
-            getBase().getNodesModule().performNodeSet(node, nodeSetter);
+            getBase().getNodesModule().performNodeSet(sender, node, nodeSetter);
             return true;
         }
 

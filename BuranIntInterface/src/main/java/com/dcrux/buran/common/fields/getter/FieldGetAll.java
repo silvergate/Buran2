@@ -7,6 +7,7 @@ import com.dcrux.buran.common.fields.IFieldGetter;
  *
  * @author: ${USER} Date: 01.07.13 Time: 00:47
  */
+@Deprecated
 public class FieldGetAll implements IFieldGetter<FieldGetResult> {
 
     public static final FieldGetAll SINGLETON = new FieldGetAll();

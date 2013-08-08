@@ -50,6 +50,10 @@ public class Test2 {
             throws IOException, InterruptedException, UnknownCommandException, UncheckedException,
             WrappedExpectableException {
 
+        /*System.out.println(Long.toHexString(Long.MAX_VALUE));
+        if (true)
+            return;*/
+
         /*
         ProcessorPack pp = new ProcessorPack();
         pp.process("This is an #[00000000|silvergate@gmail.com]# english text with 32 " +
@@ -77,9 +81,15 @@ public class Test2 {
         BuranCommandRunner bcr = new BuranCommandRunner(false);
         BaseModule bm = new BaseModule(thisAccount, sender, bcr);
 
-        final FilesTest filesTest = new FilesTest(bm);
-        filesTest.createAndReadDesc();
-        filesTest.findByTitle();
+        FilesTest filesTest = null;
+        for (int i = 0; i < 20; i++) {
+            filesTest = new FilesTest(bm);
+            filesTest.createAndReadDesc();
+        }
+
+        Thread.sleep(100);
+
+        filesTest.findByTitleNew();
 
         bcr.shutdown();
 

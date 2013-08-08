@@ -12,22 +12,22 @@ import java.util.Set;
  * @author: ${USER} Date: 02.07.13 Time: 14:35
  */
 public class ComCreateNew extends Command<IncNid> {
-    private ClassId classId;
+    private ClassId primaryClassId;
     public static final Set<Class<? extends Exception>> EXCEPTIONS = exceptions();
 
     private ComCreateNew() {
     }
 
-    public static ComCreateNew c(ClassId classId) {
-        return new ComCreateNew(classId);
+    public static ComCreateNew c(ClassId primaryClassId) {
+        return new ComCreateNew(primaryClassId);
     }
 
-    public ComCreateNew(ClassId classId) {
+    public ComCreateNew(ClassId primaryClassId) {
         super(EXCEPTIONS);
-        this.classId = classId;
+        this.primaryClassId = primaryClassId;
     }
 
-    public ClassId getClassId() {
-        return classId;
+    public ClassId getPrimaryClassId() {
+        return primaryClassId;
     }
 }

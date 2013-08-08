@@ -21,6 +21,7 @@ import com.orientechnologies.orient.core.serialization.serializer.binary.OBinary
  *
  * @author: ${USER} Date: 04.07.13 Time: 14:33
  */
+@Deprecated
 public class IndexModule extends Module<BaseModule> {
 
     private final FunctionCompiler functionCompiler = new FunctionCompiler(getBase());
@@ -56,12 +57,18 @@ public class IndexModule extends Module<BaseModule> {
 
     public void removeFromIndex(ORID versionsRecord, ClassId classId, boolean causeIsRemove)
             throws NodeClassNotFoundException {
+        /* DISABLED */
+        if (true) return;
+
         System.out.println("   - REMOVE FROM INDEX: " + versionsRecord);
         getIndexImpl().removeFromIndexAndNotify(versionsRecord, classId, causeIsRemove);
     }
 
     public void index(ONidVer versionsRecord, ClassId classId)
             throws NodeNotFoundException, NodeClassNotFoundException {
+        /* DISABLED */
+        if (true) return;
+
         getIndexImpl().indexAndNotify(versionsRecord, classId);
         System.out.println("   - ADD TO INDEX: " + versionsRecord);
     }

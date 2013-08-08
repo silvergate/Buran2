@@ -9,6 +9,9 @@ import com.dcrux.buran.commandBase.WrappedExpectableException;
 import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.classes.ClassId;
+import com.dcrux.buran.query.queries.unfielded.StrPhrase;
+import com.google.common.base.Optional;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,8 +70,9 @@ public class FilesTest {
         is.close();
     }
 
-    public void findByTitle()
+    public void findByTitleNew()
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        descModule.findByTitle("Windows");
+        descModule
+                .findByTitleNew(StrPhrase.exact("Dies ist Microsoft"), Optional.<ClassId>absent());
     }
 }

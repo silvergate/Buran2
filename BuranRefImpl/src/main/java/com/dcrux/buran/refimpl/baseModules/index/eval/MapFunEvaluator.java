@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.baseModules.index.eval;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
-import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.indexing.IndexDefinition;
 import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
 import com.dcrux.buran.common.indexing.mapFunction.TextFunction;
@@ -15,7 +14,6 @@ import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefExt;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
-import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.dcrux.buran.refimpl.baseModules.text.processors.IEmmitter;
 import com.dcrux.buran.scripting.compiler.CompiledBlock;
 import com.dcrux.buran.scripting.iface.Code;
@@ -55,11 +53,14 @@ public class MapFunEvaluator extends Module<BaseModule> {
                         //TODO: Falsch, da ein index-input auch kein feld haben kann.
                         break;
                     } else {
-                        value = getBase().getFieldsModule()
+                        /*value = getBase().getFieldsModule()
                                 .performUnfieldedGetter(new LiveNode(node.getDocument()),
-                                        classDefinition, fieldTargetCast.getField(),
-                                        FieldGetPrim.SINGLETON);
-                        //value = node.getFieldValue(fieldTargetCast.getField());
+                                        fieldTargetCast,
+                                        FieldGetPrim.SINGLETON);*/
+
+                        //TODO: Removed
+                        value = null;
+
                         inputs.put(fieldTarget, value);
                     }
                 } else {
@@ -141,10 +142,12 @@ public class MapFunEvaluator extends Module<BaseModule> {
             if (textFunctionOpt.isPresent()) {
                 evaluatedFromText = new HashSet<>();
                 TextFunction textFunction = textFunctionOpt.get();
-                Object value = getBase().getFieldsModule()
+                /*Object value = getBase().getFieldsModule()
                         .performUnfieldedGetter(new LiveNode(node.getDocument()),
                                 cde.getClassDefinition(), textFunction.getTarget(),
-                                textFunction.getDataGetter());
+                                textFunction.getDataGetter());*/
+                //TODO: Removed
+                Object value = null;
                 String valueStr = (String) value;
                 final Set<byte[]> evaluatedFromTextFinal = evaluatedFromText;
                 if (valueStr != null) {

@@ -8,9 +8,12 @@ import com.dcrux.buran.refimpl.baseModules.commit.CommitModule;
 import com.dcrux.buran.refimpl.baseModules.dataFetch.DataFetchModule;
 import com.dcrux.buran.refimpl.baseModules.dataMut.DataMutModule;
 import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
+import com.dcrux.buran.refimpl.baseModules.elasticSearch.EsModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
 import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
+import com.dcrux.buran.refimpl.baseModules.newIndexing.IndexingModuleNew;
+import com.dcrux.buran.refimpl.baseModules.newIndexing.SearchModule;
 import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsModule;
 import com.dcrux.buran.refimpl.baseModules.nodes.NodesModule;
 import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
@@ -47,6 +50,7 @@ public class BaseModule {
     private final DeltaRecorderModule deltaRecorderModule = new DeltaRecorderModule(this);
     private final Random random = new Random();
     private final IndexModule indexModule = new IndexModule(this);
+    private final IndexingModuleNew indexingModule = new IndexingModuleNew(this);
     private final VersionsModule versionsModule = new VersionsModule(this);
     private final NotificationsModule notificationsModule = new NotificationsModule(this);
     private final NodesModule nodesModule = new NodesModule(this);
@@ -54,6 +58,8 @@ public class BaseModule {
     private final SubscriptionModule subscriptionModule;
     private final NewRelationsModule newRelationsModule = new NewRelationsModule(this);
     private final TextModule textModule = new TextModule(this);
+    private final EsModule esModule = new EsModule(this);
+    private final SearchModule searchModule = new SearchModule(this);
 
     ODatabaseDocumentTx db;
 
@@ -114,6 +120,9 @@ public class BaseModule {
 
     public void close() {
         this.db.close();
+        this.esModule.shutdown();
+        //TODO: Zum testen
+        this.esModule.deleteData();
     }
 
     @Override
@@ -192,5 +201,17 @@ public class BaseModule {
 
     public TextModule getTextModule() {
         return textModule;
+    }
+
+    public IndexingModuleNew getIndexingModule() {
+        return indexingModule;
+    }
+
+    public EsModule getEsModule() {
+        return esModule;
+    }
+
+    public SearchModule getSearchModule() {
+        return searchModule;
     }
 }

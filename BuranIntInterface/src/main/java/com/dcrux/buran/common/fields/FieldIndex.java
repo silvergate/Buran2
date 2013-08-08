@@ -9,7 +9,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 29.06.13 Time: 16:29
  */
-public class FieldIndex extends AltType<IFieldTarget> implements Serializable, IFieldTarget {
+public class FieldIndex extends AltType<IFieldTarget> implements Serializable {
     private short index;
 
     public static final FieldIndex MIN = new FieldIndex(Short.MIN_VALUE);

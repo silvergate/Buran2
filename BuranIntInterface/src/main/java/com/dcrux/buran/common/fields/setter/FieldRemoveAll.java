@@ -1,5 +1,6 @@
 package com.dcrux.buran.common.fields.setter;
 
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.IFieldSetter;
 
 /**
@@ -9,10 +10,18 @@ import com.dcrux.buran.common.fields.IFieldSetter;
  */
 public class FieldRemoveAll implements IFieldSetter {
 
-    public static final FieldRemoveAll SINGLETON = new FieldRemoveAll();
+    private ClassId classId;
 
-    public static FieldRemoveAll c() {
-        return SINGLETON;
+    public FieldRemoveAll(ClassId classId) {
+        this.classId = classId;
+    }
+
+    public static FieldRemoveAll c(ClassId classId) {
+        return new FieldRemoveAll(classId);
+    }
+
+    public ClassId getClassId() {
+        return classId;
     }
 
     private FieldRemoveAll() {

@@ -7,5 +7,5 @@ import com.dcrux.buran.common.getterSetter.IDataSetter;
  *
  * @author: ${USER} Date: 10.07.13 Time: 19:10
  */
-public class INodeSetter implements IDataSetter {
+public interface INodeSetter extends IDataSetter {
 }

@@ -13,9 +13,12 @@ import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.commands.incubation.CommitResult;
 import com.dcrux.buran.commands.indexing.ComQuery;
 import com.dcrux.buran.commands.indexing.QueryResult;
+import com.dcrux.buran.commands.indexingNew.ComQueryNew;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
+import com.dcrux.buran.common.classDefinition.ClassIndexDefNew;
+import com.dcrux.buran.common.classDefinition.ClassIndexId;
 import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
@@ -40,6 +43,18 @@ import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
 import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
 import com.dcrux.buran.common.indexing.mapStore.MapIndex;
 import com.dcrux.buran.common.link.LinkTargetInc;
+import com.dcrux.buran.query.IndexFieldTarget;
+import com.dcrux.buran.query.IndexedFieldDef;
+import com.dcrux.buran.query.IndexedFieldId;
+import com.dcrux.buran.query.SingleIndexDef;
+import com.dcrux.buran.query.indexingDef.ClassIdIndexingDef;
+import com.dcrux.buran.query.indexingDef.StrAnalyzedDef;
+import com.dcrux.buran.query.queries.IQuery;
+import com.dcrux.buran.query.queries.QueryTarget;
+import com.dcrux.buran.query.queries.fielded.BoolQuery;
+import com.dcrux.buran.query.queries.fielded.Query;
+import com.dcrux.buran.query.queries.unfielded.ISimpleQuery;
+import com.dcrux.buran.query.queries.unfielded.IsClass;
 import com.dcrux.buran.scripting.functions.FunGet;
 import com.dcrux.buran.scripting.functions.FunRet;
 import com.dcrux.buran.scripting.functions.integer.FunIntLit;
@@ -65,6 +80,10 @@ public class DescModule extends Module<BaseModule> {
     public static final FieldIndex FIELD_LONG_DESC = FieldIndex.c(1);
     public static final FieldIndex FIELD_DESCRIBES = FieldIndex.c(2);
 
+    public static final ClassIndexId INDEX_ONE = new ClassIndexId((short) 0);
+    public static final IndexedFieldId INDEX_ONE_TITLE = new IndexedFieldId((short) 0);
+    public static final IndexedFieldId INDEX_ONE_TARGET_CLASS = new IndexedFieldId((short) 1);
+
     public static final ClassIndexName INDEX_BY_TITLE = new ClassIndexName("byTitiel");
 
     public DescModule(BaseModule baseModule) {
@@ -78,7 +97,23 @@ public class DescModule extends Module<BaseModule> {
                 .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false)
                 .add(FIELD_DESCRIBES, LinkType.c(), false);
         classDef.getIndexes().add(INDEX_BY_TITLE, getIndexByText());
+        defineIndexes(classDef.getIndexesNew());
         return classDef;
+    }
+
+    private void defineIndexes(ClassIndexDefNew classIndexDefNew) {
+        SingleIndexDef singleIndexDef = new SingleIndexDef();
+
+        IndexedFieldDef indexedFieldDef = new IndexedFieldDef(IndexFieldTarget.index(FIELD_TITLE),
+                new StrAnalyzedDef(false, 255, FieldGetStr.SINGLETON));
+        IndexedFieldDef indexedFieldDefClassId =
+                new IndexedFieldDef(IndexFieldTarget.index(FIELD_DESCRIBES),
+                        new ClassIdIndexingDef(false));
+
+        singleIndexDef.getFieldDef().put(INDEX_ONE_TITLE, indexedFieldDef);
+        singleIndexDef.getFieldDef().put(INDEX_ONE_TARGET_CLASS, indexedFieldDefClassId);
+
+        classIndexDefNew.getIndexes().put(INDEX_ONE, singleIndexDef);
     }
 
     private IndexDefinition getIndexByText() {
@@ -132,8 +167,8 @@ public class DescModule extends Module<BaseModule> {
         final IncNid incNid = (IncNid) getBase().sync(updateCommand);
 
         ComMutate cm = ComMutate.c(incNid,
-                FieldSetter.c().add(FIELD_TITLE, FieldSetStr.c(shortDescFinal))
-                        .add(FIELD_DESCRIBES, FieldSetLink.c(target)));
+                FieldSetter.c().add(getDescClassId(), FIELD_TITLE, FieldSetStr.c(shortDescFinal))
+                        .add(getDescClassId(), FIELD_DESCRIBES, FieldSetLink.c(target)));
         getBase().sync(cm);
 
         return incNid;
@@ -180,6 +215,27 @@ public class DescModule extends Module<BaseModule> {
         return getTitle(nid);
     }
 
+
+    public void findByTitleNew(ISimpleQuery<? extends String, ? extends StrAnalyzedDef> title,
+            Optional<ClassId> targetClassId)
+            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
+        final QueryTarget target = QueryTarget.cDef(getDescClassId(), INDEX_ONE_TITLE);
+        Query titleQuery = Query.c(target, title);
+
+        final IQuery query;
+        if (targetClassId.isPresent()) {
+            final QueryTarget cidTarget =
+                    QueryTarget.cDef(getDescClassId(), INDEX_ONE_TARGET_CLASS);
+            Query cidQuery = Query.c(cidTarget, new IsClass(targetClassId.get()));
+            query = BoolQuery.c().must(titleQuery).must(cidQuery);
+        } else {
+            query = titleQuery;
+        }
+        ComQueryNew cq = new ComQueryNew(query);
+        final QueryResult result = getBase().sync(cq);
+    }
+
+    @Deprecated
     public void findByTitle(String query)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         ComQuery cq = ComQuery.c(getDescClassId(), INDEX_BY_TITLE, Tokens.c(query));
@@ -192,13 +248,10 @@ public class DescModule extends Module<BaseModule> {
         }
     }
 
-    public void findByTitleAndType(String query, ClassId target) {
-        //TODO
-    }
-
     public String getTitle(NidVer nid)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        ComFetch<String> cf = ComFetch.c(nid, SingleGet.c(FIELD_TITLE, FieldGetStr.SINGLETON));
+        ComFetch<String> cf =
+                ComFetch.c(nid, SingleGet.c(getDescClassId(), FIELD_TITLE, FieldGetStr.SINGLETON));
         return getBase().sync(cf);
     }
 

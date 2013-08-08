@@ -23,7 +23,7 @@ public class ComCreateNewImpl extends TransactionalCommandPost<IncNid, ComCreate
     @Override
     protected OIncNid transactional(ComCreateNew command, BaseModule baseModule) throws Exception {
         return baseModule.getIncubationModule()
-                .createIncNt(baseModule.getAuthModule().getSender(), command.getClassId());
+                .createIncNt(baseModule.getAuthModule().getSender(), command.getPrimaryClassId());
     }
 
     @Override

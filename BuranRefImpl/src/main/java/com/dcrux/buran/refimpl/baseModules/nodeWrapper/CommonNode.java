@@ -8,6 +8,10 @@ import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Buran.
  *
@@ -22,9 +26,49 @@ public class CommonNode extends DocumentWrapper {
     public static final String FIELD_COMMON_LIVE = "live";
     public static final String INC_FIELD_SENDER = "sender";
     public static final String FIELD_MARKED_FOR_DELETION = "markDel";
+    public static final String FIELD_CLASSES = "c";
 
     public CommonNode(ODocument document) {
         super(document);
+    }
+
+    public boolean addClass(ClassId classId) {
+        Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
+        if (classes == null) {
+            classes = new HashSet<Long>();
+        }
+
+        final boolean notAdded = (classes.contains(classId.getId()));
+        classes.add(classId.getId());
+
+        getDocument().field(FIELD_CLASSES, classes, OType.EMBEDDEDSET);
+        return !notAdded;
+    }
+
+    public boolean removeClass(ClassId classId) {
+        Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
+        if (classes == null) {
+            return false;
+        }
+        return classes.remove(classId.getId());
+    }
+
+    public Set<ClassId> getClasses() {
+        final Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
+        if (classes == null) {
+            return Collections.emptySet();
+        } else {
+            final Set<ClassId> classIds = new HashSet<>();
+            for (final Object single : classes) {
+                final Long id = (Long) single;
+                classIds.add(new ClassId(id));
+            }
+            return classIds;
+        }
+    }
+
+    public boolean isTypeOf(ClassId classId) {
+        return getClassId().equals(classId);
     }
 
     public boolean isLive() {

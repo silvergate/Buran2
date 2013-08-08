@@ -7,6 +7,6 @@ import com.dcrux.buran.common.nodes.INodeSetter;
  *
  * @author: ${USER} Date: 10.07.13 Time: 19:09
  */
-public class NodeRemove extends INodeSetter {
+public class NodeRemove implements INodeSetter {
     public static final NodeRemove SINGLETON = new NodeRemove();
 }

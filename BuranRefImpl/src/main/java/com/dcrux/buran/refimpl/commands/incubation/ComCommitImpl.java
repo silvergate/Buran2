@@ -3,6 +3,7 @@ package com.dcrux.buran.refimpl.commands.incubation;
 import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.commit.CommitResult;
 import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
@@ -49,23 +50,32 @@ public class ComCommitImpl implements
             throw t;
         }
 
+        final UserId receiver = baseModule.getAuthModule().getReceiver();
         /* Update indexes */
         //TODO: Catch exceptions (exceptions should never occur)
         for (CommitResult.IndexResult addToIndex : commitResult.getAddToIndexes()) {
-            baseModule.getIndexModule()
-                    .index(addToIndex.getVersionsRecord(), addToIndex.getClassId());
+            /*baseModule.getIndexModule()
+                    .index(addToIndex.getVersionsRecord(), addToIndex.getPrimaryClassId());*/
+            baseModule.getIndexingModule()
+                    .index(receiver, addToIndex.getVersionsRecord(), addToIndex.getClassId());
         }
         for (CommitResult.IndexResult removeFromIndex : commitResult
                 .getRemoveFromIndexesCauseRemoved()) {
-            baseModule.getIndexModule()
+            /*baseModule.getIndexModule()
                     .removeFromIndex(removeFromIndex.getVersionsRecord().getoIdentifiable(),
-                            removeFromIndex.getClassId(), true);
+                            removeFromIndex.getPrimaryClassId(), true);*/
+            baseModule.getIndexingModule().removeFromIndex(receiver,
+                    removeFromIndex.getVersionsRecord().getoIdentifiable(),
+                    removeFromIndex.getClassId(), true);
         }
         for (CommitResult.IndexResult removeFromIndex : commitResult
                 .getRemoveFromIndexesCauseUpdated()) {
-            baseModule.getIndexModule()
+            /*baseModule.getIndexModule()
                     .removeFromIndex(removeFromIndex.getVersionsRecord().getoIdentifiable(),
-                            removeFromIndex.getClassId(), false);
+                            removeFromIndex.getPrimaryClassId(), false);*/
+            baseModule.getIndexingModule().removeFromIndex(receiver,
+                    removeFromIndex.getVersionsRecord().getoIdentifiable(),
+                    removeFromIndex.getClassId(), false);
         }
 
         /* Prepare commit result */

@@ -39,7 +39,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
 
     public static enum TargetType {
         incUnversioned(0),
-        intVersioned(1),
+        incVersioned(1),
         nid(2),
         nidVer(3),
         extNid(4),
@@ -59,7 +59,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                 case 0:
                     return incUnversioned;
                 case 1:
-                    return intVersioned;
+                    return incVersioned;
                 case 2:
                     return nid;
                 case 3:
@@ -117,7 +117,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
             if (linkTargetInc.is(LinkTargetInc.TYPE_INC)) {
                 IncLinkTarget incLinkTarget = linkTargetInc.get(LinkTargetInc.TYPE_INC);
                 if (incLinkTarget.isVersioned()) {
-                    type = TargetType.intVersioned;
+                    type = TargetType.incVersioned;
                 } else {
                     type = TargetType.incUnversioned;
                 }
@@ -254,7 +254,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
         if (oldType != null) {
             /* Commit */
             switch (oldType) {
-                case intVersioned:
+                case incVersioned:
                     final ORID incOrid = getOrid(node, fieldIndex);
                     final ORID newOrid = commitInfo.getNidVerByIncNid(incOrid);
                     if (newOrid == null) {
@@ -287,7 +287,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                     target = null;
             }
 
-            /* Add realtion */
+            /* Add relation */
             if (newType != null) {
                 switch (newType) {
                     case nidVer:
