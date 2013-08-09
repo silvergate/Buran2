@@ -2,6 +2,7 @@ package com.dcrux.buran.refimpl.baseModules.newRelations;
 
 import com.dcrux.buran.common.Nid;
 import com.dcrux.buran.common.NidVer;
+import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.inRelations.InRealtionGetter;
@@ -13,6 +14,7 @@ import com.dcrux.buran.common.inRelations.where.InRelWhereVersioned;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -36,28 +38,38 @@ public class NewRelationsModule extends Module<BaseModule> {
         NewRelationsWrapper.setupDb(getBase());
     }
 
-    private Collection<OIdentifiable> getIndexByNidAndFieldIndex(ORID nid, FieldIndex start,
-            FieldIndex end) {
+    private Collection<OIdentifiable> getIndexByNidAndFieldIndex(ORID nid, ClassId classId,
+            FieldIndex start, FieldIndex end) {
         final OIndex index = getBase().getDbUtils().getIndex(NewRelationsWrapper.CLASS_NAME,
-                NewRelationsWrapper.IDX_SOURCE_NID_AND_FIELD_INDEX);
-        final Object valueStart = index.getDefinition().createValue(nid, (int) start.getIndex());
-        final Object valueEnd = index.getDefinition().createValue(nid, (int) end.getIndex());
+                NewRelationsWrapper.IDX_SOURCE_NID_AND_CLASSID_AND_FIELD_INDEX);
+        final Object valueStart =
+                index.getDefinition().createValue(nid, classId.getId(), (int) start.getIndex());
+        final Object valueEnd =
+                index.getDefinition().createValue(nid, classId.getId(), (int) end.getIndex());
         final Collection<OIdentifiable> foundSet = index.getValuesBetween(valueStart, valueEnd);
         return foundSet;
     }
 
-    public void removeSingleRelation(ORID nid, FieldIndex fieldIndex) {
+    private Collection<OIdentifiable> getIndexByNid(ORID nid) {
+        final OIndex index = getBase().getDbUtils().getIndex(NewRelationsWrapper.CLASS_NAME,
+                NewRelationsWrapper.IDX_SOURCE_NID_AND_CLASSID_AND_FIELD_INDEX);
+        final Object valueStart = index.getDefinition().createValue(nid);
+        final Object valueEnd = index.getDefinition().createValue(nid);
+        final Collection<OIdentifiable> foundSet = index.getValuesBetween(valueStart, valueEnd);
+        return foundSet;
+    }
+
+    public void removeSingleRelation(ORID nid, FieldIndexAndClassId fieldIndex) {
         System.out.println("Remove single relation");
-        for (final OIdentifiable oIdentifiable : getIndexByNidAndFieldIndex(nid, fieldIndex,
-                fieldIndex)) {
+        for (final OIdentifiable oIdentifiable : getIndexByNidAndFieldIndex(nid,
+                fieldIndex.getClassId(), fieldIndex.getIndex(), fieldIndex.getIndex())) {
             getBase().getDb().delete((ORID) oIdentifiable);
         }
     }
 
     public void removeAllRelations(ORID nid) {
         System.out.println("Remove all relations");
-        for (final OIdentifiable oIdentifiable : getIndexByNidAndFieldIndex(nid,
-                new FieldIndex(Short.MIN_VALUE), new FieldIndex(Short.MAX_VALUE))) {
+        for (final OIdentifiable oIdentifiable : getIndexByNid(nid)) {
             getBase().getDb().delete((ORID) oIdentifiable);
         }
     }

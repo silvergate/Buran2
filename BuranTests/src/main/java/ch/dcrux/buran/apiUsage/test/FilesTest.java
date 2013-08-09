@@ -39,8 +39,8 @@ public class FilesTest {
             IOException {
         String fileName = "testFileOne.jpg Dies ist Microsoft Windows XP 2000.";
         NidVer nidVer = createFile(fileName);
-        final String desc = descModule.getBestDescription(nidVer, "unknown");
-        System.out.println("Description: " + desc);
+        final String desc = descModule.getTitle(nidVer);
+        System.out.println("Description (Read): " + desc);
         testSize(nidVer);
     }
 
@@ -72,7 +72,7 @@ public class FilesTest {
 
     public void findByTitleNew()
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        descModule
-                .findByTitleNew(StrPhrase.exact("Dies ist Microsoft"), Optional.<ClassId>absent());
+        descModule.findByTitleNew(StrPhrase.prefix("dies ist Micro"),
+                Optional.<ClassId>of(this.filesModule.getFileClassId()));
     }
 }

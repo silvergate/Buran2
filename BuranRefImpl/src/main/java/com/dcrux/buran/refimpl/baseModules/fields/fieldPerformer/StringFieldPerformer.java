@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.FieldGetStr;
 import com.dcrux.buran.common.fields.getter.FieldGetStrLimit;
@@ -17,6 +16,7 @@ import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
@@ -40,7 +40,7 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
 
     @Override
     public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
-            ClassDefinition classDefinition, StringType stringType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, StringType stringType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetStr) {
             final String value = ((FieldSetStr) setter).getValue();
@@ -61,7 +61,7 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
     @Override
     public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
             ClassDefinition classDefinition, StringType stringType,
-            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndexAndClassId fieldIndex,
             ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             Object value = node.getFieldValue(fieldIndex, OType.STRING);
@@ -73,7 +73,7 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
 
     @Override
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
-            ClassDefinition classDefinition, StringType stringType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, StringType stringType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataGetter<?> dataGetter) {
         if ((dataGetter instanceof FieldGetPrim) || (dataGetter instanceof FieldGetStr)) {
             return (Serializable) node.getFieldValue(fieldIndex, OType.STRING);

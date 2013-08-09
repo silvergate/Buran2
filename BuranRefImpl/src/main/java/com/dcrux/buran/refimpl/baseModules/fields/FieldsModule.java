@@ -15,7 +15,9 @@ import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefCache;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.fields.nodeTarget.NodeTargetFieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 
 import java.io.Serializable;
@@ -30,6 +32,8 @@ import java.util.Map;
 public class FieldsModule extends Module<BaseModule> {
 
     private static final FieldPerformerRegistry REGISTRY;
+    private final NodeTargetFieldPerformer nodeTargetFieldPerformer =
+            new NodeTargetFieldPerformer();
 
     static {
         REGISTRY = new FieldPerformerRegistry();
@@ -64,9 +68,6 @@ public class FieldsModule extends Module<BaseModule> {
         }
 
         if (dataSetter instanceof FieldSetter) {
-            /*final ClassDefinition classDef =
-                    getBase().getClassesModule().getClassDefById(node.getPrimaryClassId());*/
-            //final ClassFieldsDefinition classDefFields = classDef.getFields();
             final FieldSetter batchSet = (FieldSetter) dataSetter;
             boolean nodeChanged = false;
             for (final Map.Entry<IFieldTarget, IUnfieldedDataSetter> entry : batchSet.getSetterMap()
@@ -98,15 +99,28 @@ public class FieldsModule extends Module<BaseModule> {
                                 entry.getValue().getClass());
                     }
 
+                    final FieldIndexAndClassId fieldIndexAndClassId =
+                            new FieldIndexAndClassId(fieldIndex, classId,
+                                    classId.equals(node.getPrimaryClassId()));
+
                     final boolean unc = performer
-                            .performSetter(getBase(), sender, node, classDef, typeDef, fieldIndex,
-                                    entry.getValue());
+                            .performSetter(getBase(), sender, node, classDef, typeDef,
+                                    fieldIndexAndClassId, entry.getValue());
 
                     if (unc) {
                         nodeChanged = true;
                     }
+                } else if (fieldTarget.is(IFieldTarget.TYPE_NODE_FIELD)) {
+                    /* Node field target */
+                    final NodeFieldTarget nodeFieldTarget =
+                            fieldTarget.get(IFieldTarget.TYPE_NODE_FIELD);
+                    boolean changed = this.nodeTargetFieldPerformer
+                            .performSetter(getBase(), node, nodeFieldTarget, dataSetter);
+                    if (changed) {
+                        nodeChanged = true;
+                    }
                 } else {
-                    throw new UnsupportedOperationException("Not yet implemnted");
+                    throw new IllegalArgumentException("Unknown field target");
                 }
             }
             return nodeChanged;
@@ -140,8 +154,13 @@ public class FieldsModule extends Module<BaseModule> {
                     "Performer does not support getter: " + getter.getClass());
         }
 
+        final FieldIndexAndClassId fieldIndexAndClassId =
+                new FieldIndexAndClassId(fieldIndex, classId,
+                        classId.equals(node.getPrimaryClassId()));
+
         return (T) performer
-                .performGetter(getBase(), node, classDefinition, typeDef, fieldIndex, getter);
+                .performGetter(getBase(), node, classDefinition, typeDef, fieldIndexAndClassId,
+                        getter);
     }
 
     public Serializable performGetter(LiveNode node, IFieldGetter dataGetter)
@@ -152,8 +171,6 @@ public class FieldsModule extends Module<BaseModule> {
 
     private Serializable performGetter(LiveNode node, IFieldGetter dataGetter, ClassDefCache cache)
             throws NodeClassNotFoundException {
-        /*final ClassDefinition classDef =
-                getBase().getClassesModule().getClassDefById(node.getPrimaryClassId());*/
 
         if (dataGetter instanceof FieldGet) {
             final FieldGet fieldGet = (FieldGet) dataGetter;
@@ -190,7 +207,12 @@ public class FieldsModule extends Module<BaseModule> {
                         singleGet.getFieldGetter());
                 return value;
             } else if (fieldTarget.is(IFieldTarget.TYPE_NODE_FIELD)) {
-                throw new UnsupportedOperationException("Not yet implemented");
+                                    /* Node field target */
+                final NodeFieldTarget nodeFieldTarget =
+                        fieldTarget.get(IFieldTarget.TYPE_NODE_FIELD);
+                final IUnfieldedDataGetter getter = singleGet.getFieldGetter();
+                return this.nodeTargetFieldPerformer
+                        .performGetter(getBase(), node, nodeFieldTarget, getter);
             } else {
                 throw new IllegalArgumentException("Unknown type");
             }

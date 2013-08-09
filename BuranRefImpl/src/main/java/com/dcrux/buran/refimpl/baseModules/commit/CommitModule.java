@@ -13,6 +13,7 @@ import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.typeDef.ITypeDef;
 import com.dcrux.buran.common.getterSetter.IDataSetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
+import com.dcrux.buran.refimpl.baseModules.classes.ClassDefCache;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.common.ONid;
 import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
@@ -21,6 +22,7 @@ import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformerRegistry;
 import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.fields.IFieldPerformer;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionWrapper;
@@ -75,7 +77,7 @@ public class CommitModule extends Module<BaseModule> {
             final VersionWrapper addedVers = getBase().getVersionsModule()
                     .addNodeVersion(incubationNode.getNid(), Version.INITIAL);
             outNidVer[0] = addedVers.getONidVer();
-            outAddToIndex.add(new CommitResult.IndexResult(storeNode.getClassId(),
+            outAddToIndex.add(new CommitResult.IndexResult(storeNode.getPrimaryClassId(),
                     addedVers.getONidVer()));
 
             return storeNode;
@@ -92,19 +94,21 @@ public class CommitModule extends Module<BaseModule> {
             final VersionWrapper removedVers =
                     getBase().getVersionsModule().removeNodeVersion(upOnid);
             if (up.isMarkedForDeletion()) {
-                outRemoveFromIndexCauseRemoved.add(new CommitResult.IndexResult(up.getClassId(),
-                        removedVers.getONidVer()));
+                outRemoveFromIndexCauseRemoved
+                        .add(new CommitResult.IndexResult(up.getPrimaryClassId(),
+                                removedVers.getONidVer()));
             } else {
-                outRemoveFromIndexCauseUpdate.add(new CommitResult.IndexResult(up.getClassId(),
-                        removedVers.getONidVer()));
+                outRemoveFromIndexCauseUpdate
+                        .add(new CommitResult.IndexResult(up.getPrimaryClassId(),
+                                removedVers.getONidVer()));
             }
             if (!up.isMarkedForDeletion()) {
                 /* No need to index deleted nodes */
                 final VersionWrapper addedVers =
                         getBase().getVersionsModule().addNodeVersion(up.getNid(), up.getVersion());
                 outNidVer[0] = addedVers.getONidVer();
-                outAddToIndex
-                        .add(new CommitResult.IndexResult(up.getClassId(), addedVers.getONidVer()));
+                outAddToIndex.add(new CommitResult.IndexResult(up.getPrimaryClassId(),
+                        addedVers.getONidVer()));
             }
 
             return up;
@@ -198,26 +202,36 @@ public class CommitModule extends Module<BaseModule> {
             }
         };
 
+        final ClassDefCache classDefCache = new ClassDefCache();
+
         for (CommitInfo.CommitEntry entry : commitInfo.getCommitEntrySet()) {
             final LiveNode node = entry.getLiveNode();
-            final ClassId classId = node.getClassId();
-            final ClassDefinition classDef = getBase().getClassesModule().getClassDefById(classId);
-            for (final Map.Entry<FieldIndex, ClassFieldsDefinition.FieldEntry> fieldEntry : classDef
-                    .getFields().getFieldEntries().entrySet()) {
-                final ITypeDef typeDef = fieldEntry.getValue().getTypeDef();
-                final FieldPerformerRegistry registry =
-                        getBase().getFieldsModule().getFieldPerformerRegistry();
-                final IFieldPerformer<ITypeDef> performer =
-                        (IFieldPerformer<ITypeDef>) registry.get(typeDef.getClass());
-                performer.validateAndCommit(getBase(), sender, node, classDef, typeDef,
-                        fieldEntry.getValue(), fieldEntry.getKey(), newCommitInfo);
+            final ClassId primaryClassId = node.getPrimaryClassId();
+            final Set<ClassId> allClassIds = node.getAllClassIds();
+            for (final ClassId classId : allClassIds) {
+                final ClassDefinition classDef = classDefCache.getClassDef(getBase(), classId);
+                for (final Map.Entry<FieldIndex, ClassFieldsDefinition.FieldEntry> fieldEntry :
+                        classDef
+                        .getFields().getFieldEntries().entrySet()) {
+                    final ITypeDef typeDef = fieldEntry.getValue().getTypeDef();
+                    final FieldPerformerRegistry registry =
+                            getBase().getFieldsModule().getFieldPerformerRegistry();
+                    final IFieldPerformer<ITypeDef> performer =
+                            (IFieldPerformer<ITypeDef>) registry.get(typeDef.getClass());
+                    final FieldIndex fieldIndex = fieldEntry.getKey();
+                    final FieldIndexAndClassId fieldIndexAndClassId =
+                            new FieldIndexAndClassId(fieldIndex, classId,
+                                    primaryClassId.equals(classId));
+                    performer.validateAndCommit(getBase(), sender, node, classDef, typeDef,
+                            fieldEntry.getValue(), fieldIndexAndClassId, newCommitInfo);
+                }
             }
-
         }
     }
 
     private void removeIncNode(final ONid incNid) {
         // TODO: Alle felder und so zeugs muss auch weg.
+        // TODO: Inc node sollte nicht entfernt werden, sonst kann die ID wieder verwendet werden.
         getBase().getDb().delete(incNid.getRecordId());
     }
 

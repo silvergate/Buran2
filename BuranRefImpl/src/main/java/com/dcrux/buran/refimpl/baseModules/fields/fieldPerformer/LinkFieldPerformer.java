@@ -5,7 +5,6 @@ import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetLinkClassId;
 import com.dcrux.buran.common.fields.getter.FieldGetLinkTarget;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
@@ -20,6 +19,7 @@ import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsWrapper;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -82,7 +82,6 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
 
     public static final LinkFieldPerformer SINGLETON = new LinkFieldPerformer();
 
-
     public static final String APPEND_NID = "";
     public static final String APPEND_TYPE = "type";
     public static final String APPEND_ACCOUNT = "acc";
@@ -90,7 +89,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
 
     @Override
     public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
-            ClassDefinition classDefinition, LinkType stringType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, LinkType stringType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetLink) {
             final FieldSetLink fieldSetLink = ((FieldSetLink) setter);
@@ -205,10 +204,9 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                                     "not found", target));
                         }
                     }
-                    ClassId targetClassId = targetNode.getClassId();
+                    ClassId targetClassId = targetNode.getPrimaryClassId();
                     NewRelationsWrapper newRelationsWrapper = NewRelationsWrapper
-                            .c(node.getOrid(), node.getClassId(), fieldIndex, targetClassId, target,
-                                    versioned);
+                            .c(node.getOrid(), fieldIndex, targetClassId, target, versioned);
                     baseModule.getNewRelationsModule().addRelation(newRelationsWrapper);
             }
 
@@ -238,7 +236,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
     @Override
     public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
             ClassDefinition classDefinition, LinkType stringType,
-            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndexAndClassId fieldIndex,
             ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             Integer value = (Integer) node.getFieldValue(fieldIndex, APPEND_TYPE, OType.INTEGER);
@@ -314,10 +312,9 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
                                                 "not found", target));
                             }
                         }
-                        ClassId targetClassId = targetNode.getClassId();
+                        ClassId targetClassId = targetNode.getPrimaryClassId();
                         NewRelationsWrapper newRelationsWrapper = NewRelationsWrapper
-                                .c(node.getOrid(), node.getClassId(), fieldIndex, targetClassId,
-                                        target, versioned);
+                                .c(node.getOrid(), fieldIndex, targetClassId, target, versioned);
                         baseModule.getNewRelationsModule().addRelation(newRelationsWrapper);
                 }
             }
@@ -325,7 +322,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
     }
 
     @Nullable
-    private TargetType getType(CommonNode node, FieldIndex fieldIndex) {
+    private TargetType getType(CommonNode node, FieldIndexAndClassId fieldIndex) {
         Integer type = (Integer) node.getFieldValue(fieldIndex, APPEND_TYPE, OType.INTEGER);
         if (type == null) {
             return null;
@@ -335,7 +332,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
     }
 
     @Nullable
-    private UserId getAccount(CommonNode node, FieldIndex fieldIndex) {
+    private UserId getAccount(CommonNode node, FieldIndexAndClassId fieldIndex) {
         Long account = (Long) node.getFieldValue(fieldIndex, APPEND_ACCOUNT, OType.LONG);
         if (account == null) {
             return null;
@@ -345,7 +342,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
     }
 
     @Nullable
-    private ClassId getClassId(CommonNode node, FieldIndex fieldIndex) {
+    private ClassId getClassId(CommonNode node, FieldIndexAndClassId fieldIndex) {
         Long classId = (Long) node.getFieldValue(fieldIndex, APPEND_CLASSID, OType.LONG);
         if (classId == null) {
             return null;
@@ -355,7 +352,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
     }
 
     @Nullable
-    private ORID getOrid(CommonNode node, FieldIndex fieldIndex) {
+    private ORID getOrid(CommonNode node, FieldIndexAndClassId fieldIndex) {
         ORID orid = (ORID) node.getFieldValue(fieldIndex, APPEND_NID, OType.LINK);
         if (orid == null) {
             return null;
@@ -366,7 +363,7 @@ public class LinkFieldPerformer extends FieldPerformer<LinkType> {
 
     @Override
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
-            ClassDefinition classDefinition, LinkType stringType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, LinkType stringType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataGetter<?> dataGetter) {
         if (dataGetter instanceof FieldGetLinkTarget) {
             TargetType type = getType(node, fieldIndex);

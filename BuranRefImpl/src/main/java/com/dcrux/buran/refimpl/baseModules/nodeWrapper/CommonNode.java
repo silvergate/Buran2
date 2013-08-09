@@ -7,6 +7,7 @@ import com.dcrux.buran.refimpl.baseModules.common.DocumentWrapper;
 import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.sun.istack.internal.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class CommonNode extends DocumentWrapper {
         super(document);
     }
 
-    public boolean addClass(ClassId classId) {
+    public boolean addSecondaryClassId(ClassId classId) {
         Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
         if (classes == null) {
             classes = new HashSet<Long>();
@@ -45,15 +46,21 @@ public class CommonNode extends DocumentWrapper {
         return !notAdded;
     }
 
-    public boolean removeClass(ClassId classId) {
+    public boolean removeSecondaryClassId(ClassId classId) {
         Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
         if (classes == null) {
             return false;
         }
-        return classes.remove(classId.getId());
+        boolean removed = classes.remove(classId.getId());
+        if (classes.isEmpty()) {
+            getDocument().removeField(FIELD_CLASSES);
+        } else {
+            getDocument().field(FIELD_CLASSES, classes, OType.EMBEDDEDSET);
+        }
+        return removed;
     }
 
-    public Set<ClassId> getClasses() {
+    public Set<ClassId> getSecondaryClassIds() {
         final Set classes = getDocument().field(FIELD_CLASSES, OType.EMBEDDEDSET);
         if (classes == null) {
             return Collections.emptySet();
@@ -67,8 +74,16 @@ public class CommonNode extends DocumentWrapper {
         }
     }
 
+    public boolean hasSecondaryClasses() {
+        return getDocument().containsField(FIELD_CLASSES);
+    }
+
     public boolean isTypeOf(ClassId classId) {
-        return getClassId().equals(classId);
+        if (getPrimaryClassId().equals(classId)) {
+            return true;
+        }
+        /* Secondary? */
+        return (getSecondaryClassIds().contains(classId));
     }
 
     public boolean isLive() {
@@ -85,60 +100,89 @@ public class CommonNode extends DocumentWrapper {
         return new UserId(senderId);
     }
 
-    public ClassId getClassId() {
+    public ClassId getPrimaryClassId() {
         return ClassNameUtils.getNodeClassId(getDocument().getClassName());
     }
 
+    public Set<ClassId> getAllClassIds() {
+        if (!hasSecondaryClasses()) {
+            return Collections.singleton(getPrimaryClassId());
+        } else {
+            final Set<ClassId> classes = new HashSet<>();
+            classes.add(getPrimaryClassId());
+            classes.addAll(getSecondaryClassIds());
+            return classes;
+        }
+    }
+
+    @Deprecated
     public static String fieldName(FieldIndex index) {
         return "f" + index.getIndex();
     }
 
+    @Deprecated
     public static String fieldName(FieldIndex index, String append) {
         return "f" + append + index.getIndex();
     }
 
-    public void setFieldValue(FieldIndex index, Object value, OType type) {
-        /*System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName
-                (index));*/
-        getDocument().field(fieldName(index), value, type);
+    private static String fieldNameInt(FieldIndexAndClassId indexAndClassId,
+            @Nullable String append) {
+        final String appendStr;
+        if (append != null) {
+            appendStr = append;
+        } else {
+            appendStr = "";
+        }
+        if (indexAndClassId.isPrimaryClass()) {
+            return "f" + appendStr + indexAndClassId.getIndex().getIndex();
+        } else {
+            final String classStr = Long.toHexString(indexAndClassId.getClassId().getId());
+            return "f_" + classStr + appendStr + indexAndClassId.getIndex().getIndex();
+        }
     }
 
-    public void removeFieldValue(FieldIndex index) {
-        getDocument().removeField(fieldName(index));
+    public static String fieldName(FieldIndexAndClassId indexAndClassId) {
+        return fieldNameInt(indexAndClassId, null);
     }
 
-    public Object getFieldValue(FieldIndex index, OType type) {
-        return getDocument().field(fieldName(index), type);
+    public static String fieldName(FieldIndexAndClassId indexAndClassId, String append) {
+        return fieldNameInt(indexAndClassId, append);
     }
 
-    public Object getFieldValue(FieldIndex index) {
-        return getDocument().field(fieldName(index));
-    }
-
+    @Deprecated
     public boolean hasField(FieldIndex index) {
         return getDocument().containsField(fieldName(index));
     }
 
-    public void setFieldValue(FieldIndex index, String append, Object value, OType type) {
-        /*System.out.println("Setting value: " + value + ", at indexAndNotify: " + fieldName
-                (index));*/
+    public Object getFieldValue(FieldIndexAndClassId index, OType type) {
+        return getDocument().field(fieldName(index), type);
+    }
+
+    public void setFieldValue(FieldIndexAndClassId index, Object value, OType type) {
+        getDocument().field(fieldName(index), value, type);
+    }
+
+    public void removeFieldValue(FieldIndexAndClassId index) {
+        getDocument().removeField(fieldName(index));
+    }
+
+    public boolean hasField(FieldIndexAndClassId index) {
+        return getDocument().containsField(fieldName(index));
+    }
+
+    public void setFieldValue(FieldIndexAndClassId index, String append, Object value, OType type) {
         getDocument().field(fieldName(index, append), value, type);
     }
 
-
-    public void removeFieldValue(FieldIndex index, String append) {
+    public void removeFieldValue(FieldIndexAndClassId index, String append) {
         getDocument().removeField(fieldName(index, append));
     }
 
-    public Object getFieldValue(FieldIndex index, String append, OType type) {
+    public Object getFieldValue(FieldIndexAndClassId index, String append, OType type) {
         return getDocument().field(fieldName(index, append), type);
     }
 
-    public Object getFieldValue(FieldIndex index, String append) {
-        return getDocument().field(fieldName(index, append));
-    }
-
-    public boolean hasField(FieldIndex index, String append) {
+    public boolean hasField(FieldIndexAndClassId index, String append) {
         return getDocument().containsField(fieldName(index, append));
     }
 

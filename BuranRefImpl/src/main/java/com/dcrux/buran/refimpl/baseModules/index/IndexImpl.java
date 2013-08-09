@@ -47,7 +47,7 @@ public class IndexImpl extends Module<BaseModule> {
             throws NodeNotFoundException, NodeClassNotFoundException {
         final LiveNode node = getBase().getDataFetchModule().getNode(versionsRecord);
         final ClassDefExt classDefExt =
-                getBase().getClassesModule().getClassDefExtById(node.getClassId());
+                getBase().getClassesModule().getClassDefExtById(node.getPrimaryClassId());
 
         /* Eval values for map indexAndNotify */
         final Map<ClassIndexName, Collection<EvaluatedMap>> evalResult =

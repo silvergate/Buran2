@@ -1,8 +1,8 @@
 package com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.binary;
 
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ORecordBytes;
@@ -26,7 +26,7 @@ public class BinaryUtil {
     private static final String APPEND_SIZE = "as";
 
     @Nullable
-    public static List<OIdentifiable> getChunks(CommonNode node, FieldIndex fieldIndex,
+    public static List<OIdentifiable> getChunks(CommonNode node, FieldIndexAndClassId fieldIndex,
             boolean createIfNonExistant) {
         final Object chunks = node.getFieldValue(fieldIndex, OType.LINKLIST);
         if (chunks == null) {
@@ -43,7 +43,8 @@ public class BinaryUtil {
         }
     }
 
-    public static void empty(BaseModule baseModule, CommonNode node, FieldIndex fieldIndex) {
+    public static void empty(BaseModule baseModule, CommonNode node,
+            FieldIndexAndClassId fieldIndex) {
         final List<OIdentifiable> chunks = getChunks(node, fieldIndex, false);
         if ((chunks == null) || (chunks.isEmpty())) {
             return;
@@ -56,30 +57,31 @@ public class BinaryUtil {
 
     }
 
-    public static void remove(BaseModule baseModule, CommonNode node, FieldIndex fieldIndex) {
+    public static void remove(BaseModule baseModule, CommonNode node,
+            FieldIndexAndClassId fieldIndex) {
         empty(baseModule, node, fieldIndex);
         node.removeFieldValue(fieldIndex);
         node.removeFieldValue(fieldIndex, APPEND_SIZE);
     }
 
     @Nullable
-    public static Long getSize(CommonNode node, FieldIndex fieldIndex) {
+    public static Long getSize(CommonNode node, FieldIndexAndClassId fieldIndex) {
         return (Long) node.getFieldValue(fieldIndex, APPEND_SIZE, OType.LONG);
     }
 
-    public static boolean exists(CommonNode node, FieldIndex fieldIndex) {
+    public static boolean exists(CommonNode node, FieldIndexAndClassId fieldIndex) {
         return getSize(node, fieldIndex) != null;
     }
 
-    public static void createOfNonExistent(CommonNode node, FieldIndex fieldIndex) {
+    public static void createOfNonExistent(CommonNode node, FieldIndexAndClassId fieldIndex) {
         if (!exists(node, fieldIndex)) {
             node.setFieldValue(fieldIndex, Collections.emptyList(), OType.LINKLIST);
             node.setFieldValue(fieldIndex, APPEND_SIZE, 0, OType.LONG);
         }
     }
 
-    public static void append(BaseModule baseModule, CommonNode node, FieldIndex fieldIndex,
-            InputStream inputStream) throws IOException {
+    public static void append(BaseModule baseModule, CommonNode node,
+            FieldIndexAndClassId fieldIndex, InputStream inputStream) throws IOException {
         try {
             final List<OIdentifiable> chunksIn = getChunks(node, fieldIndex, true);
             final List<OIdentifiable> chunks = new ArrayList<>();
@@ -133,7 +135,7 @@ public class BinaryUtil {
         }
     }
 
-    public static void read(BaseModule baseModule, CommonNode node, FieldIndex fieldIndex,
+    public static void read(BaseModule baseModule, CommonNode node, FieldIndexAndClassId fieldIndex,
             long skip, long limit, OutputStream outputStream) throws IOException {
         final List<OIdentifiable> chunks = getChunks(node, fieldIndex, false);
         final long size = getSize(node, fieldIndex);

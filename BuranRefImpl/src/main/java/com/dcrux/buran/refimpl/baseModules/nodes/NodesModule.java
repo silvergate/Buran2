@@ -26,14 +26,23 @@ public class NodesModule extends Module<BaseModule> {
             throws NodeClassNotFoundException, FieldConstraintViolationInt {
         switch (classIdMut.getType()) {
             case add:
-                node.addClass(classIdMut.getClassId());
+                if (node.getPrimaryClassId().equals(classIdMut.getClassId())) {
+                    /* Nothing to do. Class already added as primary class. */
+                } else {
+                    node.addSecondaryClassId(classIdMut.getClassId());
+                }
                 break;
             case remove:
-                /* Remove all fields */
-                FieldRemoveAll fieldRemoveAll = new FieldRemoveAll(classIdMut.getClassId());
-                getBase().getFieldsModule().performSetter(sender, node, fieldRemoveAll);
-                /* Now remove class */
-                node.removeClass(classIdMut.getClassId());
+                if (node.getPrimaryClassId().equals(classIdMut.getClassId())) {
+                    /* Failure, cannot remove primary class! */
+                    throw new IllegalArgumentException("Cannot remove primary class!");
+                } else {
+                    /* Remove all fields */
+                    FieldRemoveAll fieldRemoveAll = new FieldRemoveAll(classIdMut.getClassId());
+                    getBase().getFieldsModule().performSetter(sender, node, fieldRemoveAll);
+                    /* Now remove class */
+                    node.removeSecondaryClassId(classIdMut.getClassId());
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetBin;
 import com.dcrux.buran.common.fields.getter.FieldGetBinLen;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
@@ -19,6 +18,7 @@ import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer.binary.BinaryUtil;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 
 import java.io.ByteArrayInputStream;
@@ -44,7 +44,7 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
 
     @Override
     public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
-            ClassDefinition classDefinition, BinaryType binaryType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, BinaryType binaryType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetBin) {
             final byte[] value = ((FieldSetBin) setter).getValue();
@@ -83,7 +83,7 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
     @Override
     public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
             ClassDefinition classDefinition, BinaryType binaryType,
-            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndexAndClassId fieldIndex,
             ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             boolean exists = BinaryUtil.exists(node, fieldIndex);
@@ -95,7 +95,7 @@ public class BinaryFieldPerformer extends FieldPerformer<BinaryType> {
 
     @Override
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
-            ClassDefinition classDefinition, BinaryType binaryType, FieldIndex fieldIndex,
+            ClassDefinition classDefinition, BinaryType binaryType, FieldIndexAndClassId fieldIndex,
             IUnfieldedDataGetter<?> dataGetter) {
         if ((dataGetter instanceof FieldGetPrim) || (dataGetter instanceof FieldGetBinLen)) {
             final Long len = BinaryUtil.getSize(node, fieldIndex);

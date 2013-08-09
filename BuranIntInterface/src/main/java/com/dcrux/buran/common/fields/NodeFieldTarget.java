@@ -9,7 +9,8 @@ public enum NodeFieldTarget implements IFieldTarget {
     sender,
     created,
     lastUpdated,
-    domains;
+    domains,
+    classes;
 
     @Override
     public Class<? extends IFieldTarget> getType() {

@@ -37,8 +37,9 @@ public class IncubationModule extends Module<BaseModule> {
             throws NodeNotFoundException {
         final LiveNode nodeToUpdate = getBase().getDataFetchModule().getNode(nidVerToUpdate);
 
-        final IncubationNode incubationNode = IncubationNode.createUpdate(nodeToUpdate.getClassId(),
-                getBase().getCurrentTimestampProvider().get(), sender, nidVerToUpdate);
+        final IncubationNode incubationNode = IncubationNode
+                .createUpdate(nodeToUpdate.getPrimaryClassId(),
+                        getBase().getCurrentTimestampProvider().get(), sender, nidVerToUpdate);
         incubationNode.getDocument().save();
         return incubationNode.getIncNid();
     }

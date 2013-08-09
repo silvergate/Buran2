@@ -27,7 +27,7 @@ public class Test2 {
             IOException {
         String fileName = "testFileOne.jpg";
         NidVer nidVer = createFile(filesModule, fileName);
-        final String desc = descModule.getBestDescription(nidVer, "unknown");
+        final String desc = descModule.getTitle(nidVer);
         System.out.println("Description: " + desc);
     }
 
@@ -87,7 +87,7 @@ public class Test2 {
             filesTest.createAndReadDesc();
         }
 
-        Thread.sleep(100);
+        Thread.sleep(5000);
 
         filesTest.findByTitleNew();
 

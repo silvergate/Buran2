@@ -2,6 +2,7 @@ package com.dcrux.buran.refimpl.baseModules.newIndexing;
 
 import com.dcrux.buran.query.indexingDef.IIndexingDef;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processors.ClassIdIndexingDefImpl;
+import com.dcrux.buran.refimpl.baseModules.newIndexing.processors.ClassIdsIndexingDefImpl;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processors.IntIndexingDefImpl;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processors.StrAnalyzedIndexingDefImpl;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processorsIface.IIndexingDefImpl;
@@ -34,6 +35,7 @@ public class ProcessorsRegistry {
         register(new IntIndexingDefImpl());
         register(new StrAnalyzedIndexingDefImpl());
         register(new ClassIdIndexingDefImpl());
+        register(new ClassIdsIndexingDefImpl());
     }
 
     public IIndexingDefImpl<?, ?> getUnsafe(Class<? extends IIndexingDef> aClass) {

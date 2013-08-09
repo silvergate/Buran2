@@ -3,7 +3,6 @@ package com.dcrux.buran.refimpl.baseModules.fields.fieldPerformer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassFieldsDefinition;
-import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetInt;
 import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
@@ -16,6 +15,7 @@ import com.dcrux.buran.refimpl.baseModules.fields.FieldConstraintViolationInt;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldPerformer;
 import com.dcrux.buran.refimpl.baseModules.fields.ICommitInfo;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.baseModules.nodeWrapper.FieldIndexAndClassId;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 
@@ -54,8 +54,9 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
 
     @Override
     public boolean performSetter(BaseModule baseModule, UserId sender, CommonNode node,
-            ClassDefinition classDefinition, IntegerType integerType, FieldIndex fieldIndex,
-            IUnfieldedDataSetter setter) throws FieldConstraintViolationInt {
+            ClassDefinition classDefinition, IntegerType integerType,
+            FieldIndexAndClassId fieldIndex, IUnfieldedDataSetter setter)
+            throws FieldConstraintViolationInt {
         if (setter instanceof FieldSetInt) {
             final Number value = ((FieldSetInt) setter).getValue();
             if (!integerType.isValid(value)) {
@@ -76,7 +77,7 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
     @Override
     public void validateAndCommit(BaseModule baseModule, UserId sender, CommonNode node,
             ClassDefinition classDefinition, IntegerType integerType,
-            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndex fieldIndex,
+            ClassFieldsDefinition.FieldEntry fieldEntry, FieldIndexAndClassId fieldIndex,
             ICommitInfo commitInfo) throws FieldConstraintViolationInt {
         if (fieldEntry.isRequired()) {
             Object value = node.getFieldValue(fieldIndex, oTypeFrom(integerType));
@@ -88,8 +89,8 @@ public class IntegerFieldPerformer extends FieldPerformer<IntegerType> {
 
     @Override
     public Serializable performGetter(BaseModule baseModule, LiveNode node,
-            ClassDefinition classDefinition, IntegerType integerType, FieldIndex fieldIndex,
-            IUnfieldedDataGetter<?> dataGetter) {
+            ClassDefinition classDefinition, IntegerType integerType,
+            FieldIndexAndClassId fieldIndex, IUnfieldedDataGetter<?> dataGetter) {
         return (Serializable) node.getFieldValue(fieldIndex, oTypeFrom(integerType));
     }
 

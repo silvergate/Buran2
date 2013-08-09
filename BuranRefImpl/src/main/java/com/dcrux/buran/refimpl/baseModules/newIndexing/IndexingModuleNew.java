@@ -7,6 +7,8 @@ import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.exceptions.NodeNotFoundException;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.FieldTarget;
+import com.dcrux.buran.common.fields.NodeFieldTarget;
+import com.dcrux.buran.common.fields.getter.SingleGet;
 import com.dcrux.buran.query.IndexFieldTarget;
 import com.dcrux.buran.query.IndexedFieldDef;
 import com.dcrux.buran.query.IndexedFieldId;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Buran.
@@ -77,20 +80,35 @@ public class IndexingModuleNew extends Module<BaseModule> {
         }
     }
 
-    public void index(final UserId receiver, ONidVer versionsRecord, ClassId classId)
+    private void indexSingleClassId(UserId receiver, ONidVer versionsRecord,
+            XContentBuilder contentBuilder, ClassDefCache classDefCache, ClassId classId,
+            NodeCache nodeCache)
             throws NodeClassNotFoundException, NodeNotFoundException, IOException {
-        final ClassDefExt classDefExt = getBase().getClassesModule().getClassDefExtById(classId);
-        final NodeCache cache = new NodeCache();
-        final CommonNode node = cache.getNodeVerLoad(getBase(), versionsRecord.getoIdentifiable());
-        XContentBuilder contentBuilder = XContentFactory.jsonBuilder();
-        contentBuilder.startObject();
+        final ClassDefExt classDefExt = classDefCache.getClassDefExt(getBase(), classId);
+        final CommonNode node =
+                nodeCache.getNodeVerLoad(getBase(), versionsRecord.getoIdentifiable());
         for (final Map.Entry<ClassIndexId, SingleIndexDef> singleIndex : classDefExt
                 .getClassDefinition().getIndexesNew().getIndexes().entrySet()) {
             final ClassIndexId classIndexId = singleIndex.getKey();
             indexSingle(contentBuilder, receiver, classIndexId, singleIndex.getValue(),
-                    versionsRecord, classId, classDefExt, node, cache);
+                    versionsRecord, classId, classDefExt, node, nodeCache);
         }
+    }
 
+    public void index(final UserId receiver, ONidVer versionsRecord, ClassId primaryClassId)
+            throws NodeClassNotFoundException, NodeNotFoundException, IOException {
+        final NodeCache nodeCache = new NodeCache();
+        final ClassDefCache classDefCache = new ClassDefCache();
+        final CommonNode node =
+                nodeCache.getNodeVerLoad(getBase(), versionsRecord.getoIdentifiable());
+        final Set<ClassId> allClasses = node.getAllClassIds();
+
+        XContentBuilder contentBuilder = XContentFactory.jsonBuilder();
+        contentBuilder.startObject();
+        for (final ClassId classId : allClasses) {
+            indexSingleClassId(receiver, versionsRecord, contentBuilder, classDefCache, classId,
+                    nodeCache);
+        }
         contentBuilder.endObject();
 
         System.out.println("Added document to index: " + contentBuilder.string());
@@ -142,25 +160,38 @@ public class IndexingModuleNew extends Module<BaseModule> {
         for (Map.Entry<IndexedFieldId, IndexedFieldDef> entry : singleIndexDef.getFieldDef()
                 .entrySet()) {
             final IndexedFieldDef fieldDef = entry.getValue();
-
+            final IIndexingDef<?> indexingDef = fieldDef.getIndexingDef();
             final IndexFieldTarget fieldTarget = fieldDef.getFieldTarget();
             if (fieldTarget.is(IndexFieldTarget.TYPE_NODE_FIELD)) {
-                throw new UnsupportedOperationException("Node fields no suported at the moment");
-            }
-
-            if (fieldTarget.is(IndexFieldTarget.TYPE_FIELD_INDEX)) {
-                final FieldIndex fieldIndex = fieldTarget.get(IndexFieldTarget.TYPE_FIELD_INDEX);
-                final IIndexingDef<?> indexingDef = fieldDef.getIndexingDef();
-                final FieldTarget fieldTargetImpl = FieldTarget.c(classId, fieldIndex);
-
-                final Serializable value = getBase().getFieldsModule()
-                        .performUnfieldedGetter((LiveNode) node, fieldTargetImpl, classDefCache,
-                                indexingDef.getDataGetter());
+                final NodeFieldTarget nodeFieldTarget =
+                        fieldTarget.get(IndexFieldTarget.TYPE_NODE_FIELD);
+                final SingleGet singleGet =
+                        SingleGet.c(nodeFieldTarget, indexingDef.getDataGetter());
+                final Serializable value =
+                        getBase().getFieldsModule().performGetter((LiveNode) node, singleGet);
                 if ((value == null) && (indexingDef.requiredForIndex())) {
                /* Cancel, missing field, not indexable */
                     return;
                 }
                 fieldValues.put(entry.getKey(), value);
+            } else {
+
+                if (fieldTarget.is(IndexFieldTarget.TYPE_FIELD_INDEX)) {
+                    final FieldIndex fieldIndex =
+                            fieldTarget.get(IndexFieldTarget.TYPE_FIELD_INDEX);
+                    final FieldTarget fieldTargetImpl = FieldTarget.c(classId, fieldIndex);
+
+                    final Serializable value = getBase().getFieldsModule()
+                            .performUnfieldedGetter((LiveNode) node, fieldTargetImpl, classDefCache,
+                                    indexingDef.getDataGetter());
+                    if ((value == null) && (indexingDef.requiredForIndex())) {
+               /* Cancel, missing field, not indexable */
+                        return;
+                    }
+                    fieldValues.put(entry.getKey(), value);
+                } else {
+                    throw new IllegalArgumentException("Unknwo fiel index type");
+                }
             }
         }
 
