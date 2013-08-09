@@ -7,6 +7,7 @@ import java.io.Serializable;
  *
  * @author: ${USER} Date: 09.07.13 Time: 18:08
  */
+@Deprecated
 public class LimitConfig implements Serializable {
     private boolean returnPartialResults;
     private int limit;

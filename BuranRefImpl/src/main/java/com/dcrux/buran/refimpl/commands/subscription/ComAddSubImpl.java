@@ -4,7 +4,6 @@ import com.dcrux.buran.commands.subscription.ComAddSub;
 import com.dcrux.buran.common.subscription.SubId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
-import com.dcrux.buran.refimpl.subscription.subRegistry.SubRegistry;
 
 /**
  * Buran.
@@ -16,11 +15,8 @@ public class ComAddSubImpl extends TransactionalCommand<SubId, ComAddSub> {
 
     @Override
     protected SubId transactional(ComAddSub command, BaseModule baseModule) throws Exception {
-        final SubRegistry subRegistry =
-                baseModule.getSubscriptionModule().getOrCreateRegistry(baseModule.getReceiver());
-        final SubId subId =
-                subRegistry.addSubscription(command.getBlockId(), command.getSubDefinition());
-        return subId;
+        //TODO: Implement me
+        return null;
     }
 
     @Override

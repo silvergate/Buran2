@@ -2,19 +2,16 @@ package com.dcrux.buran.refimpl.baseModules.classes;
 
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassDependenciesDef;
-import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classDefinition.DependencyIndex;
 import com.dcrux.buran.common.classes.ClassHashId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
-import com.dcrux.buran.refimpl.baseModules.index.functionCompiler.IndexingAdditionalInfo;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.ClassNameUtils;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.IRunner;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransRet;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.ITransaction;
-import com.dcrux.buran.scripting.compiler.CompiledBlock;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
@@ -199,12 +196,7 @@ public class ClassesModule extends Module<BaseModule> {
         ClassId classId = classDefWrapper.getClassId();
 
         /* Create information for storage */
-        final IndexingAdditionalInfo indexingAdditionalInfo = getBase().getIndexModule()
-                .prepareClassForIndexing(classId, classDefinition.getIndexes());
-        final Map<ClassIndexName, CompiledBlock> compiledMapFunctions =
-                indexingAdditionalInfo.getCompiledIndexes();
-        ClassDefExt classDefExt =
-                new ClassDefExt(classDefinition, compiledMapFunctions, classIdDependencies);
+        ClassDefExt classDefExt = new ClassDefExt(classDefinition, classIdDependencies);
         final byte[] completedBinary = toBinary(classDefExt);
 
         /* Create orientDB-classes */

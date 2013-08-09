@@ -16,28 +16,12 @@ import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.common.fields.getter.FieldGetBinLen;
-import com.dcrux.buran.common.fields.getter.FieldGetStrLimit;
 import com.dcrux.buran.common.fields.getter.SingleGet;
 import com.dcrux.buran.common.fields.setter.FieldAppendBin;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.types.BinaryType;
 import com.dcrux.buran.common.fields.types.StringType;
-import com.dcrux.buran.common.indexing.IndexDefinition;
-import com.dcrux.buran.common.indexing.mapFunction.MapFunction;
-import com.dcrux.buran.common.indexing.mapInput.FieldTarget;
-import com.dcrux.buran.common.indexing.mapInput.NodeMapInput;
-import com.dcrux.buran.common.indexing.mapStore.MapIndex;
-import com.dcrux.buran.scripting.functions.FunGet;
-import com.dcrux.buran.scripting.functions.FunRet;
-import com.dcrux.buran.scripting.functions.bin.FunBinConcat;
-import com.dcrux.buran.scripting.functions.integer.FunIntLit;
-import com.dcrux.buran.scripting.functions.integer.FunIntToBin;
-import com.dcrux.buran.scripting.functions.list.FunListNew;
-import com.dcrux.buran.scripting.functions.string.FunStrHash;
-import com.dcrux.buran.scripting.iface.Code;
-import com.dcrux.buran.scripting.iface.VarName;
-import com.dcrux.buran.scripting.iface.types.IntegerType;
 
 /**
  * Buran.
@@ -61,66 +45,12 @@ public class FilesModule extends Module<BaseModule> {
         this.descModule = new DescModule(baseModule);
     }
 
-    private IndexDefinition getIndexByFileSize() {
-        final VarName fsVarName = VarName.c("fileSize");
-        final NodeMapInput mapInput = new NodeMapInput();
-        mapInput.getFields().put(fsVarName, FieldTarget.cRequired(FIELD_DATA));
-
-        Code mapCode = new Code();
-        mapCode.add(FunRet.c(FunListNew.c().add(FunIntToBin
-                .c(FunGet.c(fsVarName, IntegerType.class),
-                        com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64))
-                .add(FunIntLit.c(0)).get()));
-
-        MapFunction mapFunction = MapFunction.single(mapCode);
-        MapIndex mapIndex = new MapIndex(true);
-
-        final IndexDefinition indexDefinition =
-                new IndexDefinition(mapInput, mapFunction, mapIndex);
-        return indexDefinition;
-    }
-
-    private IndexDefinition getIndexByMimeAndFileSize() {
-        final VarName fsVarName = VarName.c("fileSize");
-        final VarName mimeTypeVarName = VarName.c("mimeType");
-
-        final NodeMapInput mapInput = new NodeMapInput();
-        mapInput.getFields().put(mimeTypeVarName, FieldTarget.cRequired(FIELD_MIME));
-        mapInput.getFields()
-                .put(fsVarName, FieldTarget.cRequired(FIELD_DATA, FieldGetStrLimit.limit(200)));
-
-        Code mapCode = new Code();
-
-        FunStrHash funStrHash = FunStrHash
-                .c(FunGet.c(mimeTypeVarName, com.dcrux.buran.scripting.iface.types.StringType
-                        .class), FunStrHash.Length.bits64);
-        FunIntToBin funIntToBin = FunIntToBin.c(FunGet.c(fsVarName, IntegerType.class),
-                com.dcrux.buran.scripting.iface.types.IntegerType.NumOfBits.int64);
-
-        mapCode.add(FunRet.c(
-                FunListNew.c().add(FunBinConcat.c(funStrHash, funIntToBin)).add(FunIntLit.c(0))
-                        .get()));
-
-        MapFunction mapFunction = MapFunction.single(mapCode);
-        MapIndex mapIndex = new MapIndex(true);
-
-        final IndexDefinition indexDefinition =
-                new IndexDefinition(mapInput, mapFunction, mapIndex);
-        return indexDefinition;
-    }
 
     private ClassDefinition getFileClassDef() {
         ClassDefinition classDef = new ClassDefinition("A Node containing a file",
                 "A note containing a simple file. Hier noch mehr informationen, ganz viel.");
         classDef.getFields().add(FIELD_MIME, new StringType(0, 256), false)
                 .add(FIELD_DATA, BinaryType.c(BinaryType.MAXLEN_LIMIT), false);
-
-        /* File-size index */
-        classDef.getIndexes().add(INDEX_BY_FILESIZE, getIndexByFileSize());
-
-        /* Mime and fileSize */
-        classDef.getIndexes().add(INDEX_BY_MIME_FILESIZE, getIndexByMimeAndFileSize());
-
         return classDef;
     }
 

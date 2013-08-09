@@ -10,6 +10,7 @@ import java.util.List;
  *
  * @author: ${USER} Date: 09.07.13 Time: 18:09
  */
+@Deprecated
 public class QueryResult implements Serializable {
     private boolean limited;
     private List<NidVer> results;

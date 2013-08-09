@@ -11,7 +11,6 @@ import com.dcrux.buran.refimpl.baseModules.deltaRecorder.DeltaRecorderModule;
 import com.dcrux.buran.refimpl.baseModules.elasticSearch.EsModule;
 import com.dcrux.buran.refimpl.baseModules.fields.FieldsModule;
 import com.dcrux.buran.refimpl.baseModules.incubation.IncubationModule;
-import com.dcrux.buran.refimpl.baseModules.index.IndexModule;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.IndexingModuleNew;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.SearchModule;
 import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsModule;
@@ -49,7 +48,6 @@ public class BaseModule {
     private final AuthModule authModule = new AuthModule(this);
     private final DeltaRecorderModule deltaRecorderModule = new DeltaRecorderModule(this);
     private final Random random = new Random();
-    private final IndexModule indexModule = new IndexModule(this);
     private final IndexingModuleNew indexingModule = new IndexingModuleNew(this);
     private final VersionsModule versionsModule = new VersionsModule(this);
     private final NotificationsModule notificationsModule = new NotificationsModule(this);
@@ -75,7 +73,6 @@ public class BaseModule {
         this.classesModule.setupDb();
         this.deltaRecorderModule.setupDb();
         this.versionsModule.setupDb();
-        this.indexModule.setupDb();
         this.newRelationsModule.setupDb();
     }
 
@@ -173,10 +170,6 @@ public class BaseModule {
 
     public DeltaRecorderModule getDeltaRecorderModule() {
         return deltaRecorderModule;
-    }
-
-    public IndexModule getIndexModule() {
-        return indexModule;
     }
 
     public VersionsModule getVersionsModule() {

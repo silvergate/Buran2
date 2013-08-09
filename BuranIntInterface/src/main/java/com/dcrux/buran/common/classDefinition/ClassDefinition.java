@@ -29,14 +29,11 @@ public class ClassDefinition implements Serializable {
         this.shortDesc = shortDesc;
         this.longDesc = longDesc;
         this.fields = new ClassFieldsDefinition();
-        this.indexes = new ClassIndexDefinition();
         this.dependencies = new ClassDependenciesDef();
         this.indexesNew = new ClassIndexDefNew();
     }
 
     private ClassFieldsDefinition fields;
-    @Deprecated
-    private ClassIndexDefinition indexes;
     private ClassIndexDefNew indexesNew;
     private ClassDependenciesDef dependencies;
 
@@ -59,10 +56,6 @@ public class ClassDefinition implements Serializable {
         return dependencies;
     }
 
-    public ClassIndexDefinition getIndexes() {
-        return indexes;
-    }
-
     public ClassIndexDefNew getIndexesNew() {
         return indexesNew;
     }
@@ -73,7 +66,6 @@ public class ClassDefinition implements Serializable {
                 "shortDesc='" + shortDesc + '\'' +
                 ", longDesc='" + longDesc + '\'' +
                 ", fields=" + fields +
-                ", indexes=" + indexes +
                 '}';
     }
 }
