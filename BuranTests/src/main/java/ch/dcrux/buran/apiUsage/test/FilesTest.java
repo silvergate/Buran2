@@ -32,6 +32,7 @@ public class FilesTest {
     public FilesTest(BaseModule baseModule) {
         this.filesModule = new FilesModule(baseModule);
         this.descModule = new DescModule(baseModule);
+        //TEST
     }
 
     public void createAndReadDesc()
