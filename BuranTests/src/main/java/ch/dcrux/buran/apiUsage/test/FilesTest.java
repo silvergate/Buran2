@@ -7,9 +7,17 @@ import com.dcrux.buran.commandBase.UncheckedException;
 import com.dcrux.buran.commandBase.UnknownCommandException;
 import com.dcrux.buran.commandBase.WrappedExpectableException;
 import com.dcrux.buran.commands.incubation.CommitResult;
+import com.dcrux.buran.commands.subscription.ComAddSub;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classes.ClassId;
+import com.dcrux.buran.common.subscription.SubId;
+import com.dcrux.buran.query.queries.IQuery;
+import com.dcrux.buran.query.queries.QueryTarget;
+import com.dcrux.buran.query.queries.fielded.BoolQuery;
+import com.dcrux.buran.query.queries.fielded.IOrQueryInput;
+import com.dcrux.buran.query.queries.fielded.Query;
+import com.dcrux.buran.query.queries.unfielded.IntCmp;
 import com.dcrux.buran.query.queries.unfielded.StrPhrase;
 import com.google.common.base.Optional;
 
@@ -27,11 +35,26 @@ public class FilesTest {
     private FilesModule filesModule;
     private DescModule descModule;
 
-    private static final String TEST_FILE = "/testFiles/testFileOne.jpg";
+    private static final String TEST_FILE = "/testFiles/WebsiteText.docx";
 
     public FilesTest(BaseModule baseModule) {
         this.filesModule = new FilesModule(baseModule);
         this.descModule = new DescModule(baseModule);
+    }
+
+    public void addSubscriptionNewFile()
+            throws UnknownCommandException, UncheckedException, WrappedExpectableException {
+
+        final IOrQueryInput query =
+                Query.c(QueryTarget.cDef(this.filesModule.getFileClassId(), FilesModule.INDEX_SIZE),
+                        IntCmp.ge(136000000));
+        final IOrQueryInput query2 = Query.c(QueryTarget
+                .cDef(this.descModule.getDescClassId(), DescModule.INDEX_ONE_TITLE),
+                StrPhrase.prefix("testFileOne"));
+        final IQuery iq2 = BoolQuery.c().must(query).must(query2);
+
+        ComAddSub comAddSub = ComAddSub.c(new SubId(212), iq2);
+        this.filesModule.getBase().sync(comAddSub);
     }
 
     public void createAndReadDesc()
@@ -74,5 +97,11 @@ public class FilesTest {
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         descModule.findByTitleNew(StrPhrase.prefix("dies ist Micro"),
                 Optional.<ClassId>of(this.filesModule.getFileClassId()));
+
+        /*System.out.println("QUERY BY FILESIZE:");
+        final IQuery query = Query.c(
+                QueryTarget.cDef(this.filesModule.getFileClassId(), FilesModule.INDEX_SIZE),
+                IntCmp.ge(40000000));
+        this.filesModule.getBase().sync(new ComQueryNew(query));*/
     }
 }

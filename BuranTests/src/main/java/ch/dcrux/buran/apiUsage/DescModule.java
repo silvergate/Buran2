@@ -50,10 +50,12 @@ public class DescModule extends Module<BaseModule> {
 
     public static final FieldIndex FIELD_TITLE = FieldIndex.c(0);
     public static final FieldIndex FIELD_LONG_DESC = FieldIndex.c(1);
+    public static final FieldIndex FIELD_INDEX_ONLY = FieldIndex.c(2);
 
     public static final ClassIndexId INDEX_ONE = new ClassIndexId((short) 0);
     public static final IndexedFieldId INDEX_ONE_TITLE = new IndexedFieldId((short) 0);
     public static final IndexedFieldId INDEX_ONE_CLASSES = new IndexedFieldId((short) 1);
+    public static final IndexedFieldId INDEX_ONE_INDEX_ONLY = new IndexedFieldId((short) 3);
 
     public DescModule(BaseModule baseModule) {
         super(baseModule);
@@ -63,7 +65,8 @@ public class DescModule extends Module<BaseModule> {
         ClassDefinition classDef = new ClassDefinition("A described node",
                 "Eine node welche eine andere node beschreibt.");
         classDef.getFields().add(FIELD_TITLE, new StringType(0, 255), false)
-                .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false);
+                .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false)
+                .add(FIELD_INDEX_ONLY, new StringType(0, StringType.MAXLEN_LIMIT), false);
         defineIndexes(classDef.getIndexesNew());
         return classDef;
     }
@@ -73,12 +76,16 @@ public class DescModule extends Module<BaseModule> {
 
         IndexedFieldDef indexedFieldDef = new IndexedFieldDef(IndexFieldTarget.index(FIELD_TITLE),
                 new StrAnalyzedDef(false, 255, FieldGetStr.SINGLETON));
+        IndexedFieldDef indexedFieldOnly =
+                new IndexedFieldDef(IndexFieldTarget.index(FIELD_INDEX_ONLY),
+                        new StrAnalyzedDef(false, StringType.MAXLEN_LIMIT, FieldGetStr.SINGLETON));
         IndexedFieldDef indexedFieldDefClassId =
                 new IndexedFieldDef(IndexFieldTarget.node(NodeFieldTarget.classes),
                         ClassIdsIndexingDef.c());
 
         singleIndexDef.getFieldDef().put(INDEX_ONE_TITLE, indexedFieldDef);
         singleIndexDef.getFieldDef().put(INDEX_ONE_CLASSES, indexedFieldDefClassId);
+        singleIndexDef.getFieldDef().put(INDEX_ONE_INDEX_ONLY, indexedFieldOnly);
 
         classIndexDefNew.getIndexes().put(INDEX_ONE, singleIndexDef);
     }

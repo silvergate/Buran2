@@ -25,7 +25,8 @@ public class SearchModule extends Module<BaseModule> {
         super(baseModule);
     }
 
-    public void search(UserId receiver, IQuery query) throws NodeClassNotFoundException {
+    public FilterOrQueryBuilder buildQuery(UserId receiver, IQuery query)
+            throws NodeClassNotFoundException {
         final ClassDefCache classDefCache = new ClassDefCache();
         final ProcessorsRegistry registry = getBase().getIndexingModule().getProcessorsRegistry();
         final IFieldBuilder fieldBuilder = getBase().getIndexingModule().getFieldBuilder();
@@ -36,6 +37,13 @@ public class SearchModule extends Module<BaseModule> {
         if (queryOrFilterBuilder == null) {
             throw new IllegalArgumentException("No query");
         }
+        return queryOrFilterBuilder;
+    }
+
+    public void search(UserId receiver, IQuery query) throws NodeClassNotFoundException {
+        final IFieldBuilder fieldBuilder = getBase().getIndexingModule().getFieldBuilder();
+
+        final FilterOrQueryBuilder queryOrFilterBuilder = buildQuery(receiver, query);
 
         final Client client = getBase().getEsModule().getClient();
         try {

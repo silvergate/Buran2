@@ -1,7 +1,10 @@
 package com.dcrux.buran.refimpl.baseModules.elasticSearch;
 
+import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
+import com.dcrux.buran.refimpl.baseModules.newIndexing.FieldBuilder;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.io.FileSystemUtils;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -30,6 +33,21 @@ public class EsModule extends Module<BaseModule> {
                 ImmutableSettings.settingsBuilder().put("http" + ".enabled", "false")
                         .put("path.data", "/Users/caelis/esTest");
         this.node = NodeBuilder.nodeBuilder().local(true).settings(esSettings.build()).node();
+    }
+
+    public void ensureIndex(UserId receiver) {
+        final String index = FieldBuilder.getIndexStatic(receiver);
+
+        final Client client = getClient();
+        try {
+            final IndicesExistsResponse response =
+                    client.admin().indices().prepareExists(index).execute().actionGet();
+            if (!response.isExists()) {
+                client.admin().indices().prepareCreate(index).execute().actionGet();
+            }
+        } finally {
+            client.close();
+        }
     }
 
     public void shutdown() {

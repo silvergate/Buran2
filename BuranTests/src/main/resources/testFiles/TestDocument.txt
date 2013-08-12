@@ -1,0 +1,4 @@
+Test document with some text inside.
+
+In Wicket development, you have to add SLF4j logging implementation, otherwise, it will failed to start. To fix it, declared the slf4j in your Maven pom.xml file.
+

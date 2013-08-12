@@ -121,7 +121,7 @@ public class QueryBuilder {
         }
     }
 
-    private org.elasticsearch.index.query.QueryBuilder toQuery(
+    public static org.elasticsearch.index.query.QueryBuilder toQuery(
             FilterOrQueryBuilder filterOrQueryBuilder) {
         if (filterOrQueryBuilder.getQueryBuilder() == null) {
             return QueryBuilders.constantScoreQuery(filterOrQueryBuilder.getFilterBuilder());

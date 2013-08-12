@@ -36,7 +36,7 @@ public class Test2 {
             IOException {
         final IncNid incNide = filesModule.createFile("image/jpeg");
 
-        final InputStream is = Test2.class.getResourceAsStream("/testFiles/testFileOne.jpg");
+        final InputStream is = Test2.class.getResourceAsStream("/testFiles/WebsiteText.docx");
         int size = is.available();
         byte[] buffer = new byte[size];
         int numRead = is.read(buffer);
@@ -81,13 +81,20 @@ public class Test2 {
         BuranCommandRunner bcr = new BuranCommandRunner(false);
         BaseModule bm = new BaseModule(thisAccount, sender, bcr);
 
-        FilesTest filesTest = null;
-        for (int i = 0; i < 20; i++) {
-            filesTest = new FilesTest(bm);
+        FilesTest filesTest = new FilesTest(bm);
+
+        Thread.sleep(1000);
+
+        for (int i = 0; i < 3; i++) {
+            filesTest.createAndReadDesc();
+        }
+        Thread.sleep(1000);
+        filesTest.addSubscriptionNewFile();
+        for (int i = 0; i < 3; i++) {
             filesTest.createAndReadDesc();
         }
 
-        Thread.sleep(5000);
+        Thread.sleep(1000);
 
         filesTest.findByTitleNew();
 

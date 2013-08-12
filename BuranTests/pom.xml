@@ -14,11 +14,6 @@
 
     <dependencies>
         <dependency>
-            <artifactId>buran-scripting</artifactId>
-            <groupId>com.dcrux.buran</groupId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <artifactId>buran-internal-interface</artifactId>
             <groupId>com.dcrux.buran</groupId>
             <version>0.1-SNAPSHOT</version>

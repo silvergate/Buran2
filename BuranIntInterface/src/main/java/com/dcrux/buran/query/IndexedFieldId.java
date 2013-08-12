@@ -8,6 +8,11 @@ import java.io.Serializable;
  * @author: ${USER} Date: 06.08.13 Time: 22:23
  */
 public class IndexedFieldId implements Serializable {
+
+    public static IndexedFieldId c(int id) {
+        return new IndexedFieldId((short) id);
+    }
+
     private short id;
 
     public IndexedFieldId(short id) {

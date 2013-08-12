@@ -41,5 +41,25 @@ public class QueryTarget {
         return indexedFieldId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        QueryTarget that = (QueryTarget) o;
+
+        if (!classId.equals(that.classId)) return false;
+        if (!indexId.equals(that.indexId)) return false;
+        if (!indexedFieldId.equals(that.indexedFieldId)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = classId.hashCode();
+        result = 31 * result + indexId.hashCode();
+        result = 31 * result + indexedFieldId.hashCode();
+        return result;
+    }
 }

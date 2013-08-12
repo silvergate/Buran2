@@ -9,12 +9,14 @@ import com.dcrux.buran.commands.dataMut.ComMutate;
 import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.commands.incubation.ComCreateNew;
 import com.dcrux.buran.commands.incubation.CommitResult;
+import com.dcrux.buran.commands.text.TextExtract;
+import com.dcrux.buran.commands.text.TextField;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
-import com.dcrux.buran.common.classDefinition.ClassIndexName;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.FieldIndex;
+import com.dcrux.buran.common.fields.FieldTarget;
 import com.dcrux.buran.common.fields.getter.FieldGetBinLen;
 import com.dcrux.buran.common.fields.getter.SingleGet;
 import com.dcrux.buran.common.fields.setter.FieldAppendBin;
@@ -22,6 +24,11 @@ import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.types.BinaryType;
 import com.dcrux.buran.common.fields.types.StringType;
+import com.dcrux.buran.query.IndexFieldTarget;
+import com.dcrux.buran.query.IndexedFieldDef;
+import com.dcrux.buran.query.IndexedFieldId;
+import com.dcrux.buran.query.SingleIndexDef;
+import com.dcrux.buran.query.indexingDef.IntIndexingDef;
 
 /**
  * Buran.
@@ -37,20 +44,22 @@ public class FilesModule extends Module<BaseModule> {
     public static final FieldIndex FIELD_MIME = FieldIndex.c(0);
     public static final FieldIndex FIELD_DATA = FieldIndex.c(1);
 
-    public static final ClassIndexName INDEX_BY_FILESIZE = new ClassIndexName("byFs");
-    public static final ClassIndexName INDEX_BY_MIME_FILESIZE = new ClassIndexName("byMFs");
+    public static final IndexedFieldId INDEX_SIZE = IndexedFieldId.c(0);
 
     public FilesModule(BaseModule baseModule) {
         super(baseModule);
         this.descModule = new DescModule(baseModule);
     }
 
-
     private ClassDefinition getFileClassDef() {
         ClassDefinition classDef = new ClassDefinition("A Node containing a file",
                 "A note containing a simple file. Hier noch mehr informationen, ganz viel.");
         classDef.getFields().add(FIELD_MIME, new StringType(0, 256), false)
                 .add(FIELD_DATA, BinaryType.c(BinaryType.MAXLEN_LIMIT), false);
+        SingleIndexDef singleIndexDef = new SingleIndexDef();
+        classDef.getIndexesNew().add().field(INDEX_SIZE, IndexedFieldDef
+                .c(IndexFieldTarget.index(FIELD_DATA),
+                        IntIndexingDef.withGetter(true, FieldGetBinLen.SINGLETON)));
         return classDef;
     }
 
@@ -69,6 +78,14 @@ public class FilesModule extends Module<BaseModule> {
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
         descModule.describe(incNid, filename, null);
 
+        /* Transfer metadata */
+        TextExtract ct = TextExtract.c(FieldTarget.c(getFileClassId(), FIELD_DATA))
+                .addText(TextField.content, FieldTarget
+                        .c(this.descModule.getDescClassId(), DescModule.FIELD_INDEX_ONLY),
+                        StringType.MAXLEN_LIMIT, false);
+        ComMutate comMutate = ComMutate.c(incNid, ct);
+        getBase().sync(comMutate);
+
         ComCommit comCommit = ComCommit.c(incNid);
         return getBase().sync(comCommit);
     }
@@ -82,9 +99,9 @@ public class FilesModule extends Module<BaseModule> {
 
     public long getFileSize(NidVer nidVer)
             throws UnknownCommandException, UncheckedException, WrappedExpectableException {
-        ComFetch<Long> comFetch = ComFetch.c(nidVer,
+        ComFetch<Number> comFetch = ComFetch.c(nidVer,
                 SingleGet.c(getFileClassId(), FIELD_DATA, FieldGetBinLen.SINGLETON));
-        return getBase().sync(comFetch);
+        return getBase().sync(comFetch).longValue();
     }
 
     public ClassId getFileClassId()

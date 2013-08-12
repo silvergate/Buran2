@@ -19,4 +19,14 @@ public class ClassIndexDefNew implements Serializable {
     public Map<ClassIndexId, SingleIndexDef> getIndexes() {
         return indexes;
     }
+
+    public void add(SingleIndexDef singleIndexDef) {
+        getIndexes().put(ClassIndexId.DEFAULT, singleIndexDef);
+    }
+
+    public SingleIndexDef add() {
+        final SingleIndexDef singleIndexDef = new SingleIndexDef();
+        getIndexes().put(ClassIndexId.DEFAULT, singleIndexDef);
+        return singleIndexDef;
+    }
 }

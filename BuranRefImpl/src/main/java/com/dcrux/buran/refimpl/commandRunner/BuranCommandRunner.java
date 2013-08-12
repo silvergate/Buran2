@@ -11,7 +11,6 @@ import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandInvoker;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandRunParamProvider;
 import com.dcrux.buran.refimpl.commands.DispatcherConfigUtil;
-import com.dcrux.buran.refimpl.subscription.SubscriptionModule;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -36,7 +35,6 @@ public class BuranCommandRunner implements ICommandRunner, ICallbackReceiver {
     private final Multimap<UserId, BaseModule> inactiveBaseModules =
             Multimaps.synchronizedMultimap(this.inactiveBaseModulesUnSync);
     private final CallbackQueuesRegistry callbackQueuesRegistry = new CallbackQueuesRegistry();
-    private final SubscriptionModule subscriptionModule = new SubscriptionModule();
 
     private final ICommandInvoker commandInvoker = new ICommandInvoker() {
         @Override
@@ -85,8 +83,7 @@ public class BuranCommandRunner implements ICommandRunner, ICallbackReceiver {
             if (this.clearDbs) {
                 BaseModule.createNew(receiver, true);
             }
-            final BaseModule newModule =
-                    new BaseModule(receiver, sender, callbackReceiver, subscriptionModule);
+            final BaseModule newModule = new BaseModule(receiver, sender, callbackReceiver, true);
             this.baseModuleThreadLocal.set(newModule);
         }
     }

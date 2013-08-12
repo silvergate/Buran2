@@ -7,6 +7,7 @@ import com.dcrux.buran.common.fields.getter.FieldGetPrim;
 import com.dcrux.buran.common.fields.getter.FieldGetStr;
 import com.dcrux.buran.common.fields.getter.FieldGetStrLimit;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
+import com.dcrux.buran.common.fields.setter.FieldAppendStr;
 import com.dcrux.buran.common.fields.setter.FieldRemove;
 import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.IUnfieldedDataSetter;
@@ -34,7 +35,7 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
             getters(FieldGetPrim.class, FieldGetStr.class, FieldGetStrLimit.class);
 
     private final static Set<Class<? extends IUnfieldedDataSetter>> SETTERS = setters(FieldSetStr
-            .class, FieldRemove.class);
+            .class, FieldRemove.class, FieldAppendStr.class);
 
     public static final StringFieldPerformer SINGLETON = new StringFieldPerformer();
 
@@ -54,6 +55,21 @@ public class StringFieldPerformer extends FieldPerformer<StringType> {
         if (setter instanceof FieldRemove) {
             node.removeFieldValue(fieldIndex);
             return true;
+        }
+
+        if (setter instanceof FieldAppendStr) {
+            final String value = ((FieldSetStr) setter).getValue();
+            final String oldValue = (String) node.getFieldValue(fieldIndex, OType.STRING);
+            final String newValue;
+            if (oldValue == null) {
+                newValue = value;
+            } else {
+                newValue = oldValue.concat(value);
+            }
+            if (!stringType.isValid(newValue)) {
+                throw new FieldConstraintViolationInt("Invalid string. Check length.");
+            }
+            node.setFieldValue(fieldIndex, newValue, OType.STRING);
         }
         throw new IllegalStateException("Unknown setter");
     }

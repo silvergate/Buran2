@@ -3,6 +3,7 @@ package com.dcrux.buran.query.queries.fielded;
 import com.dcrux.buran.query.indexingDef.IIndexingDef;
 import com.dcrux.buran.query.queries.IQuery;
 import com.dcrux.buran.query.queries.QueryTarget;
+import com.dcrux.buran.query.queries.SubscriptionValidationException;
 import com.dcrux.buran.query.queries.unfielded.ISimpleQuery;
 
 import java.io.Serializable;
@@ -32,5 +33,11 @@ public class MultiFieldQuery implements IOrQueryInput, IQueryOrMultifield, IQuer
 
     public ISimpleQuery<Serializable, IIndexingDef<Serializable>> getDef() {
         return def;
+    }
+
+    @Override
+    public void validateForSubscription(Set<QueryTarget> targets)
+            throws SubscriptionValidationException {
+        throw new SubscriptionValidationException();
     }
 }

@@ -1,6 +1,8 @@
 package com.dcrux.buran.refimpl.commands.subscription;
 
 import com.dcrux.buran.commands.subscription.ComAddSub;
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.subscription.SubBlockId;
 import com.dcrux.buran.common.subscription.SubId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
@@ -15,8 +17,11 @@ public class ComAddSubImpl extends TransactionalCommand<SubId, ComAddSub> {
 
     @Override
     protected SubId transactional(ComAddSub command, BaseModule baseModule) throws Exception {
-        //TODO: Implement me
-        return null;
+        final UserId receiver = baseModule.getAuthModule().getReceiver();
+        baseModule.getSubscriptionModule()
+                .register(receiver, new SubBlockId("DEFAULT"), command.getSubId(),
+                        command.getQuery());
+        return command.getSubId();
     }
 
     @Override

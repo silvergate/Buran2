@@ -17,6 +17,18 @@ public class IntCmp implements ISimpleQuery<Number, IntIndexingDef>, IConstantIn
         this.rhs = rhs;
     }
 
+    public static IntCmp eq(Number rhs) {
+        return new IntCmp(NumCmp.equal, rhs);
+    }
+
+    public static IntCmp le(Number rhs) {
+        return new IntCmp(NumCmp.less, rhs);
+    }
+
+    public static IntCmp ge(Number rhs) {
+        return new IntCmp(NumCmp.greater, rhs);
+    }
+
     @Override
     public boolean supports(IntIndexingDef indexingDef) {
         return true;

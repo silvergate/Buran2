@@ -18,8 +18,7 @@ public class IndexedFieldDef implements Serializable {
         this.indexingDef = indexingDef;
     }
 
-    public static IndexedFieldDef c(IndexFieldTarget fieldTarget,
-            IIndexingDef<Serializable> indexingDef) {
+    public static IndexedFieldDef c(IndexFieldTarget fieldTarget, IIndexingDef<?> indexingDef) {
         return new IndexedFieldDef(fieldTarget, indexingDef);
     }
 

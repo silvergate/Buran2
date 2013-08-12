@@ -1,6 +1,8 @@
 package com.dcrux.buran.query.queries.fielded;
 
 import com.dcrux.buran.query.queries.IQuery;
+import com.dcrux.buran.query.queries.QueryTarget;
+import com.dcrux.buran.query.queries.SubscriptionValidationException;
 import com.dcrux.buran.query.queries.unfielded.IConstantIndicator;
 
 import java.util.Collections;
@@ -13,6 +15,14 @@ import java.util.Set;
  * @author: ${USER} Date: 06.08.13 Time: 22:42
  */
 public class BoolQuery implements IQuery, IConstantIndicator {
+
+    @Override
+    public void validateForSubscription(Set<QueryTarget> targets)
+            throws SubscriptionValidationException {
+        for (final Entry entry : this.queries) {
+            entry.getOrQueryInput().validateForSubscription(targets);
+        }
+    }
 
     public static class Entry {
         private BooleanLogic logic;

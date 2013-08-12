@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.classes;
 
+import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassDependenciesDef;
 import com.dcrux.buran.common.classDefinition.DependencyIndex;
@@ -211,6 +212,10 @@ public class ClassesModule extends Module<BaseModule> {
                 classDefWrapperFinal.getDocument().save();
             }
         });
+
+        /* Say hello to the indexer */
+        final UserId receiver = getBase().getAuthModule().getReceiver();
+        getBase().getIndexingModule().prepareForIndexing(receiver, classId, classDefinition);
 
         return classId;
     }

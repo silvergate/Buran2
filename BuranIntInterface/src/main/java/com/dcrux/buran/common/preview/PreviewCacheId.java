@@ -1,24 +1,20 @@
-package com.dcrux.buran.common.subscription;
+package com.dcrux.buran.common.preview;
 
 import java.io.Serializable;
 
 /**
  * Buran.
  *
- * @author: ${USER} Date: 09.08.13 Time: 18:00
+ * @author: ${USER} Date: 12.08.13 Time: 10:14
  */
-public class SubBlockId implements Serializable {
+public class PreviewCacheId implements Serializable {
     private String id;
 
-    public SubBlockId(String id) {
+    public PreviewCacheId(String id) {
         this.id = id;
     }
 
-    private SubBlockId() {
-    }
-
-    public String getId() {
-        return id;
+    private PreviewCacheId() {
     }
 
     @Override
@@ -26,7 +22,7 @@ public class SubBlockId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SubBlockId that = (SubBlockId) o;
+        PreviewCacheId that = (PreviewCacheId) o;
 
         if (!id.equals(that.id)) return false;
 
@@ -38,9 +34,13 @@ public class SubBlockId implements Serializable {
         return id.hashCode();
     }
 
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
-        return "SubBlockId{" +
+        return "PreviewCacheId{" +
                 "id='" + id + '\'' +
                 '}';
     }

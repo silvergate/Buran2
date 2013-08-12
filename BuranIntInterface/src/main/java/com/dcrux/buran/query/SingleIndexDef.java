@@ -21,4 +21,9 @@ public class SingleIndexDef implements Serializable {
     public boolean isForNotificationOnly() {
         return forNotificationOnly;
     }
+
+    public SingleIndexDef field(IndexedFieldId indexedFieldId, IndexedFieldDef def) {
+        getFieldDef().put(indexedFieldId, def);
+        return this;
+    }
 }

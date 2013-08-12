@@ -17,10 +17,10 @@ import com.dcrux.buran.refimpl.baseModules.newRelations.NewRelationsModule;
 import com.dcrux.buran.refimpl.baseModules.nodes.NodesModule;
 import com.dcrux.buran.refimpl.baseModules.notifications.NotificationsModule;
 import com.dcrux.buran.refimpl.baseModules.orientUtils.DbUtils;
+import com.dcrux.buran.refimpl.baseModules.subscription.SubscriptionModule;
 import com.dcrux.buran.refimpl.baseModules.text.TextModule;
 import com.dcrux.buran.refimpl.baseModules.time.CurrentTimestampProvider;
 import com.dcrux.buran.refimpl.baseModules.versions.VersionsModule;
-import com.dcrux.buran.refimpl.subscription.SubscriptionModule;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentPool;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -53,7 +53,7 @@ public class BaseModule {
     private final NotificationsModule notificationsModule = new NotificationsModule(this);
     private final NodesModule nodesModule = new NodesModule(this);
     private final ICallbackCommandReceiver callbackReceiver;
-    private final SubscriptionModule subscriptionModule;
+    private final SubscriptionModule subscriptionModule = new SubscriptionModule(this);
     private final NewRelationsModule newRelationsModule = new NewRelationsModule(this);
     private final TextModule textModule = new TextModule(this);
     private final EsModule esModule = new EsModule(this);
@@ -93,14 +93,18 @@ public class BaseModule {
     }
 
     public BaseModule(UserId userId, UserId sender, ICallbackCommandReceiver callbackReceiver,
-            SubscriptionModule subscriptionModule) throws IOException {
+            boolean createNewEsIndex) throws IOException {
         this.callbackReceiver = callbackReceiver;
-        this.subscriptionModule = subscriptionModule;
         final File path = getDbPath(userId);
         this.db = ODatabaseDocumentPool.global().acquire(getDbString(path), "admin", "admin");
         setSender(sender);
         getAuthModule().setReceiver(userId);
         setup();
+
+        if (createNewEsIndex) {
+            /* Create index */
+            getEsModule().ensureIndex(userId);
+        }
     }
 
     public boolean emitCallbackCommand(ICallbackCommand command) {

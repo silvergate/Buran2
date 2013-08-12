@@ -2,7 +2,10 @@ package com.dcrux.buran.query.queries.fielded;
 
 import com.dcrux.buran.query.queries.IQuery;
 import com.dcrux.buran.query.queries.QueryTarget;
+import com.dcrux.buran.query.queries.SubscriptionValidationException;
 import com.dcrux.buran.query.queries.unfielded.ISimpleQuery;
+
+import java.util.Set;
 
 /**
  * Buran.
@@ -28,5 +31,14 @@ public class Query implements IOrQueryInput, IQueryOrMultifield, IQuery {
 
     public ISimpleQuery<?, ?> getDef() {
         return def;
+    }
+
+    @Override
+    public void validateForSubscription(Set<QueryTarget> targets)
+            throws SubscriptionValidationException {
+        if (!this.def.isImplementationDefined()) {
+            throw new SubscriptionValidationException();
+        }
+        targets.add(this.target);
     }
 }

@@ -1,6 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.newIndexing;
 
 import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.classDefinition.ClassDefinition;
 import com.dcrux.buran.common.classDefinition.ClassIndexId;
 import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
@@ -24,6 +25,8 @@ import com.dcrux.buran.refimpl.baseModules.newIndexing.processorsIface.IIndexing
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.LiveNode;
 import com.orientechnologies.orient.core.id.ORID;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
@@ -32,9 +35,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Buran.
@@ -55,11 +56,6 @@ public class IndexingModuleNew extends Module<BaseModule> {
 
     public ProcessorsRegistry getProcessorsRegistry() {
         return PROCESSORS_REGISTRY;
-    }
-
-    private String getIndex() {
-        final UserId receiver = getBase().getAuthModule().getReceiver();
-        return "A" + Long.toHexString(receiver.getId());
     }
 
     public void removeFromIndex(UserId receiver, ORID versionsRecord, ClassId classId,
@@ -114,18 +110,26 @@ public class IndexingModuleNew extends Module<BaseModule> {
         System.out.println("Added document to index: " + contentBuilder.string());
 
         final Client client = getBase().getEsModule().getClient();
+        IndexResponse response;
         try {
         /* Add document to elasticsearch */
             final String indexName = getFieldBuilder().getIndex(receiver);
             final String typeName = getFieldBuilder().getType();
-            IndexResponse response =
-                    client.prepareIndex(indexName, typeName).setSource(contentBuilder)
-                            .setId(versionsRecord.getoIdentifiable().toString()).execute()
-                            .actionGet();
+            response = client.prepareIndex(indexName, typeName).setSource(contentBuilder)
+                    .setId(versionsRecord.getoIdentifiable().toString()).setPercolate("*").execute()
+                    .actionGet();
+
         } finally {
             client.close();
         }
 
+        /* Percolation matches */
+        final List<String> percolationMatches = response.getMatches();
+        if (percolationMatches != null) {
+            for (final String percolationId : percolationMatches) {
+                System.out.println("PERCOLATION MATCH: " + percolationId);
+            }
+        }
     }
 
     private void buildDocumentForIndex(XContentBuilder builder, UserId receiver,
@@ -197,7 +201,50 @@ public class IndexingModuleNew extends Module<BaseModule> {
 
         buildDocumentForIndex(builder, receiver, classIndexId, singleIndexDef, classId,
                 fieldValues);
+    }
 
-        System.out.println("INDEXING: " + fieldValues);
+    public void prepareForIndexing(UserId receiver, ClassId classId,
+            ClassDefinition classDefinition) throws IOException {
+        //TODO: Das scheint nicht zu funktionieren
+
+        final IFieldBuilder fieldBuilder = getFieldBuilder();
+        final String index = fieldBuilder.getIndex(receiver);
+
+        //final XContentBuilder contentBuilder = XContentFactory.jsonBuilder();
+        //contentBuilder.startObject();
+        final List<String> elements = new ArrayList<>();
+        for (final Map.Entry<ClassIndexId, SingleIndexDef> singleIndexDef : classDefinition
+                .getIndexesNew().getIndexes().entrySet()) {
+            for (final Map.Entry<IndexedFieldId, IndexedFieldDef> indexedField : singleIndexDef
+                    .getValue().getFieldDef().entrySet()) {
+                final IndexedFieldDef def = indexedField.getValue();
+                final IIndexingDefImpl defImpl =
+                        getProcessorsRegistry().get(def.getIndexingDef().getClass());
+                final String defStr = defImpl.getIndexDefSimplified(def.getIndexingDef());
+                final QueryTarget queryTarget =
+                        new QueryTarget(classId, singleIndexDef.getKey(), indexedField.getKey());
+                final String fieldName = fieldBuilder.getField(receiver, queryTarget);
+                //contentBuilder.field(fieldName, defStr);
+                elements.add(fieldName);
+                elements.add(defStr);
+            }
+        }
+        //contentBuilder.endObject();
+
+        final String type = fieldBuilder.getType();
+
+        final Client client = getBase().getEsModule().getClient();
+        try {
+
+            final PutMappingRequestBuilder putMapping =
+                    client.admin().indices().preparePutMapping(index).setIgnoreConflicts(false)
+                            .setSource(elements.toArray()).setType(type);
+            final PutMappingResponse response = putMapping.execute().actionGet();
+
+            //System.out.println("PutMapping. ACK=" + putMapping.request().toString());
+            //System.out.println("PutMappingResponse. ACK=" + response.isAcknowledged());
+        } finally {
+            client.close();
+        }
     }
 }

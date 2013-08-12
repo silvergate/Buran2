@@ -1,5 +1,6 @@
 package com.dcrux.buran.refimpl.baseModules.dataMut;
 
+import com.dcrux.buran.commands.text.TextExtract;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.exceptions.IncNodeNotFound;
@@ -17,7 +18,10 @@ import com.dcrux.buran.refimpl.baseModules.nodeWrapper.IncubationNode;
 import com.google.common.base.Optional;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.sun.istack.internal.Nullable;
+import org.apache.tika.exception.TikaException;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Set;
 
@@ -34,7 +38,7 @@ public class DataMutModule extends Module<BaseModule> {
     public boolean setDataDirect(final UserId sender, final CommonNode node,
             final IDataSetter setter, @Nullable final Set<OIdentifiable> outCommittableRelations)
             throws NodeClassNotFoundException, FieldConstraintViolationInt, NodeNotFoundException,
-            IncNodeNotFound {
+            IncNodeNotFound, IOException, TikaException, SAXException {
 
         if (setter instanceof BulkSet) {
             final BulkSet bulkSet = (BulkSet) setter;
@@ -61,7 +65,13 @@ public class DataMutModule extends Module<BaseModule> {
             return true;
         }
 
-        throw new IllegalArgumentException("Unknown setter type");
+        if (setter instanceof TextExtract) {
+            final TextExtract textExtract = (TextExtract) setter;
+            getBase().getTextModule().performSet(sender, node, textExtract);
+            return true;
+        }
+
+        throw new IllegalArgumentException("Unknown setter type: " + setter.getClass());
     }
 
     private void setDataIndirect(final UserId sender, final IncubationNode node,
@@ -71,7 +81,7 @@ public class DataMutModule extends Module<BaseModule> {
 
     public void setData(UserId sender, IncNid incNid, IDataSetter setter)
             throws IncNodeNotFound, NodeClassNotFoundException, FieldConstraintViolationInt,
-            NodeNotFoundException {
+            NodeNotFoundException, IOException, TikaException, SAXException {
         final Optional<IncubationNode> iNode =
                 getBase().getIncubationModule().getIncNode(sender, incNid);
         if (!iNode.isPresent()) {
