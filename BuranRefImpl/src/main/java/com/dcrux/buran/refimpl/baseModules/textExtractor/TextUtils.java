@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.textExtractor;
+package com.dcrux.buran.refimpl.baseModules.textExtractor;
 
 import org.apache.tika.Tika;
 import org.apache.tika.config.TikaConfig;
@@ -39,7 +39,7 @@ public class TextUtils {
     }
 
     public static void toMeta(Metadata metadata,
-            com.dcrux.buran.refimpl.textExtractor.Metadata meta) {
+            com.dcrux.buran.refimpl.baseModules.textExtractor.Metadata meta) {
         meta.putNull(MetadataTags.MIME, metadata.get(TikaCoreProperties.TYPE));
         meta.putNull(MetadataTags.LANG, metadata.get(TikaCoreProperties.LANGUAGE));
         meta.putNull(MetadataTags.TITLE, metadata.get(TikaCoreProperties.TITLE));

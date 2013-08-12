@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.textExtractor;
+package com.dcrux.buran.refimpl.baseModules.textExtractor;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.IOUtils;

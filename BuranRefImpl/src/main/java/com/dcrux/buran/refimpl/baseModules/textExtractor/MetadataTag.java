@@ -1,4 +1,4 @@
-package com.dcrux.buran.refimpl.textExtractor;
+package com.dcrux.buran.refimpl.baseModules.textExtractor;
 
 import java.io.Serializable;
 
