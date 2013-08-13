@@ -56,13 +56,32 @@ public class BaseModule {
     private final SubscriptionModule subscriptionModule = new SubscriptionModule(this);
     private final NewRelationsModule newRelationsModule = new NewRelationsModule(this);
     private final TextModule textModule = new TextModule(this);
-    private final EsModule esModule = new EsModule(this);
+    private final EsModule esModule = new EsModule();
     private final SearchModule searchModule = new SearchModule(this);
 
     ODatabaseDocumentTx db;
 
-    public static File getDbPath(UserId userId) {
-        return new File("/Users/caelis/" + userId.getId() + ".orientdb");
+    public static File getBuranHome() {
+        final String userHomePath = System.getProperty("user.home");
+        final File buranDir = new File(userHomePath, "buran_v0");
+        if (!buranDir.exists()) {
+            buranDir.mkdirs();
+        }
+        return buranDir;
+    }
+
+    public static File getOrientDbPath(UserId userId, boolean create) {
+        final File buranHome = getBuranHome();
+        final File orientHome = new File(buranHome, "orient");
+        if (!orientHome.exists()) {
+            orientHome.mkdirs();
+        }
+
+        final File buranDir = new File(orientHome, Long.toHexString(userId.getId()));
+        if ((!buranDir.exists()) && (create)) {
+            buranDir.mkdirs();
+        }
+        return buranDir;
     }
 
     public static String getDbString(File path) throws IOException {
@@ -80,29 +99,39 @@ public class BaseModule {
         return this.db;
     }
 
-    public static void createNew(UserId userId, boolean removeIfExisting) throws IOException {
-        final File path = getDbPath(userId);
-        if (path.exists() && removeIfExisting) {
+    public static void removeAccount(UserId userId) throws IOException {
+        final File path = getOrientDbPath(userId, false);
+        if (path.exists()) {
             for (final File file : path.listFiles()) {
                 file.delete();
             }
             path.delete();
         }
-        ODatabaseDocumentTx db = new ODatabaseDocumentTx(getDbString(path)).create();
-        db.close();
+
+        /* Remove es index */
+        EsModule esMod = new EsModule();
+        esMod.removeUserIndex(userId);
     }
 
-    public BaseModule(UserId userId, UserId sender, ICallbackCommandReceiver callbackReceiver,
-            boolean createNewEsIndex) throws IOException {
+    public BaseModule(UserId userId, UserId sender, ICallbackCommandReceiver callbackReceiver)
+            throws IOException {
         this.callbackReceiver = callbackReceiver;
-        final File path = getDbPath(userId);
+        final File path = getOrientDbPath(userId, false);
+        final boolean needCreate = !path.exists();
+        if (needCreate) {
+            path.mkdirs();
+
+            ODatabaseDocumentTx db = new ODatabaseDocumentTx(getDbString(path)).create();
+            db.close();
+        }
         this.db = ODatabaseDocumentPool.global().acquire(getDbString(path), "admin", "admin");
         setSender(sender);
         getAuthModule().setReceiver(userId);
         setup();
 
-        if (createNewEsIndex) {
+        if (needCreate) {
             /* Create index */
+            getEsModule().removeUserIndex(userId);
             getEsModule().ensureIndex(userId);
         }
     }
@@ -123,7 +152,7 @@ public class BaseModule {
         this.db.close();
         this.esModule.shutdown();
         //TODO: Zum testen
-        this.esModule.deleteData();
+        // this.esModule.deleteData();
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.dcrux.buran.refimpl.baseModules.elasticSearch;
 
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.FieldBuilder;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
@@ -18,21 +17,36 @@ import java.io.File;
  *
  * @author: ${USER} Date: 07.08.13 Time: 11:02
  */
-public class EsModule extends Module<BaseModule> {
+public class EsModule {
 
-    private Node node;
+    private static Node node;
+    private Node nodeThis;
 
-    public void deleteData() {
-        deleteDirectory();
+    public static void deleteAllEsData() {
+        FileSystemUtils.deleteRecursively(getEsDirectory());
     }
 
-    public EsModule(BaseModule baseModule) {
-        super(baseModule);
+    public static File getEsDirectory() {
+        final File buranHome = BaseModule.getBuranHome();
+        final File esHome = new File(buranHome, "elastic_v0");
+        if (!esHome.exists()) {
+            esHome.mkdirs();
+        }
+        return esHome;
+    }
 
-        ImmutableSettings.Builder esSettings =
-                ImmutableSettings.settingsBuilder().put("http" + ".enabled", "false")
-                        .put("path.data", "/Users/caelis/esTest");
-        this.node = NodeBuilder.nodeBuilder().local(true).settings(esSettings.build()).node();
+    public static synchronized Node getNode() {
+        if (node == null) {
+            ImmutableSettings.Builder esSettings =
+                    ImmutableSettings.settingsBuilder().put("http" + ".enabled", "false")
+                            .put("path.data", getEsDirectory().getAbsolutePath());
+            node = NodeBuilder.nodeBuilder().local(true).settings(esSettings.build()).node();
+        }
+        return node;
+    }
+
+    public EsModule() {
+        this.nodeThis = getNode();
     }
 
     public void ensureIndex(UserId receiver) {
@@ -50,16 +64,26 @@ public class EsModule extends Module<BaseModule> {
         }
     }
 
+    public void removeUserIndex(UserId receiver) {
+        final String index = FieldBuilder.getIndexStatic(receiver);
+
+        final Client client = getClient();
+        try {
+            final IndicesExistsResponse response =
+                    client.admin().indices().prepareExists(index).execute().actionGet();
+            if (response.isExists()) {
+                client.admin().indices().prepareDelete(index).execute().actionGet();
+            }
+        } finally {
+            client.close();
+        }
+    }
+
     public void shutdown() {
-        this.node.close();
+        this.nodeThis.close();
     }
 
     public Client getClient() {
-        return this.node.client();
+        return this.nodeThis.client();
     }
-
-    private void deleteDirectory() {
-        FileSystemUtils.deleteRecursively(new File("/Users/caelis/esTest"));
-    }
-
 }

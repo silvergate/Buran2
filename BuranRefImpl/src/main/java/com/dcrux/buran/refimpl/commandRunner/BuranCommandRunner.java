@@ -80,10 +80,10 @@ public class BuranCommandRunner implements ICommandRunner, ICallbackReceiver {
         } else {
             /* Nothing to reuse */
             System.out.println("BuranCommandRunner: Open new DB");
-            if (this.clearDbs) {
+            /*if (this.clearDbs) {
                 BaseModule.createNew(receiver, true);
-            }
-            final BaseModule newModule = new BaseModule(receiver, sender, callbackReceiver, true);
+            } */
+            final BaseModule newModule = new BaseModule(receiver, sender, callbackReceiver);
             this.baseModuleThreadLocal.set(newModule);
         }
     }

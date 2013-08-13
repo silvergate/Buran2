@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?language javascript?>
+
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Text?>
+<VBox fx:id="root" prefHeight="367.0" prefWidth="359.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.dcrux.buran.demoGui.files.FileUploaderController">
+    <children>
+        <StackPane prefHeight="150.0" prefWidth="200.0">
+            <children>
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#606060" height="200.0"
+                           stroke="BLACK" strokeType="INSIDE" width="298.25"/>
+                <Text fx:id="textField" fill="#dfdfdf" onDragDropped="this" strokeWidth="2.5
+        " text="Drop files here"/>
+            </children>
+        </StackPane>
+        <Hyperlink onAction="controller.onHyperlinkClick()" text="Hyperlink"/>
+    </children>
+</VBox>

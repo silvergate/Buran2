@@ -16,6 +16,7 @@
         <module>BuranDemoGui</module>
         <module>BuranTests</module>
         <module>BuranTextExtractor</module>
+        <module>BuranDemoGui2</module>
     </modules>
 
     <repositories>
