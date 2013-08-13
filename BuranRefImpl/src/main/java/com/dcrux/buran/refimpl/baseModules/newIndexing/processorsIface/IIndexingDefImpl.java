@@ -1,7 +1,7 @@
 package com.dcrux.buran.refimpl.baseModules.newIndexing.processorsIface;
 
-import com.dcrux.buran.query.indexingDef.IIndexingDef;
-import com.dcrux.buran.query.queries.unfielded.ISimpleQuery;
+import com.dcrux.buran.common.query.indexingDef.IIndexingDef;
+import com.dcrux.buran.common.query.queries.unfielded.ISimpleQuery;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.io.IOException;

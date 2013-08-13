@@ -1,6 +1,6 @@
 package com.dcrux.buran.common.classDefinition;
 
-import com.dcrux.buran.query.SingleIndexDef;
+import com.dcrux.buran.common.query.SingleIndexDef;
 
 import java.io.Serializable;
 import java.util.HashMap;

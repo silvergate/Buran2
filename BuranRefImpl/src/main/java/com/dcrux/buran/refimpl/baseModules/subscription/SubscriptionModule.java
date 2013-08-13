@@ -2,9 +2,9 @@ package com.dcrux.buran.refimpl.baseModules.subscription;
 
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
+import com.dcrux.buran.common.query.queries.IQuery;
 import com.dcrux.buran.common.subscription.SubBlockId;
 import com.dcrux.buran.common.subscription.SubId;
-import com.dcrux.buran.query.queries.IQuery;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.IFieldBuilder;

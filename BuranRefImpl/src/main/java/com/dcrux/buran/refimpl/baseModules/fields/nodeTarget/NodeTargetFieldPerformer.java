@@ -4,9 +4,11 @@ import com.dcrux.buran.common.classes.ClassId;
 import com.dcrux.buran.common.fields.IFieldSetter;
 import com.dcrux.buran.common.fields.NodeFieldTarget;
 import com.dcrux.buran.common.fields.getter.FieldGetClassIds;
+import com.dcrux.buran.common.fields.getter.FieldGetDomainIds;
 import com.dcrux.buran.common.fields.getter.IUnfieldedDataGetter;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.nodeWrapper.CommonNode;
+import com.dcrux.buran.utils.SerSet;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -32,6 +34,11 @@ public class NodeTargetFieldPerformer {
                         classIds.add(node.getPrimaryClassId());
                     }
                     return classIds;
+                }
+                break;
+            case domains:
+                if (dataGetter instanceof FieldGetDomainIds) {
+                    return SerSet.wrap(node.getDomainIds());
                 }
                 break;
             default:

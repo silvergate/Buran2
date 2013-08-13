@@ -10,7 +10,8 @@ import java.util.HashSet;
  *
  * @author: ${USER} Date: 30.06.13 Time: 13:10
  */
-public class FieldGetClassIds implements IUnfieldedDataGetter<HashSet<ClassId>> {
+public class FieldGetClassIds implements IUnfieldedDataGetter<HashSet<ClassId>> /* CHANGE TO
+ISerSet */ {
     public static enum Type {
         primary,
         secondaries

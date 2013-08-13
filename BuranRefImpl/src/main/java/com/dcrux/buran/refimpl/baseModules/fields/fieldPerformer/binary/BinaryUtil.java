@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class BinaryUtil {
 
-    private static final int CHUNK_SIZE = 8192 * 2;
+    public static final int CHUNK_SIZE = 8192 * 2;
     private static final String APPEND_SIZE = "as";
 
     @Nullable

@@ -24,11 +24,11 @@ import com.dcrux.buran.common.fields.setter.FieldSetStr;
 import com.dcrux.buran.common.fields.setter.FieldSetter;
 import com.dcrux.buran.common.fields.types.BinaryType;
 import com.dcrux.buran.common.fields.types.StringType;
-import com.dcrux.buran.query.IndexFieldTarget;
-import com.dcrux.buran.query.IndexedFieldDef;
-import com.dcrux.buran.query.IndexedFieldId;
-import com.dcrux.buran.query.SingleIndexDef;
-import com.dcrux.buran.query.indexingDef.IntIndexingDef;
+import com.dcrux.buran.common.query.IndexFieldTarget;
+import com.dcrux.buran.common.query.IndexedFieldDef;
+import com.dcrux.buran.common.query.IndexedFieldId;
+import com.dcrux.buran.common.query.SingleIndexDef;
+import com.dcrux.buran.common.query.indexingDef.IntIndexingDef;
 
 /**
  * Buran.

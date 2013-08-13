@@ -1,9 +1,9 @@
 package com.dcrux.buran.refimpl.baseModules.newIndexing.processors;
 
 import com.dcrux.buran.common.classes.ClassId;
-import com.dcrux.buran.query.indexingDef.ClassIdsIndexingDef;
-import com.dcrux.buran.query.queries.unfielded.HasClass;
-import com.dcrux.buran.query.queries.unfielded.ISimpleQuery;
+import com.dcrux.buran.common.query.indexingDef.ClassIdsIndexingDef;
+import com.dcrux.buran.common.query.queries.unfielded.HasClass;
+import com.dcrux.buran.common.query.queries.unfielded.ISimpleQuery;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processorsIface.FilterOrQueryBuilder;
 import com.dcrux.buran.refimpl.baseModules.newIndexing.processorsIface.IIndexingDefImpl;
 import org.elasticsearch.common.xcontent.XContentBuilder;

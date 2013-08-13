@@ -2,7 +2,7 @@ package com.dcrux.buran.commands.indexingNew;
 
 import com.dcrux.buran.commands.Command;
 import com.dcrux.buran.commands.indexing.QueryResult;
-import com.dcrux.buran.query.queries.IQuery;
+import com.dcrux.buran.common.query.queries.IQuery;
 
 /**
  * Buran.

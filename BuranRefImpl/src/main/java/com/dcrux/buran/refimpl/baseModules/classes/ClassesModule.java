@@ -64,7 +64,7 @@ public class ClassesModule extends Module<BaseModule> {
     public boolean existsOrientClass(ClassId classId) {
         final String className = ClassNameUtils.generateNodeClasName(classId);
         boolean exists = getBase().getDb().getMetadata().getSchema().existsClass(className);
-        //System.out.println("Exists class: '" + className + "', : " + exists);
+        //System.out.println("BoolEq class: '" + className + "', : " + exists);
         return exists;
     }
 

@@ -25,6 +25,7 @@ import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,10 +47,9 @@ public class TextModule extends Module<BaseModule> {
             throws IOException, FieldConstraintViolationInt, NodeNotFoundException,
             NodeClassNotFoundException, IncNodeNotFound, TikaException, SAXException {
         final FieldTarget fieldTarget = setter.getBinaryField();
-        BinInputStream binInputStream = new BinInputStream(node, getBase(),
+        InputStream binInputStream = BinInputStream.buffered(node, getBase(),
                 new FieldIndexAndClassId(fieldTarget.getFieldIndex(), fieldTarget.getClassId(),
                         node.getPrimaryClassId().equals(fieldTarget.getClassId())));
-        //getBase().getDataFetchModule().getData()
         final ParseResult parseResult = this.textUtils.parse(binInputStream);
 
         for (final TransferEntry transferEntry : setter.getTransferEntries()) {

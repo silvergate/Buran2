@@ -2,6 +2,7 @@ package com.dcrux.buran.refimpl.baseModules.nodeWrapper;
 
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.classes.ClassId;
+import com.dcrux.buran.common.domain.DomainId;
 import com.dcrux.buran.common.fields.FieldIndex;
 import com.dcrux.buran.refimpl.baseModules.common.DocumentWrapper;
 import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
@@ -28,6 +29,7 @@ public class CommonNode extends DocumentWrapper {
     public static final String INC_FIELD_SENDER = "sender";
     public static final String FIELD_MARKED_FOR_DELETION = "markDel";
     public static final String FIELD_CLASSES = "c";
+    public static final String FIELD_DOMAIN_IDS = "domIds";
 
     public CommonNode(ODocument document) {
         super(document);
@@ -202,5 +204,17 @@ public class CommonNode extends DocumentWrapper {
 
     public OIncNid getIncNid() {
         return new OIncNid(getDocument().getIdentity());
+    }
+
+    public Set<DomainId> getDomainIds() {
+        final Set domIdsLong = getDocument().field(FIELD_DOMAIN_IDS, OType.EMBEDDEDSET);
+        final Set<DomainId> domainIds = new HashSet<>();
+        if (domIdsLong != null) {
+            for (final Object obj : domIdsLong) {
+                domainIds.add(new DomainId(((Number) obj).longValue()));
+            }
+        }
+
+        return domainIds;
     }
 }

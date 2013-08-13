@@ -2,7 +2,7 @@ package com.dcrux.buran.refimpl.baseModules.newIndexing;
 
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
-import com.dcrux.buran.query.queries.IQuery;
+import com.dcrux.buran.common.query.queries.IQuery;
 import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.baseModules.classes.ClassDefCache;
 import com.dcrux.buran.refimpl.baseModules.common.Module;
