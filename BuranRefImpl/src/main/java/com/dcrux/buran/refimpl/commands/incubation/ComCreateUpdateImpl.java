@@ -2,10 +2,10 @@ package com.dcrux.buran.refimpl.commands.incubation;
 
 import com.dcrux.buran.commands.incubation.ComCreateUpdate;
 import com.dcrux.buran.common.IncNid;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
-import com.dcrux.buran.refimpl.baseModules.common.OIncNid;
 import com.dcrux.buran.refimpl.commands.TransactionalCommandPost;
+import com.dcrux.buran.refimpl.modules.BaseModule;
+import com.dcrux.buran.refimpl.modules.common.IfaceUtils;
+import com.dcrux.buran.refimpl.modules.common.OIncNid;
 
 /**
  * Buran.

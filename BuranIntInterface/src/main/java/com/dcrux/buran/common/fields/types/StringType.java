@@ -15,8 +15,13 @@ public class StringType implements ITypeDef {
 
     private int minLen;
     private int maxLen;
+    private boolean indexOnly; //TODO: Implement me
 
     public StringType(int minLen, int maxLen) {
+        this(minLen, maxLen, false);
+    }
+
+    public StringType(int minLen, int maxLen, boolean indexOnly) {
         if (minLen < MINLEN_LIMIT) {
             throw new IllegalArgumentException("(minLen<MINLEN_LIMIT)");
         }
@@ -25,6 +30,15 @@ public class StringType implements ITypeDef {
         }
         this.minLen = minLen;
         this.maxLen = maxLen;
+        this.indexOnly = indexOnly;
+    }
+
+    public static StringType indexOnly(int minLen, int maxLen) {
+        return new StringType(minLen, maxLen, true);
+    }
+
+    public static StringType indexOnly(int maxLen) {
+        return new StringType(0, maxLen, true);
     }
 
     private StringType() {
@@ -54,5 +68,9 @@ public class StringType implements ITypeDef {
     @Override
     public TypeMaxMemRequirement getMaxMemoryRequirement() {
         return new TypeMaxMemRequirement(this.maxLen * 4);
+    }
+
+    public boolean isIndexOnly() {
+        return indexOnly;
     }
 }

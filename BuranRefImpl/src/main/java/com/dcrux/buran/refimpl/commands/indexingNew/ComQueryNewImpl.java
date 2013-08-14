@@ -3,8 +3,8 @@ package com.dcrux.buran.refimpl.commands.indexingNew;
 import com.dcrux.buran.commands.indexing.QueryResult;
 import com.dcrux.buran.commands.indexingNew.ComQueryNew;
 import com.dcrux.buran.common.UserId;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
+import com.dcrux.buran.refimpl.modules.BaseModule;
 
 /**
  * Buran.

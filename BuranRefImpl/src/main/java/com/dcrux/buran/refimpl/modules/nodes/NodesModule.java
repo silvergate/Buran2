@@ -1,0 +1,64 @@
+package com.dcrux.buran.refimpl.modules.nodes;
+
+import com.dcrux.buran.common.UserId;
+import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
+import com.dcrux.buran.common.fields.setter.FieldRemoveAll;
+import com.dcrux.buran.common.nodes.INodeSetter;
+import com.dcrux.buran.common.nodes.setter.ClassIdMut;
+import com.dcrux.buran.common.nodes.setter.NodeRemove;
+import com.dcrux.buran.refimpl.modules.BaseModule;
+import com.dcrux.buran.refimpl.modules.common.Module;
+import com.dcrux.buran.refimpl.modules.fields.FieldConstraintViolationInt;
+import com.dcrux.buran.refimpl.modules.nodeWrapper.CommonNode;
+import com.dcrux.buran.refimpl.modules.nodeWrapper.LiveNode;
+
+/**
+ * Buran.
+ *
+ * @author: ${USER} Date: 10.07.13 Time: 19:17
+ */
+public class NodesModule extends Module<BaseModule> {
+    public NodesModule(BaseModule baseModule) {
+        super(baseModule);
+    }
+
+    private void perform_classIdMut(UserId sender, CommonNode node, ClassIdMut classIdMut)
+            throws NodeClassNotFoundException, FieldConstraintViolationInt {
+        switch (classIdMut.getType()) {
+            case add:
+                if (node.getPrimaryClassId().equals(classIdMut.getClassId())) {
+                    /* Nothing to do. Class already added as primary class. */
+                } else {
+                    node.addSecondaryClassId(classIdMut.getClassId());
+                }
+                break;
+            case remove:
+                if (node.getPrimaryClassId().equals(classIdMut.getClassId())) {
+                    /* Failure, cannot remove primary class! */
+                    throw new IllegalArgumentException("Cannot remove primary class!");
+                } else {
+                    /* Remove all fields */
+                    FieldRemoveAll fieldRemoveAll = new FieldRemoveAll(classIdMut.getClassId());
+                    getBase().getFieldsModule().performSetter(sender, node, fieldRemoveAll);
+                    /* Now remove class */
+                    node.removeSecondaryClassId(classIdMut.getClassId());
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown type");
+        }
+    }
+
+    public void performNodeSet(UserId sender, CommonNode node, INodeSetter nodeSetter)
+            throws NodeClassNotFoundException, FieldConstraintViolationInt {
+        if (nodeSetter instanceof NodeRemove) {
+            final LiveNode liveNode = new LiveNode(node.getDocument());
+            liveNode.markForDeletion();
+        } else if (nodeSetter instanceof ClassIdMut) {
+            final ClassIdMut classIdMut = (ClassIdMut) nodeSetter;
+            perform_classIdMut(sender, node, classIdMut);
+        } else {
+            throw new IllegalArgumentException("Unknown node setter");
+        }
+    }
+}

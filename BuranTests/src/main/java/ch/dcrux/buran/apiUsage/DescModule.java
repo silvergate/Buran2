@@ -66,7 +66,7 @@ public class DescModule extends Module<BaseModule> {
                 "Eine node welche eine andere node beschreibt.");
         classDef.getFields().add(FIELD_TITLE, new StringType(0, 255), false)
                 .add(FIELD_LONG_DESC, new StringType(0, StringType.MAXLEN_LIMIT), false)
-                .add(FIELD_INDEX_ONLY, new StringType(0, StringType.MAXLEN_LIMIT), false);
+                .add(FIELD_INDEX_ONLY, StringType.indexOnly(StringType.MAXLEN_LIMIT), false);
         defineIndexes(classDef.getIndexesNew());
         return classDef;
     }

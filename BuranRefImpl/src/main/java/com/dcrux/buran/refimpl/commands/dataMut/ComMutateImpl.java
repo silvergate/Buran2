@@ -2,8 +2,8 @@ package com.dcrux.buran.refimpl.commands.dataMut;
 
 import com.dcrux.buran.commandBase.VoidType;
 import com.dcrux.buran.commands.dataMut.ComMutate;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
+import com.dcrux.buran.refimpl.modules.BaseModule;
 
 /**
  * Buran.

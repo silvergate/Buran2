@@ -77,7 +77,7 @@ public class Test2 {
         //com.dcrux.buran.refimpl.baseModules.BaseModule.createNew(new UserId(0), true);
         final UserId thisAccount = new UserId(0);
         final UserId sender = new UserId(0);
-        com.dcrux.buran.refimpl.baseModules.BaseModule.removeAccount(thisAccount);
+        com.dcrux.buran.refimpl.modules.BaseModule.removeAccount(thisAccount);
 
         BuranCommandRunner bcr = new BuranCommandRunner(false);
         BaseModule bm = new BaseModule(thisAccount, sender, bcr);

@@ -1,8 +1,8 @@
 package com.dcrux.buran.refimpl.commands;
 
 import com.dcrux.buran.commandBase.ICommand;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
+import com.dcrux.buran.refimpl.modules.BaseModule;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.tx.OTransaction;
 

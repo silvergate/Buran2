@@ -4,11 +4,11 @@ import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
-import com.dcrux.buran.refimpl.baseModules.commit.CommitResult;
-import com.dcrux.buran.refimpl.baseModules.common.IfaceUtils;
-import com.dcrux.buran.refimpl.baseModules.common.ONidVer;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
+import com.dcrux.buran.refimpl.modules.BaseModule;
+import com.dcrux.buran.refimpl.modules.commit.CommitResult;
+import com.dcrux.buran.refimpl.modules.common.IfaceUtils;
+import com.dcrux.buran.refimpl.modules.common.ONidVer;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
 import com.orientechnologies.orient.core.tx.OTransaction;
 

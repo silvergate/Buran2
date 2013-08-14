@@ -4,8 +4,8 @@ import com.dcrux.buran.commands.subscription.ComAddSub;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.subscription.SubBlockId;
 import com.dcrux.buran.common.subscription.SubId;
-import com.dcrux.buran.refimpl.baseModules.BaseModule;
 import com.dcrux.buran.refimpl.commands.TransactionalCommand;
+import com.dcrux.buran.refimpl.modules.BaseModule;
 
 /**
  * Buran.
