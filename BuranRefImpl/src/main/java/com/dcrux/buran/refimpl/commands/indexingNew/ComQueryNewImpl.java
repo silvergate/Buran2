@@ -1,7 +1,7 @@
 package com.dcrux.buran.refimpl.commands.indexingNew;
 
-import com.dcrux.buran.commands.indexing.QueryResult;
 import com.dcrux.buran.commands.indexingNew.ComQueryNew;
+import com.dcrux.buran.commands.indexingNew.QueryResultNew;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.refimpl.commandDispatchBase.ICommandImpl;
 import com.dcrux.buran.refimpl.modules.BaseModule;
@@ -11,7 +11,7 @@ import com.dcrux.buran.refimpl.modules.BaseModule;
  *
  * @author: ${USER} Date: 09.07.13 Time: 22:05
  */
-public class ComQueryNewImpl implements ICommandImpl<BaseModule, QueryResult, ComQueryNew> {
+public class ComQueryNewImpl implements ICommandImpl<BaseModule, QueryResultNew, ComQueryNew> {
 
     public static final ComQueryNewImpl SINGLETON = new ComQueryNewImpl();
 
@@ -26,10 +26,9 @@ public class ComQueryNewImpl implements ICommandImpl<BaseModule, QueryResult, Co
     }
 
     @Override
-    public QueryResult run(final ComQueryNew command, final BaseModule baseModule)
+    public QueryResultNew run(final ComQueryNew command, final BaseModule baseModule)
             throws Exception {
         final UserId receiver = baseModule.getAuthModule().getReceiver();
-        baseModule.getSearchModule().search(receiver, command.getQuery());
-        return null;
+        return baseModule.getSearchModule().search(receiver, command.getQuery());
     }
 }

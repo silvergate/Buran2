@@ -1,5 +1,7 @@
 package com.dcrux.buran.refimpl.modules.newIndexing;
 
+import com.dcrux.buran.commands.indexingNew.QueryResultNew;
+import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.UserId;
 import com.dcrux.buran.common.exceptions.NodeClassNotFoundException;
 import com.dcrux.buran.common.query.queries.IQuery;
@@ -8,12 +10,16 @@ import com.dcrux.buran.refimpl.modules.classes.ClassDefCache;
 import com.dcrux.buran.refimpl.modules.common.Module;
 import com.dcrux.buran.refimpl.modules.newIndexing.processorsIface.FilterOrQueryBuilder;
 import com.dcrux.buran.refimpl.modules.newIndexing.queryBuilder.QueryBuilder;
+import com.dcrux.buran.utils.SerList;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Buran.
@@ -40,7 +46,7 @@ public class SearchModule extends Module<BaseModule> {
         return queryOrFilterBuilder;
     }
 
-    public void search(UserId receiver, IQuery query) throws NodeClassNotFoundException {
+    public QueryResultNew search(UserId receiver, IQuery query) throws NodeClassNotFoundException {
         final IFieldBuilder fieldBuilder = getBase().getIndexingModule().getFieldBuilder();
 
         final FilterOrQueryBuilder queryOrFilterBuilder = buildQuery(receiver, query);
@@ -63,13 +69,17 @@ public class SearchModule extends Module<BaseModule> {
             }
             final SearchResponse searchResponse = srb.execute().actionGet();
             final SearchHits hits = searchResponse.getHits();
+
+            final List<NidVer> results = new ArrayList<NidVer>();
             for (final SearchHit hit : hits.getHits()) {
-                System.out.println("QUERY RESULT: ID: " + hit.getId());
+                //System.out.println("QUERY RESULT: ID: " + hit.getId());
+                results.add(new NidVer(hit.getId()));
             }
             if (hits.getHits().length == 0) {
                 System.out.println("QUERY RESULT: NONE");
             }
 
+            return new QueryResultNew(false, SerList.wrap(results));
         } finally {
             client.close();
         }

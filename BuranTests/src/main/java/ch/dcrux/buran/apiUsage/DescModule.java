@@ -8,8 +8,8 @@ import com.dcrux.buran.commands.dataFetch.ComFetch;
 import com.dcrux.buran.commands.dataMut.ComMutate;
 import com.dcrux.buran.commands.incubation.ComCommit;
 import com.dcrux.buran.commands.incubation.CommitResult;
-import com.dcrux.buran.commands.indexing.QueryResult;
 import com.dcrux.buran.commands.indexingNew.ComQueryNew;
+import com.dcrux.buran.commands.indexingNew.QueryResultNew;
 import com.dcrux.buran.common.IncNid;
 import com.dcrux.buran.common.NidVer;
 import com.dcrux.buran.common.classDefinition.ClassDefinition;
@@ -137,7 +137,11 @@ public class DescModule extends Module<BaseModule> {
             query = titleQuery;
         }
         ComQueryNew cq = new ComQueryNew(query);
-        final QueryResult result = getBase().sync(cq);
+        final QueryResultNew result = getBase().sync(cq);
+
+        for (final NidVer resultEntry : result.getResults()) {
+            System.out.println("RESULT: " + resultEntry);
+        }
     }
 
     @Nullable
